@@ -1,0 +1,6 @@
+/log/
+/venv/
+/OCSP_DNS_DJANGO/local.py
+/OCSP_DNS_DJANGO/temp/
+/OCSP_DNS_DJANGO/.idea
+/.idea

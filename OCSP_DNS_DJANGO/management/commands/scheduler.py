@@ -8,9 +8,15 @@ from django_apscheduler.jobstores import DjangoJobStore
 logger = logging.getLogger(__name__)
 import concurrent
 import redis
-from OCSP_DNS_DJANGO.local import INTERVAL_TYPE, INTERVAL_VAL
+from OCSP_DNS_DJANGO.local import INTERVAL_TYPE, INTERVAL_VAL, LOCAL, LOCAL_REDIS_HOST, REMOTE_REDIS_HOST
 
-r = redis.Redis(host='pharah.cs.vt.edu', port=6379, db=0, password="certificatesarealwaysmisissued")
+if LOCAL:
+    redis_host = LOCAL_REDIS_HOST
+else:
+    redis_host = REMOTE_REDIS_HOST
+
+
+r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
 
 import redis
 from OCSP_DNS_DJANGO.models import *
@@ -196,7 +202,7 @@ def unit_ocsp_url_process(ocsp_url):
 
 def ocsp_job_mp():
     t1 = time.perf_counter()
-    r = redis.Redis(host='pharah.cs.vt.edu', port=6379, db=0, password="certificatesarealwaysmisissued")
+    r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
     ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
     ocsp_urls_lst = [item.decode() for item in ocsp_urls_set]
 
@@ -212,7 +218,7 @@ def ocsp_job():
     t1 = time.perf_counter()
 
     logger.info("Starting ocsp job now !")
-    r = redis.Redis(host='pharah.cs.vt.edu', port=6379, db=0, password="certificatesarealwaysmisissued")
+    r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
     ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
     ocsp_urls_lst = [item.decode() for item in ocsp_urls_set]
 

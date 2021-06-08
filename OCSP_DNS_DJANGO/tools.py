@@ -25,4 +25,4 @@ def get_dns_records(ocsp_url):
             dns_records.append(('A_RECORD', str(rdata)))
         return dns_records
     except Exception as e:
-        return {}
+        return []

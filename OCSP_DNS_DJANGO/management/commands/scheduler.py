@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django_apscheduler.jobstores import DjangoJobStore
 
 logger = logging.getLogger(__name__)
-
+import concurrent
 import redis
 from OCSP_DNS_DJANGO.local import INTERVAL_TYPE, INTERVAL_VAL
 
@@ -138,8 +138,79 @@ def get_ocsp_request_headers(ocsp_host):
     certificate is Good or Revoked.
 '''
 
+def unit_ocsp_url_process(ocsp_url):
+    ocsp_url_instance = None
+    if not ocsp_url_db.objects.filter(url=ocsp_url).exists():
+        ocsp_url_instance = ocsp_url_db.objects.create(url=ocsp_url)
+        dns_records = get_dns_records(ocsp_url)
+        for record in dns_records:
+            dns_record.objects.create(ocsp_url=ocsp_url_instance, type=record[0], record=record[1])
+    else:
+        ocsp_url_instance = ocsp_url_db.objects.get(url=ocsp_url)
+
+    q_key = "ocsp:serial:" + ocsp_url
+    elements = r.lrange(q_key, 0, -1)
+    elements = [e.decode() for e in elements]
+
+    logger.info("Processing total {} certificate for ocsp url {}".format(len(elements), ocsp_url))
+
+    for element in elements:
+        try:
+            serial_number, akid, fingerprint = element.split(":")
+
+            if ocsp_data.objects.filter(ocsp_url=ocsp_url_instance, serial=serial_number).exists():
+                continue
+
+            ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
+            ca_cert = pem.readPemFromString(ca_cert)
+            issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
+
+            ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)
+
+            headers = get_ocsp_request_headers(ocsp_host)
+
+            ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(serial_number)), userCert=None,
+                                      add_nonce=False)
+
+            import requests as r_req
+            response = r_req.post(url=ocsp_url, data=encoder.encode(ocspReq), headers=headers, timeout=5)
+            decoded_response = return_ocsp_result(response)
+
+            if str(decoded_response.response_status) != "OCSPResponseStatus.SUCCESSFUL":
+                ocsp_data.objects.create(ocsp_url=ocsp_url_instance, serial=serial_number, akid=akid,
+                                         fingerprint=fingerprint,
+                                         ocsp_response=response,
+                                         ocsp_response_status=str(decoded_response.response_status))
+            else:
+                delegated_responder = False
+                if len(decoded_response.certificates) > 0:
+                    delegated_responder = True
+                ocsp_data.objects.create(ocsp_url=ocsp_url_instance, serial=serial_number, akid=akid,
+                                         fingerprint=fingerprint,
+                                         delegated_response=delegated_responder, ocsp_response=response,
+                                         ocsp_response_status=str(decoded_response.response_status))
+
+        except Exception as e:
+            logger.error("Error in Processing cert serial {} for ocsp url {} ({})".format(serial_number, ocsp_url, e))
+
+
+def ocsp_job_mp():
+    t1 = time.perf_counter()
+    r = redis.Redis(host='pharah.cs.vt.edu', port=6379, db=0, password="certificatesarealwaysmisissued")
+    ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
+    ocsp_urls_lst = [item.decode() for item in ocsp_urls_set]
+
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        executor.map(unit_ocsp_url_process, ocsp_urls_lst)
+
+    t2 = time.perf_counter()
+
+    logger.info("Scheduler Job Finished in {} seconds".format(t2 - t1))
+
 
 def ocsp_job():
+    t1 = time.perf_counter()
+
     logger.info("Starting ocsp job now !")
     r = redis.Redis(host='pharah.cs.vt.edu', port=6379, db=0, password="certificatesarealwaysmisissued")
     ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
@@ -157,10 +228,12 @@ def ocsp_job():
         else:
             ocsp_url_instance = ocsp_url_db.objects.get(url=ocsp_url)
 
+
+
         q_key = "ocsp:serial:" + ocsp_url
         elements = r.lrange(q_key, 0, -1)
         elements = [e.decode() for e in elements]
-        elements = elements[0: 2]
+        elements = elements[0: 5]
 
         logger.info("Processing total {} certificate for ocsp url {}".format(len(elements), ocsp_url))
 
@@ -201,6 +274,9 @@ def ocsp_job():
 
             except Exception as e:
                 logger.error("Error in Processing cert serial {} for ocsp url {} ({})".format(serial_number, ocsp_url, e))
+
+    t2 = time.perf_counter()
+    print(f'Finished in {t2 - t1} seconds')
 
 
 class Command(BaseCommand):

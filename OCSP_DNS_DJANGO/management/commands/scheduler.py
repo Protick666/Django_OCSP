@@ -266,7 +266,7 @@ def unit_ocsp_url_process(ocsp_url):
                     delegated_responder = True
                 ocsp_data.objects.create(ocsp_url=ocsp_url_instance, serial=serial_number, akid=akid,
                                          fingerprint=fingerprint,
-                                         delegated_response=delegated_responder, ocsp_response=response,
+                                         delegated_response=delegated_responder, ocsp_response=response.content,
                                          ocsp_response_status=str(decoded_response.response_status))
 
         except Exception as e:

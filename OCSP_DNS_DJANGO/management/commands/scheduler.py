@@ -292,9 +292,9 @@ class Command(BaseCommand):
         scheduler.add_jobstore(DjangoJobStore(), "default")
 
         scheduler.add_job(
-            ocsp_job,
+            ocsp_job_mp(),
             'interval',  # Every hour
-            minutes=2,
+            hours=1,
             max_instances=2,
             replace_existing=True,
         )

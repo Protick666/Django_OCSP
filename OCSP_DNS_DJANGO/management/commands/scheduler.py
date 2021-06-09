@@ -1,5 +1,8 @@
 import logging
 
+import django
+django.setup()
+
 from apscheduler.schedulers.blocking import BlockingScheduler
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -292,10 +295,10 @@ class Command(BaseCommand):
         scheduler.add_jobstore(DjangoJobStore(), "default")
 
         scheduler.add_job(
-            ocsp_job_mp(),
+            ocsp_job_mp,
             'interval',  # Every hour
             hours=1,
-            max_instances=2,
+            max_instances=1,
             replace_existing=True,
         )
 

@@ -258,7 +258,7 @@ def unit_ocsp_url_process(ocsp_url):
             if str(decoded_response.response_status) != "OCSPResponseStatus.SUCCESSFUL":
                 ocsp_data.objects.create(ocsp_url=ocsp_url_instance, serial=serial_number, akid=akid,
                                          fingerprint=fingerprint,
-                                         ocsp_response=response,
+                                         ocsp_response=response.content,
                                          ocsp_response_status=str(decoded_response.response_status))
             else:
                 delegated_responder = False

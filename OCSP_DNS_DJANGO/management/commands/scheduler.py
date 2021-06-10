@@ -151,14 +151,14 @@ def get_ocsp_request_headers(ocsp_host):
     certificate is Good or Revoked.
 '''
 
-async def process_certs(ocsp_url, elements):
-    async with aiohttp.ClientSession() as session:
-        tasks = []
-        for element in elements:
-            task = asyncio.ensure_future(process_cert(session, ocsp_url, element))
-            tasks.append(task)
-
-        await asyncio.gather(*tasks)
+# async def process_certs(ocsp_url, elements):
+#     async with aiohttp.ClientSession() as session:
+#         tasks = []
+#         for element in elements:
+#             task = asyncio.ensure_future(process_cert(session, ocsp_url, element))
+#             tasks.append(task)
+#
+#         await asyncio.gather(*tasks)
 
 
 def unit_ocsp_url_process_v2(ocsp_url):
@@ -217,6 +217,7 @@ def unit_ocsp_url_process_v2(ocsp_url):
         except Exception as e:
             logger.error("Error in Processing cert serial {} for ocsp url {} ({})".format(serial_number, ocsp_url, e))
 
+
 def unit_ocsp_url_process(ocsp_url):
     ocsp_url_instance = None
     if not ocsp_url_db.objects.filter(url=ocsp_url).exists():
@@ -274,17 +275,19 @@ def unit_ocsp_url_process(ocsp_url):
 
 
 def ocsp_job_mp():
-    t1 = time.perf_counter()
-    r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
-    ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
-    ocsp_urls_lst = [item.decode() for item in ocsp_urls_set]
+    for i in range(0, 20):
+        logger.info("Starting Scheduler Job")
+        t1 = time.perf_counter()
+        r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
+        ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
+        ocsp_urls_lst = [item.decode() for item in ocsp_urls_set]
 
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        executor.map(unit_ocsp_url_process, ocsp_urls_lst)
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            executor.map(unit_ocsp_url_process, ocsp_urls_lst)
 
-    t2 = time.perf_counter()
+        t2 = time.perf_counter()
 
-    logger.info("Scheduler Job Finished in {} seconds".format(t2 - t1))
+        logger.info("Scheduler Job Finished in {} seconds".format(t2 - t1))
 
 
 def ocsp_job():

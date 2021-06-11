@@ -28,7 +28,7 @@ r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealway
 import redis
 from OCSP_DNS_DJANGO.models import *
 
-from OCSP_DNS_DJANGO.tools import fix_cert_indentation, get_dns_records
+from OCSP_DNS_DJANGO.tools import fix_cert_indentation, get_dns_records, get_ns_records
 
 from cryptography.x509 import ocsp
 import binascii
@@ -274,6 +274,15 @@ def unit_ocsp_url_process(ocsp_url):
             logger.error("Error in Processing cert serial {} for ocsp url {} ({})".format(serial_number, ocsp_url, e))
 
 
+def add_NS_records():
+    ocsp_urls = ocsp_url_db.objects.all()
+
+    for ocsp_url in ocsp_urls:
+        ns_records = get_ns_records(ocsp_url=ocsp_url.url)
+        for record in ns_records:
+            dns_record.objects.create(ocsp_url=ocsp_url, type=record[0], record=record[1])
+
+
 def query_unauthorized_responses():
     unauthorized_responses = ocsp_data.objects.filter(ocsp_response_status="OCSPResponseStatus.UNAUTHORIZED")
     total_query_member = unauthorized_responses.count()
@@ -313,6 +322,7 @@ def query_unauthorized_responses():
             logger.error("Error in re-querying cert serial {} for ocsp url {} ({})".format(serial_number, ocsp_url, e))
 
     logger.info("Total new successful response: {} out of {}".format(flipped_response_count, total_query_member))
+
 
 def ocsp_job_mp():
     for i in range(0, 20):

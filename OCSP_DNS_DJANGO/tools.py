@@ -1,5 +1,5 @@
 from dns import resolver, rdata
-from dns.rdatatype import CNAME, A
+from dns.rdatatype import CNAME, A, NS
 
 def fix_cert_indentation(der_encoded_cert):
     l = len(der_encoded_cert)
@@ -23,6 +23,23 @@ def get_dns_records(ocsp_url):
             dns_records.append(('CNAME', str(rdata)))
         for rdata in resolver.resolve(ocsp_url_base, A, raise_on_no_answer=False):
             dns_records.append(('A_RECORD', str(rdata)))
+        for rdata in resolver.resolve(ocsp_url_base, NS, raise_on_no_answer=False):
+            dns_records.append(('NS_RECORD', str(rdata)))
         return dns_records
     except Exception as e:
         return []
+
+
+def get_ns_records(ocsp_url):
+    try:
+        dns_records = []
+        if ocsp_url.startswith("http://"):
+            ocsp_url_base = ocsp_url[7:]
+        if "/" in ocsp_url_base:
+            ocsp_url_base = ocsp_url_base[0: ocsp_url_base.find("/")]
+        for rdata in resolver.resolve(ocsp_url_base, NS, raise_on_no_answer=False):
+            dns_records.append(('NS_RECORD', str(rdata)))
+        return dns_records
+    except Exception as e:
+        return []
+

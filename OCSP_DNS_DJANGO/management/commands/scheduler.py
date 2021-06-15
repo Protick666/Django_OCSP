@@ -43,10 +43,14 @@ from pyasn1.codec.der import encoder
 from pyasn1.type import univ
 
 
-def return_ocsp_result(ocsp_response):
+def return_ocsp_result(ocsp_response, is_bytes=False):
     """ Extract the OCSP result from the provided ocsp_response """
     try:
-        ocsp_response = ocsp.load_der_ocsp_response(ocsp_response.content)
+        if is_bytes:
+            ocsp_response = ocsp.load_der_ocsp_response(ocsp_response)
+        else:
+            ocsp_response = ocsp.load_der_ocsp_response(ocsp_response.content)
+
         return ocsp_response
 
     except ValueError as err:
@@ -138,6 +142,14 @@ def get_ocsp_request_headers(ocsp_host):
                'Content-Type': 'application/ocsp-request', \
                'Host': ocsp_host
                }
+    return headers
+
+def get_ocsp_request_headers_as_tuples(ocsp_host):
+    headers = [('Connection', 'Keep-Alive'),
+               ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
+               ('User-Agent', "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:56.0) Gecko/20100101 Firefox/56.0"),
+               ('Content-Type', 'application/ocsp-request'),
+               ('Host', ocsp_host)]
     return headers
 
 

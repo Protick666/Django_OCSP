@@ -295,6 +295,45 @@ def add_NS_records():
             dns_record.objects.create(ocsp_url=ocsp_url, type=record[0], record=record[1])
 
 
+def fix_unfilled_records():
+    unfilled_responses = ocsp_data.objects.filter(ocsp_response="<Response [200]>")
+    total_query_member = unfilled_responses.count()
+    logger.info("Starting fixing unfilled responses, total {}".format(total_query_member))
+
+    for ocsp_response in unfilled_responses:
+        try:
+            ocsp_url, serial_number, akid = ocsp_response.ocsp_url.url, ocsp_response.serial, ocsp_response.akid
+
+            ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
+            ca_cert = pem.readPemFromString(ca_cert)
+            issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
+
+            ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)
+            headers = get_ocsp_request_headers(ocsp_host)
+            ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(serial_number)), userCert=None,
+                                      add_nonce=False)
+
+            import requests as r_req
+            response = r_req.post(url=ocsp_url, data=encoder.encode(ocspReq), headers=headers, timeout=5)
+            decoded_response = return_ocsp_result(response)
+
+            if str(decoded_response.response_status) == "OCSPResponseStatus.SUCCESSFUL":
+                # logger.info("New status: {}".format(str(decoded_response.response_status)))
+                ocsp_response.ocsp_response_status = str(decoded_response.response_status)
+                ocsp_response.ocsp_response = response.content
+
+                if len(decoded_response.certificates) > 0:
+                    ocsp_response.delegated_response = True
+                else:
+                    ocsp_response.delegated_response = False
+
+                ocsp_response.save()
+        except Exception as e:
+            logger.error("Error in re-querying cert serial {} for ocsp url {} ({})".format(serial_number, ocsp_url, e))
+
+    logger.info("Finished filling responses")
+
+
 def query_unauthorized_responses():
     unauthorized_responses = ocsp_data.objects.filter(ocsp_response_status="OCSPResponseStatus.UNAUTHORIZED")
     total_query_member = unauthorized_responses.count()

@@ -300,6 +300,8 @@ def fix_unfilled_records():
     total_query_member = unfilled_responses.count()
     logger.info("Starting fixing unfilled responses, total {}".format(total_query_member))
 
+    count_fix = 0
+
     for ocsp_response in unfilled_responses:
         try:
             ocsp_url, serial_number, akid = ocsp_response.ocsp_url.url, ocsp_response.serial, ocsp_response.akid
@@ -318,6 +320,7 @@ def fix_unfilled_records():
             decoded_response = return_ocsp_result(response)
 
             if str(decoded_response.response_status) == "OCSPResponseStatus.SUCCESSFUL":
+
                 # logger.info("New status: {}".format(str(decoded_response.response_status)))
                 ocsp_response.ocsp_response_status = str(decoded_response.response_status)
                 ocsp_response.ocsp_response = response.content
@@ -328,6 +331,9 @@ def fix_unfilled_records():
                     ocsp_response.delegated_response = False
 
                 ocsp_response.save()
+                count_fix += 1
+                if count_fix % 1000 == 0:
+                    print("processed {} certs".format(count_fix))
         except Exception as e:
             logger.error("Error in re-querying cert serial {} for ocsp url {} ({})".format(serial_number, ocsp_url, e))
 

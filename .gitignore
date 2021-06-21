@@ -6,3 +6,5 @@
 /.idea
 /ocsp_luminati.json
 
+/ocsp_top_30.json
+/ocsp_remote.json

@@ -1,0 +1,122 @@
+[
+  {
+    "url": "http://ocsp.comodoca.com",
+    "total_ocsp_response": 191156
+  },
+  {
+    "url": "http://ocsp.digicert.com",
+    "total_ocsp_response": 177765
+  },
+  {
+    "url": "http://ocsp.sectigo.com",
+    "total_ocsp_response": 161157
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1d4",
+    "total_ocsp_response": 124488
+  },
+  {
+    "url": "http://r3.o.lencr.org",
+    "total_ocsp_response": 119676
+  },
+  {
+    "url": "http://ocsp.sca1b.amazontrust.com",
+    "total_ocsp_response": 85399
+  },
+  {
+    "url": "http://zerossl.ocsp.sectigo.com",
+    "total_ocsp_response": 45100
+  },
+  {
+    "url": "http://oneocsp.microsoft.com/ocsp",
+    "total_ocsp_response": 40663
+  },
+  {
+    "url": "http://ocsp.godaddy.com/",
+    "total_ocsp_response": 38992
+  },
+  {
+    "url": "http://ocsp.msocsp.com",
+    "total_ocsp_response": 22918
+  },
+  {
+    "url": "http://statuse.digitalcertvalidation.com",
+    "total_ocsp_response": 14865
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsalphasha2g2",
+    "total_ocsp_response": 11987
+  },
+  {
+    "url": "http://ocsp.starfieldtech.com/",
+    "total_ocsp_response": 9875
+  },
+  {
+    "url": "http://ocsp.usertrust.com",
+    "total_ocsp_response": 9648
+  },
+  {
+    "url": "http://ocsp.entrust.net",
+    "total_ocsp_response": 9594
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsgccr3dvtlsca2020",
+    "total_ocsp_response": 8697
+  },
+  {
+    "url": "http://nazwassl2sha2.ocsp-certum.com",
+    "total_ocsp_response": 8143
+  },
+  {
+    "url": "http://commercial.ocsp.identrust.com",
+    "total_ocsp_response": 7998
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1d2",
+    "total_ocsp_response": 6406
+  },
+  {
+    "url": "http://ocsp06.actalis.it/VA/AUTHDV-G3",
+    "total_ocsp_response": 6400
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1d4int",
+    "total_ocsp_response": 5071
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1p5",
+    "total_ocsp_response": 4157
+  },
+  {
+    "url": "http://ocsp.digicert.cn",
+    "total_ocsp_response": 3976
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1o1",
+    "total_ocsp_response": 3842
+  },
+  {
+    "url": "http://status.thawte.com",
+    "total_ocsp_response": 3204
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsdomainvalsha2g3",
+    "total_ocsp_response": 2907
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1c3",
+    "total_ocsp_response": 2676
+  },
+  {
+    "url": "http://GEANT.ocsp.sectigo.com",
+    "total_ocsp_response": 2553
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsrsaovsslca2018",
+    "total_ocsp_response": 2545
+  },
+  {
+    "url": "http://dvcasha2.ocsp-certum.com",
+    "total_ocsp_response": 2534
+  }
+]

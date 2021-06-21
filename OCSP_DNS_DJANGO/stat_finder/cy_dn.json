@@ -1,0 +1,143 @@
+[
+  {
+    "url": "http://ocsp.pki.goog/gts1c3"
+  },
+  {
+    "url": "http://statusf.digitalcertvalidation.com"
+  },
+  {
+    "url": "http://e1.o.lencr.org"
+  },
+  {
+    "url": "http://ocsp.netsolssl.com"
+  },
+  {
+    "url": "http://bitcert.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1o1core"
+  },
+  {
+    "url": "http://alpiro.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://ocsp.trustwave.com/"
+  },
+  {
+    "url": "http://certcloud.ocsp.trust-provider.com"
+  },
+  {
+    "url": "http://ocsp.digicert.com"
+  },
+  {
+    "url": "http://status.rapidssl.com"
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1d2"
+  },
+  {
+    "url": "http://ocsp.incommon-ecc.org"
+  },
+  {
+    "url": "http://digitaltrust.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://nijimo.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1d4int"
+  },
+  {
+    "url": "http://zerossl.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://ocspx.digicert.com"
+  },
+  {
+    "url": "http://ocsp.securetrust.com/"
+  },
+  {
+    "url": "http://ocsp.digicert-cn.com"
+  },
+  {
+    "url": "http://ocsp.sectigochina.com"
+  },
+  {
+    "url": "http://onesign.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://dnencrypt.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://omitsecurity.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://statusd.digitalcertvalidation.com"
+  },
+  {
+    "url": "http://globessl.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://tiTrust.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://r3.o.lencr.org"
+  },
+  {
+    "url": "http://trustocean.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://certdata.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://eMudhra.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1p5"
+  },
+  {
+    "url": "http://ocsp.sslcom.cn"
+  },
+  {
+    "url": "http://statuse.digitalcertvalidation.com"
+  },
+  {
+    "url": "http://status.thawte.com"
+  },
+  {
+    "url": "http://ocsp.ssl.com"
+  },
+  {
+    "url": "http://statush.digitalcertvalidation.com"
+  },
+  {
+    "url": "http://GEANT.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1d4"
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1o1"
+  },
+  {
+    "url": "http://ocsp.digicert.cn"
+  },
+  {
+    "url": "http://status.geotrust.com"
+  },
+  {
+    "url": "http://genious.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://ziwit.ocsp.sectigo.com"
+  },
+  {
+    "url": "http://ocsp.dcocsp.cn"
+  },
+  {
+    "url": "http://ocsp.pki.goog/GIAG4"
+  },
+  {
+    "url": "http://wotrus.ocsp.sectigo.com"
+  }
+]

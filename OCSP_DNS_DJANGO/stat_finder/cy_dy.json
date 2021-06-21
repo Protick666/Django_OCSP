@@ -1,0 +1,507 @@
+[
+  {
+    "url": "http://ocsp2.globalsign.com/gsorganizationvalsha2g2",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.msocsp.com",
+    "type": "CNAME",
+    "record": "hostedocsp.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apsrsa12g101",
+    "type": "CNAME",
+    "record": "ocsp-lb.apple.com.akadns.net."
+  },
+  {
+    "url": "http://silver-server-g2.ocsp.swisssign.net/DBBCBF821859DC69FAF8ABAA834D771D0BB08BD8",
+    "type": "CNAME",
+    "record": "ocsp.swisssign.net."
+  },
+  {
+    "url": "http://gold-server-g2.ocsp.swisssign.net/E7F1E7FD2E53AD11E5811A57A4738F127D98C8AE",
+    "type": "CNAME",
+    "record": "ocsp.swisssign.net."
+  },
+  {
+    "url": "http://ocsp.digicert.com",
+    "type": "CNAME",
+    "record": "cs9.wac.phicdn.net."
+  },
+  {
+    "url": "http://wildca.ocsp.dhimyotis.com",
+    "type": "CNAME",
+    "record": "ocsp.dhimyotis.com."
+  },
+  {
+    "url": "http://servicesca.ocsp.dhimyotis.com",
+    "type": "CNAME",
+    "record": "ocsp.dhimyotis.com."
+  },
+  {
+    "url": "http://ocsp03.sbca.telesec.de/ocspr",
+    "type": "CNAME",
+    "record": "ocsp.sbca.telesec.de."
+  },
+  {
+    "url": "http://ssl-c3-ca1-ev-2009.ocsp.d-trust.net",
+    "type": "CNAME",
+    "record": "ocsp.d-trust.net."
+  },
+  {
+    "url": "http://xnetcas2.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://niig5.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://ev2.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-30.dr.secomtrust.net."
+  },
+  {
+    "url": "http://sr30.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-11.dr.secomtrust.net."
+  },
+  {
+    "url": "http://evcasha2.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://dvcasha2.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://unitedtrustov.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://gdcadv.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://yandex.ocsp-responder.com",
+    "type": "CNAME",
+    "record": "cdn.yandex.net."
+  },
+  {
+    "url": "http://ocsp.buypass.com",
+    "type": "CNAME",
+    "record": "ocsp.buypass.com.edgesuite.net."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/crowdstrikegccr3tlsovca2020",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-appleistca2g129",
+    "type": "CNAME",
+    "record": "ocsp-lb.apple.com.akadns.net."
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apevsecc1g101",
+    "type": "CNAME",
+    "record": "ocsp-lb.apple.com.akadns.net."
+  },
+  {
+    "url": "http://xinchachaev.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://lh.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://gold-ev-g2.ocsp.swisssign.net/EEFD46CAF7275E91BC5AB6E787CD0AFA550A2642",
+    "type": "CNAME",
+    "record": "ocsp.swisssign.net."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gseccevsslca2018",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/dhltlscai5",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ssl-c3-ca1-2009.ocsp.d-trust.net",
+    "type": "CNAME",
+    "record": "ocsp.d-trust.net."
+  },
+  {
+    "url": "http://mh2.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://itrusdv.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/attatlasr3ovtlsca2020",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://shuididv.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsgccr3evqwacca2020",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.ovcf.intesasanpaolo.com/",
+    "type": "CNAME",
+    "record": "ocsp.ovcf.isplb.aws.infocert.it."
+  },
+  {
+    "url": "http://nazwassl2sha2.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/solutiovsha256g3",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.starfieldtech.com/",
+    "type": "CNAME",
+    "record": "ocsp.godaddy.com.akadns.net."
+  },
+  {
+    "url": "http://itrusov.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/validalphasslca2018",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://wotrus-ovca.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://xinchachaov.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ovcasha2.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ssocsp.cybertrust.ne.jp/OcspServer",
+    "type": "CNAME",
+    "record": "ssocsp.managedpki.ne.jp."
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apevsrsa2g101",
+    "type": "CNAME",
+    "record": "ocsp-lb.apple.com.akadns.net."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsrsaovsslca2018",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gseccovsslca2018",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://nijimo3.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://shuidiov.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://kingnettechov.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsdomainvalsha2g3",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://shoperssl.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://h.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ov.g4.ocsp.pubcert.jprs.jp",
+    "type": "CNAME",
+    "record": "jprsovca.ocsp.secomtrust.net."
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apsecc12g101",
+    "type": "CNAME",
+    "record": "ocsp-lb.apple.com.akadns.net."
+  },
+  {
+    "url": "http://gdcaov.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ocsp-pki.certinomis.com/",
+    "type": "CNAME",
+    "record": "va-pki.certinomis.com."
+  },
+  {
+    "url": "http://ssl-ca2-2020.ocsp.d-trust.net",
+    "type": "CNAME",
+    "record": "ocsp.d-trust.net."
+  },
+  {
+    "url": "http://ocsp.entrust.net",
+    "type": "CNAME",
+    "record": "ocsp.entrust.net.edgekey.net."
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/cloudsslsha2g3",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://oneocsp.microsoft.com/ocsp",
+    "type": "CNAME",
+    "record": "oneocsp-microsoft-com.a-0003.a-msedge.net."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/validsslevca2018",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://dv.g4.ocsp.pubcert.jprs.jp",
+    "type": "CNAME",
+    "record": "jprsdvca.ocsp.secomtrust.net."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/gsatlasr3dvtlsca2020",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsextendvalsha2g3r3",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.trustcor.ca",
+    "type": "CNAME",
+    "record": "d2nxkl6x1iu1xf.cloudfront.net."
+  },
+  {
+    "url": "http://ocsp.ovcf.ca3.infocert.it",
+    "type": "CNAME",
+    "record": "ocsp.ca3.icelb.aws.infocert.it."
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-appleistca2g128",
+    "type": "CNAME",
+    "record": "ocsp-lb.apple.com.akadns.net."
+  },
+  {
+    "url": "http://ev.ocsp.quovadisglobal.com",
+    "type": "CNAME",
+    "record": "ocsp.quovadisglobal.com."
+  },
+  {
+    "url": "http://rootnetworksdv.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://xinchachadv.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsgccr3dvtlsca2020",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apevsrsa1g101",
+    "type": "CNAME",
+    "record": "ocsp-lb.apple.com.akadns.net."
+  },
+  {
+    "url": "http://ocsp.postsignum.cz/OCSP/VCA5/",
+    "type": "CNAME",
+    "record": "www3.postsignum.cz."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/gsovsha2g4r3",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp.affirmtrust.com",
+    "type": "CNAME",
+    "record": "ocsp.entrust.net.edgekey.net."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/rnpicpeduovsslca2019",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://intecca3.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://ocsp05.actalis.it/VA/AUTHEV-G3",
+    "type": "CNAME",
+    "record": "ocsp.actalis.it."
+  },
+  {
+    "url": "http://niig7ecc.ocsp.secom-cert.jp",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsalphasha2g2",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://niig7rsa.ocsp.secom-cert.jp",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsorganizationvalsha2g3",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsdomainvalsha2g2",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://servicesca.ocsp.certigna.fr",
+    "type": "CNAME",
+    "record": "ocsp.certigna.fr."
+  },
+  {
+    "url": "http://ocsp3.gdca.com.cn/ev",
+    "type": "CNAME",
+    "record": "ocsp3.gdca.com.cn.w.kunlungr.com."
+  },
+  {
+    "url": "http://ovca5.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://wildca.ocsp.certigna.fr",
+    "type": "CNAME",
+    "record": "ocsp.certigna.fr."
+  },
+  {
+    "url": "http://ocsp.godaddy.com/",
+    "type": "CNAME",
+    "record": "ocsp.godaddy.com.akadns.net."
+  },
+  {
+    "url": "http://yektadv.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://evocsp.cybertrust.ne.jp/OcspServer",
+    "type": "CNAME",
+    "record": "evocsp.managedpki.ne.jp."
+  },
+  {
+    "url": "http://ocsp.accv.es",
+    "type": "CNAME",
+    "record": "ocsp.wip.accv.es."
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/gsoveccg4r3",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  },
+  {
+    "url": "http://fnetcas2.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://dvca5.ocsp.secomtrust.net",
+    "type": "CNAME",
+    "record": "ksdc0016-ocsp1.dr.secomtrust.net."
+  },
+  {
+    "url": "http://sl.ocsp.quovadisglobal.com",
+    "type": "CNAME",
+    "record": "ocsp.quovadisglobal.com."
+  },
+  {
+    "url": "http://shenzhenov.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://shenzhendv.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://s2.symcb.com",
+    "type": "CNAME",
+    "record": "ocsp-ds.ws.symantec.com.edgekey.net."
+  },
+  {
+    "url": "http://wotrus-dvca.ocsp-certum.com",
+    "type": "CNAME",
+    "record": "ocsp.akamai.certum.pl."
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/solutidvsha256g3",
+    "type": "CNAME",
+    "record": "global.prd.cdn.globalsign.com."
+  }
+]

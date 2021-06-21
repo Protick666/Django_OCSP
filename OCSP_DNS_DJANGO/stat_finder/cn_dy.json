@@ -1,0 +1,161 @@
+[
+  {
+    "url": "http://ocsp.e-tugra.com/status/ocsp"
+  },
+  {
+    "url": "http://moica.nat.gov.tw/cgi-bin/OCSP2/ocsp_server.exe"
+  },
+  {
+    "url": "http://ocsp09.actalis.it/VA/AUTHCL-G3"
+  },
+  {
+    "url": "http://ocsp.firmaprofesional.com"
+  },
+  {
+    "url": "http://ocsp.gtlsca.nat.gov.tw/OCSP"
+  },
+  {
+    "url": "http://commercial.ocsp.identrust.com/"
+  },
+  {
+    "url": "http://ocsp.elektronicznypodpis.pl"
+  },
+  {
+    "url": "http://subcar2i2-ocsp.disig.sk/ocsp/subcar2i2"
+  },
+  {
+    "url": "http://ocsp.fineid.fi/vrksp3"
+  },
+  {
+    "url": "http://ocsps.ssl.com"
+  },
+  {
+    "url": "http://ocsp.ica.cz/sca15_rsa"
+  },
+  {
+    "url": "http://ocsp.globaltrust.eu"
+  },
+  {
+    "url": "http://ocsp.izenpe.com"
+  },
+  {
+    "url": "http://sslca2014-ocsp1.e-szigno.hu"
+  },
+  {
+    "url": "http://ocsp.a-trust.at/ocsp"
+  },
+  {
+    "url": "http://ocsp.fineid.fi/vrkshsp"
+  },
+  {
+    "url": "http://ocsp09.actalis.it/VA/AUTHOV-G3"
+  },
+  {
+    "url": "http://ocsp.harica.gr"
+  },
+  {
+    "url": "http://ocsp06.actalis.it/VA/AUTHDV-G2"
+  },
+  {
+    "url": "http://ocsp.oaticerts.com/ocsp"
+  },
+  {
+    "url": "http://ocsp06.actalis.it/VA/AUTHDV-G3"
+  },
+  {
+    "url": "http://ocsp.quovadisglobal.com"
+  },
+  {
+    "url": "http://ocsp.pca.dfn.de/OCSP-Server/OCSP"
+  },
+  {
+    "url": "http://ocsp.serverpass.telesec.de/ocspr"
+  },
+  {
+    "url": "http://ocsp.swisssign.net/E7F1E7FD2E53AD11E5811A57A4738F127D98C8AE"
+  },
+  {
+    "url": "http://ocsp.ica.cz/qcw17_rsa"
+  },
+  {
+    "url": "http://ocsp.fina.hr"
+  },
+  {
+    "url": "http://ocsp.certsign.ro"
+  },
+  {
+    "url": "http://ocsp3.sheca.com/ocsp/sheca/sheca.ocsp"
+  },
+  {
+    "url": "http://ocspap.cert.fnmt.es/ocspap/OcspResponder"
+  },
+  {
+    "url": "http://ssl-ocsp-gov.gpki.go.kr:8100"
+  },
+  {
+    "url": "http://ocsp.publicca.hinet.net/OCSP/ocspG2"
+  },
+  {
+    "url": "http://ocsp1.netlock.hu/cbca.cgi"
+  },
+  {
+    "url": "http://twcasslocsp.twca.com.tw/"
+  },
+  {
+    "url": "http://ocspssls1.kamusm.gov.tr"
+  },
+  {
+    "url": "http://ocsp1.netlock.hu/olsslgca.cgi"
+  },
+  {
+    "url": "http://ocsp1.eCert.gov.hk"
+  },
+  {
+    "url": "http://ocsp.trust.telia.com"
+  },
+  {
+    "url": "http://ocspcomp.cert.fnmt.es/ocsp/OcspResponder"
+  },
+  {
+    "url": "http://evsslocsp.twca.com.tw/"
+  },
+  {
+    "url": "http://qtlsca2018-ocsp1.e-szigno.hu"
+  },
+  {
+    "url": "http://ocsp.cfca.com.cn/ocsp"
+  },
+  {
+    "url": "http://ocsp2020.managedpki.com"
+  },
+  {
+    "url": "http://ocsp.acedicom.edicomgroup.com/caedicom01"
+  },
+  {
+    "url": "http://ocsp.swisssign.net/EEFD46CAF7275E91BC5AB6E787CD0AFA550A2642"
+  },
+  {
+    "url": "http://ocsp.swisssign.net/DBBCBF821859DC69FAF8ABAA834D771D0BB08BD8"
+  },
+  {
+    "url": "http://ocsp.serpro.gov.br/acserprosslv1"
+  },
+  {
+    "url": "http://ocsp.wisekey.com"
+  },
+  {
+    "url": "http://commercial.ocsp.identrust.com"
+  },
+  {
+    "url": "http://pki-ocsp.atos.net"
+  },
+  {
+    "url": "http://ocsp.serpro.gov.br/ACSERPRORFBSSL"
+  },
+  {
+    "url": "http://ocsp.camerfirma.com"
+  },
+  {
+    "url": "http://va.tuntrust.tn"
+  }
+]

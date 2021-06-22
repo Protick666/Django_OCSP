@@ -54,6 +54,7 @@ def return_ocsp_result(ocsp_response, is_bytes=False):
         return ocsp_response
 
     except ValueError as err:
+        print(f"{str(err)}")
         return f"{str(err)}"
 
 

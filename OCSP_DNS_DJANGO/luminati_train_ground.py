@@ -57,7 +57,7 @@ def luminati_master_crawler():
         elements = r.lrange(q_key, 0, -1)
 
         # Tune here
-        elements = elements[0: 20]
+        elements = elements[0: 2]
         elements = [e.decode() for e in elements]
 
         for element in elements:
@@ -82,6 +82,7 @@ def luminati_master_crawler():
                 headers = get_ocsp_request_headers_as_tuples(ocsp_host)
 
                 keys = list(d.keys())
+                keys = keys[0: 2]
                 # Tune here
 
                 for c in range(len(keys)):

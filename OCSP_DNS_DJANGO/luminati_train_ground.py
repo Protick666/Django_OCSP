@@ -109,7 +109,7 @@ def luminati_master_crawler():
                         b = bb.read()
                         decoded_response = return_ocsp_result(b, is_bytes=True)
 
-                        print(type(decoded_response))
+                        # print(type(decoded_response))
 
                         if str(decoded_response.response_status) != "OCSPResponseStatus.SUCCESSFUL":
                             ocsp_data_luminati.objects.create(ocsp_url=ocsp_url_instance, serial=serial_number, akid=akid,

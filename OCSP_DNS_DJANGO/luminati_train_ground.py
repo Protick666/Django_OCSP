@@ -43,7 +43,10 @@ def luminati_master_crawler():
     logger.info("Processing total {} ocsp urls".format(len(ocsp_urls_lst)))
 
     # 240*214*20*.002333
+    url_count = 0
     for ocsp_url in ocsp_urls_lst:
+        logger.info("Processed total {} ocsp urls".format(url_count))
+        url_count += 1
         ocsp_url_instance = None
         if not ocsp_url_db.objects.filter(url=ocsp_url).exists():
             continue
@@ -54,7 +57,7 @@ def luminati_master_crawler():
         elements = r.lrange(q_key, 0, -1)
 
         # Tune here
-        elements = elements[0: 20]
+        elements = elements[0: 15]
         elements = [e.decode() for e in elements]
 
         for element in elements:

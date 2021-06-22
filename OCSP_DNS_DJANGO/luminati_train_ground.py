@@ -57,13 +57,17 @@ def luminati_master_crawler():
         elements = r.lrange(q_key, 0, -1)
 
         # Tune here
-        elements = elements[0: 15]
+        elements = elements[0: 20]
         elements = [e.decode() for e in elements]
 
         for element in elements:
             serial_number = None
             try:
                 serial_number, akid, fingerprint = element.split(":")
+
+                if ocsp_data_luminati.objects.filter(ocsp_url=ocsp_url_instance, serial=serial_number).exists():
+                    continue
+
                 ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
                 ca_cert = pem.readPemFromString(ca_cert)
                 issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())

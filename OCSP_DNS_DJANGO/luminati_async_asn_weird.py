@@ -62,31 +62,34 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
                 raise Exception(decoded_response)
             # print(decoded_response.response_status)
 
+            print(decoded_response.certificate_status)
+
             per_cert_dict = {}
             for header in headers.keys():
                 if header.startswith('x-luminati'):
                     per_cert_dict[header] = headers[header]
 
-            serial_exists = await database_sync_to_async(
-                OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number, asn=asn).exists)()
-            if serial_exists:
-                return
+            # serial_exists = await database_sync_to_async(
+            #     OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number, asn=asn).exists)()
+            # if serial_exists:
+            #     return
 
-            await store_ocsp_response(decoded_response=decoded_response, ocsp_url_id=ocsp_url_id,
-                                      serial_number=serial_number,
-                                      akid=akid, fingerprint=fingerprint,
-                                      country_code=country_code,
-                                      per_cert_dict=per_cert_dict, b_ocsp_response=result_data, asn=asn)
+            # await store_ocsp_response(decoded_response=decoded_response, ocsp_url_id=ocsp_url_id,
+            #                           serial_number=serial_number,
+            #                           akid=akid, fingerprint=fingerprint,
+            #                           country_code=country_code,
+            #                           per_cert_dict=per_cert_dict, b_ocsp_response=result_data, asn=asn)
 
     except Exception as e:
-        serial_exists = await database_sync_to_async(
-            OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number, asn=asn).exists)()
-        if serial_exists:
-            return
-
-        await store_error_msg_of_ocsp_response(e=e, ocsp_url_id=ocsp_url_id, serial_number=serial_number,
-                                               akid=akid, fingerprint=fingerprint,
-                                               country_code=country_code, asn=asn)
+        pass
+        # serial_exists = await database_sync_to_async(
+        #     OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number, asn=asn).exists)()
+        # if serial_exists:
+        #     return
+        #
+        # await store_error_msg_of_ocsp_response(e=e, ocsp_url_id=ocsp_url_id, serial_number=serial_number,
+        #                                        akid=akid, fingerprint=fingerprint,
+        #                                        country_code=country_code, asn=asn)
 
 
 @sync_to_async
@@ -186,23 +189,26 @@ async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_asn
         for ocsp_url in ocsp_url_list:
             ocsp_url_id = ocsp_url_to_id_dict[ocsp_url]
             q_key = "ocsp:serial:" + ocsp_url
-            elements = r.lrange(q_key, 0, -1)
+            # elements = r.lrange(q_key, 0, -1)
+            #
+            #
+            # elements = [e.decode() for e in elements]
+            # elements = list(set(elements))
+            #
+            # elements = elements[0: TOTAL_CERTS]
 
-
-            elements = [e.decode() for e in elements]
-            elements = list(set(elements))
-
-            elements = elements[0: TOTAL_CERTS]
-
-            for element in elements:
+            for i in range(1):
                 serial_number = None
                 try:
-                    serial_number, akid, fingerprint = element.split(":")
+                    f = open("ocsp_weird.json")
+                    info = json.load(f)
+                    serial_number, akid, fingerprint = info[0]['serial'], info[0]['akid'], info[0]['fingerprint'],
 
-                    serial_exists = await database_sync_to_async(
-                        OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number).exists)()
-                    if serial_exists:
-                        continue
+
+                    # serial_exists = await database_sync_to_async(
+                    #     OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number).exists)()
+                    # if serial_exists:
+                    #     continue
 
                     '''
                         MAKE OCSP REQUEST
@@ -229,7 +235,7 @@ async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_asn
         execution_results = await asyncio.gather(*tasks)
 
 
-def luminati_master_crawler_async():
+def luminati_master_crawler_debug_now():
     starting_time = time.time()
 
     logger.info("Starting ocsp job now !")
@@ -244,9 +250,14 @@ def luminati_master_crawler_async():
     # 240*214*20*.002333
     url_count = 0
     ocsp_url_to_id_dict = {}
-    chosen_asn_list = choose_candidate_asns()
 
-    logger.info("Chosen total {} asns".format(len(chosen_asn_list)))
+    f = open("ocsp_weird.json")
+    c_info = json.load(f)
+    chosen_asn_list = [(element['asn'], 'BD') for element in c_info]
+
+    # chosen_asn_list = choose_candidate_asns()
+    #
+    # logger.info("Chosen total {} asns".format(len(chosen_asn_list)))
 
     for ocsp_url in ocsp_urls_lst:
         ocsp_url_instance = None

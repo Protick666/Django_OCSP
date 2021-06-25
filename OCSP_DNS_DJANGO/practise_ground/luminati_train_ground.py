@@ -1,12 +1,9 @@
-import json
 import logging
-from random import randrange
 
 import django
 
-from OCSP_DNS_DJANGO.management.commands.scheduler import get_ocsp_host, get_ocsp_request_headers, makeOcspRequest, \
+from OCSP_DNS_DJANGO.management.commands.scheduler import get_ocsp_host, makeOcspRequest, \
     return_ocsp_result, get_ocsp_request_headers_as_tuples
-from OCSP_DNS_DJANGO.models import *
 
 django.setup()
 
@@ -32,12 +29,13 @@ from pyasn1.codec.der import decoder
 from pyasn1.codec.der import encoder
 
 
-def luminati_master_crawler():
+def luminati_master_crawler_debug():
 
     logger.info("Starting ocsp job now !")
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
-    ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
-    ocsp_urls_lst = [item.decode() for item in ocsp_urls_set]
+    # ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
+    # ocsp_urls_lst = [item.decode() for item in ocsp_urls_set]
+    ocsp_urls_lst = ['http://ocsp.sectigochina.com']
     # Tune here
 
     logger.info("Processing total {} ocsp urls".format(len(ocsp_urls_lst)))
@@ -47,103 +45,49 @@ def luminati_master_crawler():
     for ocsp_url in ocsp_urls_lst:
         logger.info("Processed total {} ocsp urls".format(url_count))
         url_count += 1
-        ocsp_url_instance = None
-        if not ocsp_url_db.objects.filter(url=ocsp_url).exists():
-            continue
-        else:
-            ocsp_url_instance = ocsp_url_db.objects.get(url=ocsp_url)
 
-        q_key = "ocsp:serial:" + ocsp_url
-        elements = r.lrange(q_key, 0, -1)
+        tu = ('81192179725040481647048356377781389991', 'C6545E5A649886C3FBD40F48892B5B2BF3B120AF', 'e93960a575ac256d7f64267fe626fa6dfc7b18dd21792cb7baf9e3efc9673726')
 
-        # Tune here
-        elements = elements[0: 15]
-        elements = [e.decode() for e in elements]
+        serial_number, akid, fingerprint = tu[0], tu[1], tu[2]
 
-        for element in elements:
-            serial_number = None
+
+        ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
+        ca_cert = pem.readPemFromString(ca_cert)
+        issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
+
+        ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)
+
+        ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(serial_number)),
+                                  userCert=None, add_nonce=False)
+
+        asn_list = ['10796', '11776', '133612', '25144', '29571', '35805', '43940']
+
+
+        headers = get_ocsp_request_headers_as_tuples(ocsp_host)
+
+
+        for c in asn_list:
             try:
-                serial_number, akid, fingerprint = element.split(":")
+                import urllib.request
+                opener = urllib.request.build_opener(
+                    urllib.request.ProxyHandler(
+                        {
+                            'http': 'http://lum-customer-c_9c799542-zone-residential-asn-{}:xm4jk9845cgb@zproxy.lum-superproxy.io:22225'.format(
+                                c)}))
+                opener.addheaders = headers
+                bb = opener.open(ocsp_url, data=encoder.encode(ocspReq))
+                # per_cert_dict = {}
+                # for header in bb.headers.keys():
+                #     if header.startswith('x-luminati'):
+                #         per_cert_dict[header] = bb.headers[header]
 
-                if ocsp_data_luminati.objects.filter(ocsp_url=ocsp_url_instance, serial=serial_number).exists():
-                    continue
+                b = bb.read()
+                decoded_response = return_ocsp_result(b, is_bytes=True)
 
-                ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
-                ca_cert = pem.readPemFromString(ca_cert)
-                issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
+                # print(type(decoded_response))
 
-                ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)
-
-                ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(serial_number)),
-                                          userCert=None, add_nonce=False)
-
-                f = open("OCSP_DNS_DJANGO/countries.json")
-                d = json.load(f)
-                headers = get_ocsp_request_headers_as_tuples(ocsp_host)
-
-                keys = list(d.keys())
-                # Tune here
-
-                for c in range(len(keys)):
-                    try:
-                        country_key = keys[c]
-                        country_verbose_name = d[country_key]['country']
-                        cc = d[country_key]["cc"]
-
-                        import urllib.request
-                        opener = urllib.request.build_opener(
-                            urllib.request.ProxyHandler(
-                                {
-                                    'http': 'http://lum-customer-c_9c799542-zone-residential-country-{}:xm4jk9845cgb@zproxy.lum-superproxy.io:22225'.format(
-                                        cc)}))
-                        opener.addheaders = headers
-                        bb = opener.open(ocsp_url, data=encoder.encode(ocspReq))
-                        per_cert_dict = {}
-                        for header in bb.headers.keys():
-                            if header.startswith('x-luminati'):
-                                per_cert_dict[header] = bb.headers[header]
-
-                        b = bb.read()
-                        decoded_response = return_ocsp_result(b, is_bytes=True)
-
-                        # print(type(decoded_response))
-
-                        if str(decoded_response.response_status) != "OCSPResponseStatus.SUCCESSFUL":
-                            ocsp_data_luminati.objects.create(ocsp_url=ocsp_url_instance, serial=serial_number, akid=akid,
-                                                     fingerprint=fingerprint,
-                                                     ocsp_response=b,
-                                                     ocsp_response_status=str(decoded_response.response_status),
-                                                              country_verbose_name=country_verbose_name, country_code=cc,
-                                                              luminati_headers=str(per_cert_dict))
-                        else:
-                            delegated_responder = False
-                            if len(decoded_response.certificates) > 0:
-                                delegated_responder = True
-                            ocsp_data_luminati.objects.create(ocsp_url=ocsp_url_instance, serial=serial_number,
-                                                              akid=akid,
-                                                              fingerprint=fingerprint,
-                                                              ocsp_response=b,
-                                                              ocsp_response_status=str(
-                                                                  decoded_response.response_status),
-                                                              ocsp_cert_status=decoded_response.certificate_status,
-                                                              country_verbose_name=country_verbose_name,
-                                                              country_code=cc, delegated_response=delegated_responder,
-                                                              luminati_headers=str(per_cert_dict))
-
-
-                    except Exception as e:
-                        if hasattr(e, 'hdrs'):
-                            err_msg = str(e) + "\n" + str(e.hdrs)
-                        else:
-                            err_msg = str(e)
-
-                        ocsp_data_luminati.objects.create(ocsp_url=ocsp_url_instance, serial=serial_number,
-                                                          akid=akid,
-                                                          fingerprint=fingerprint,
-                                                          country_verbose_name=country_verbose_name,
-                                                          country_code=cc, has_error=True, error=err_msg)
-
+                if str(decoded_response.response_status) == "OCSPResponseStatus.SUCCESSFUL":
+                    print(decoded_response.certificate_status)
             except Exception as e:
-                logger.error(
-                    "Error in init Processing cert serial {} for ocsp url {} ({})".format(serial_number, ocsp_url, e))
+                a = 1
 

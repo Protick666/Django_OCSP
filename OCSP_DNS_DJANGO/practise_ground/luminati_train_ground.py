@@ -95,8 +95,6 @@ def luminati_master_crawler():
                             urllib.request.ProxyHandler(
                                 {
                                     'http': 'http://lum-customer-c_9c799542-zone-residential-country-{}:xm4jk9845cgb@zproxy.lum-superproxy.io:22225'.format(
-                                        cc),
-                                    'https': 'http://lum-customer-c_9c799542-zone-residential-country-{}:xm4jk9845cgb@zproxy.lum-superproxy.io:22225'.format(
                                         cc)}))
                         opener.addheaders = headers
                         bb = opener.open(ocsp_url, data=encoder.encode(ocspReq))

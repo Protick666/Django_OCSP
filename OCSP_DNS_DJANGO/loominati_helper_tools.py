@@ -6,7 +6,7 @@ def choose_asn_number_per_country(number):
     if LOCAL:
         return min(number, 1)
     else:
-        return max(int(number * .20), 1)
+        return max(int(number * .15), 1)
 
 
 def get_total_cert_per_ocsp_url():

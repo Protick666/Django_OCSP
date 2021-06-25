@@ -49,7 +49,6 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
                                  fingerprint, country_code, session, asn):
     try:
 
-        st = time.time()
         async with session.post(url=ocsp_url,
                                 proxy='http://lum-customer-c_9c799542-zone-residential-asn-{}:xm4jk9845cgb@zproxy.lum-superproxy.io:22225'.format(
                                     asn),
@@ -58,6 +57,7 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
             result_data = await response.read()
             headers = response.headers
             decoded_response = return_ocsp_result(result_data, is_bytes=True)
+
             if type(decoded_response) == type('xxx'):
                 raise Exception(decoded_response)
             # print(decoded_response.response_status)
@@ -67,6 +67,11 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
                 if header.startswith('x-luminati'):
                     per_cert_dict[header] = headers[header]
 
+            serial_exists = await database_sync_to_async(
+                OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number, asn=asn).exists)()
+            if serial_exists:
+                return
+
             await store_ocsp_response(decoded_response=decoded_response, ocsp_url_id=ocsp_url_id,
                                       serial_number=serial_number,
                                       akid=akid, fingerprint=fingerprint,
@@ -74,6 +79,11 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
                                       per_cert_dict=per_cert_dict, b_ocsp_response=result_data, asn=asn)
 
     except Exception as e:
+        serial_exists = await database_sync_to_async(
+            OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number, asn=asn).exists)()
+        if serial_exists:
+            return
+
         await store_error_msg_of_ocsp_response(e=e, ocsp_url_id=ocsp_url_id, serial_number=serial_number,
                                                akid=akid, fingerprint=fingerprint,
                                                country_code=country_code, asn=asn)
@@ -87,8 +97,10 @@ def store_error_msg_of_ocsp_response(e, ocsp_url_id, serial_number, akid,
         err_msg = str(e) + "\n" + str(e.hdrs)
     else:
         err_msg = str(e)
+    if err_msg is None or len(err_msg) == 0:
+        if "TimeoutError" in str(type(e)):
+            err_msg = "TimeoutError"
 
-    print("yo")
     OcspResponsesWrtAsn.objects.create(ocsp_url_id=ocsp_url_id, serial=serial_number,
                                       akid=akid,
                                       fingerprint=fingerprint,
@@ -100,12 +112,15 @@ def store_error_msg_of_ocsp_response(e, ocsp_url_id, serial_number, akid,
 def store_ocsp_response(decoded_response, ocsp_url_id, serial_number, akid,
                         fingerprint, country_code,
                         per_cert_dict, b_ocsp_response, asn):
-    print("yo")
+
+
+
+
     if str(decoded_response.response_status) != "OCSPResponseStatus.SUCCESSFUL":
         OcspResponsesWrtAsn.objects.create(ocsp_url_id=ocsp_url_id, serial=serial_number,
                                           akid=akid,
                                           fingerprint=fingerprint,
-                                          ocsp_response=b_ocsp_response,
+                                          ocsp_response_as_bytes=b_ocsp_response,
                                           ocsp_response_status=str(
                                               decoded_response.response_status),
                                           asn=asn,
@@ -115,10 +130,11 @@ def store_ocsp_response(decoded_response, ocsp_url_id, serial_number, akid,
         delegated_responder = False
         if len(decoded_response.certificates) > 0:
             delegated_responder = True
+
         OcspResponsesWrtAsn.objects.create(ocsp_url_id=ocsp_url_id, serial=serial_number,
                                           akid=akid,
                                           fingerprint=fingerprint,
-                                          ocsp_response=b_ocsp_response,
+                                          ocsp_response_as_bytes=b_ocsp_response,
                                           ocsp_response_status=str(
                                               decoded_response.response_status),
                                           ocsp_cert_status=decoded_response.certificate_status,
@@ -155,16 +171,20 @@ def process_cert_async(ocsp_host, ocsp_url, ocspReq,
 
 
 async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_asn_list):
-    async with aiohttp.ClientSession() as session:
+    timeout = aiohttp.ClientTimeout(total=20)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
         tasks = []
+
         for ocsp_url in ocsp_url_list:
             ocsp_url_id = ocsp_url_to_id_dict[ocsp_url]
             q_key = "ocsp:serial:" + ocsp_url
             elements = r.lrange(q_key, 0, -1)
 
-            # Tune here
-            elements = elements[0: TOTAL_CERTS]
+
             elements = [e.decode() for e in elements]
+            elements = list(set(elements))
+
+            elements = elements[0: TOTAL_CERTS]
 
             for element in elements:
                 serial_number = None
@@ -172,7 +192,7 @@ async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_asn
                     serial_number, akid, fingerprint = element.split(":")
 
                     serial_exists = await database_sync_to_async(
-                        ocsp_data_luminati.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number).exists)()
+                        OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number).exists)()
                     if serial_exists:
                         continue
 
@@ -215,14 +235,16 @@ def luminati_master_crawler_async():
     # 240*214*20*.002333
     url_count = 0
     ocsp_url_to_id_dict = {}
-
     chosen_asn_list = choose_candidate_asns()
+
+    logger.info("Chosen total {} asns".format(len(chosen_asn_list)))
 
     for ocsp_url in ocsp_urls_lst:
         ocsp_url_instance = None
         if not ocsp_url_db.objects.filter(url=ocsp_url).exists():
             ocsp_url_instance = ocsp_url_db.objects.create(url=ocsp_url)
             dns_records = get_dns_records(ocsp_url)
+
             for record in dns_records:
                 dns_record.objects.create(ocsp_url=ocsp_url_instance, type=record[0], record=record[1])
         else:

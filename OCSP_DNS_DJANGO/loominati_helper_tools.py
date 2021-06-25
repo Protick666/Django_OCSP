@@ -4,19 +4,19 @@ import random
 
 def choose_asn_number_per_country(number):
     if LOCAL:
-        return min(number, 2)
+        return min(number, 1)
     else:
-        return max(int(number * .2), 1)
+        return max(int(number * .20), 1)
 
 
 def get_total_cert_per_ocsp_url():
     if LOCAL:
-        return 2
+        return 10
     else:
         return 20
 
 def choose_candidate_asns():
-    f = open('luminati_data/luminati_country_to_asn.json')
+    f = open('luminati_country_to_asn.json')
     country_to_asn_list = json.load(f)
 
     chosen_asn_outer = []
@@ -28,12 +28,14 @@ def choose_candidate_asns():
         chosen_asn_s = [(element[0], country) for element in chosen_asn_s]
         chosen_asn_outer = chosen_asn_outer + chosen_asn_s
 
+    if LOCAL:
+        chosen_asn_outer = chosen_asn_outer[0: 10]
     return chosen_asn_outer
 
 
 def get_ocsp_url_number(total_number):
     if LOCAL:
-        return 2
+        return 10
     else:
         return total_number
 

@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-# from .views import ocsp_crawler, ocsp_crawler_v2
+from .views import ocsp_crawler_v2
 
 urlpatterns = [
-    # path('crawl/', ocsp_crawler_v2),
+    path('crawl/', ocsp_crawler_v2),
 ]

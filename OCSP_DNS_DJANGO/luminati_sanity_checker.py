@@ -26,14 +26,11 @@ logger = logging.getLogger(__name__)
 
 
 def check_sanity():
+    count = 0
     elements = OcspResponsesWrtAsn.objects.filter(ocsp_response_status='OCSPResponseStatus.SUCCESSFUL')
     for element in elements:
         ocsp_response = return_ocsp_result(element.ocsp_response_as_bytes, is_bytes=True)
-        passed = True
-        if str(ocsp_response.certificate_status) != element.ocsp_cert_status:
-            print("XXX")
-            passed = False
-        if str(ocsp_response.serial_number) != element.serial:
-            print("XXX")
-            passed = False
-        print(passed)
+        if str(ocsp_response.certificate_status) != element.ocsp_cert_status or str(ocsp_response.serial_number) != element.serial:
+            count += 1
+    print("Bad eggs: ", count)
+    logger.info("Bad eggs: {}".format(count))

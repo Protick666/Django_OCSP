@@ -28,6 +28,7 @@ from collections import defaultdict
 
 d_url = defaultdict(lambda : 0)
 d_asn = defaultdict(lambda : 0)
+d_url_to_responder_hash = defaultdict(lambda : set())
 
 def check_sanity():
     count = 0
@@ -37,6 +38,9 @@ def check_sanity():
         if str(ocsp_response.certificate_status) != element.ocsp_cert_status or str(ocsp_response.serial_number) != element.serial:
             count += 1
             d_url[element.ocsp_url.url] += 1
+
+            d_url_to_responder_hash[element.ocsp_url.url].add(ocsp_response.responder_key_hash)
+
             d_asn[element.asn] += 1
             print("Found one {}".format(element.id))
     print("Bad eggs: ", count)
@@ -44,6 +48,9 @@ def check_sanity():
 
     print("Bad ocsp urls")
     print(d_url)
+
+    print("Responder")
+    print(d_url_to_responder_hash)
 
     print("Bad asns")
     print(d_asn)

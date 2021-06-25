@@ -50,6 +50,56 @@ class ocsp_data_luminati(models.Model):
         db_table = 'ocsp_data_luminati'
 
 
+class OcspResponsesWrtAsn(models.Model):
+    ocsp_url = models.ForeignKey(ocsp_url_db, on_delete=models.CASCADE)
+
+    serial = models.CharField(max_length=1000)
+    akid = models.CharField(max_length=1000)
+    fingerprint = models.CharField(max_length=1000)
+
+    ocsp_response_status = models.CharField(max_length=1000, null=True, blank=True)
+    ocsp_cert_status = models.CharField(max_length=1000, null=True, blank=True)
+    delegated_response = models.BooleanField(default=False)
+    ocsp_response = models.TextField(null=True, blank=True)
+
+    luminati_headers = models.TextField(null=True, blank=True)
+    country_code = models.CharField(max_length=1000)
+    asn = models.CharField(max_length=1000)
+
+    error = models.TextField(null=True, blank=True)
+    has_error = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+    updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+    class Meta:
+        db_table = 'ocsp_response_wrt_asn'
+        unique_together = ('ocsp_url', 'serial', 'asn')
+
+
+class ocsp_data_luminati(models.Model):
+    ocsp_url = models.ForeignKey(ocsp_url_db, on_delete=models.CASCADE)
+    serial = models.CharField(max_length=1000)
+    akid = models.CharField(max_length=1000)
+    fingerprint = models.CharField(max_length=1000)
+    ocsp_response_status = models.CharField(max_length=1000, null=True, blank=True)
+    ocsp_cert_status = models.CharField(max_length=1000, null=True, blank=True)
+    delegated_response = models.BooleanField(default=False)
+    ocsp_response = models.TextField(null=True, blank=True)
+
+    luminati_headers = models.TextField(null=True, blank=True)
+
+    country_verbose_name = models.CharField(max_length=1000)
+    country_code = models.CharField(max_length=1000)
+    error = models.TextField(null=True, blank=True)
+    has_error = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+
+    class Meta:
+        db_table = 'ocsp_data_luminati'
+
+
 class dns_record(models.Model):
     ocsp_url = models.ForeignKey(ocsp_url_db, on_delete=models.CASCADE)
     type = models.CharField(max_length=100)

@@ -179,8 +179,8 @@ def process_cert_async(ocsp_host, ocsp_url, ocspReq,
 
 
 async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_asn_list):
-    # timeout = aiohttp.ClientTimeout(total=20)
-    async with aiohttp.ClientSession() as session:
+    timeout = aiohttp.ClientTimeout(total=60)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
         tasks = []
 
         for ocsp_url in ocsp_url_list:
@@ -260,8 +260,8 @@ def luminati_master_crawler_async():
 
         ocsp_url_to_id_dict[ocsp_url] = ocsp_url_instance.id
 
-    asyncio.run(process_ocsp_urls_async(ocsp_url_list=ocsp_urls_lst,
-                                        ocsp_url_to_id_dict=ocsp_url_to_id_dict,
-                                        chosen_asn_list=chosen_asn_list))
+        asyncio.run(process_ocsp_urls_async(ocsp_url_list=[ocsp_url],
+                                            ocsp_url_to_id_dict=ocsp_url_to_id_dict,
+                                            chosen_asn_list=chosen_asn_list))
 
     print("Elapsed time {}".format(time.time() - starting_time))

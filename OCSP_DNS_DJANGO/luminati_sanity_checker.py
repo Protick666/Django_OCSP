@@ -24,6 +24,10 @@ from OCSP_DNS_DJANGO.tools import fix_cert_indentation, get_dns_records
 django.setup()
 logger = logging.getLogger(__name__)
 
+from collections import defaultdict
+
+d_url = defaultdict(lambda : 0)
+d_asn = defaultdict(lambda : 0)
 
 def check_sanity():
     count = 0
@@ -32,6 +36,14 @@ def check_sanity():
         ocsp_response = return_ocsp_result(element.ocsp_response_as_bytes, is_bytes=True)
         if str(ocsp_response.certificate_status) != element.ocsp_cert_status or str(ocsp_response.serial_number) != element.serial:
             count += 1
+            d_url[element.ocsp_url.url] += 1
+            d_asn[element.asn] += 1
             print("Found one {}".format(element.id))
     print("Bad eggs: ", count)
     logger.info("Bad eggs: {}".format(count))
+
+    print("Bad ocsp urls")
+    print(d_url)
+
+    print("Bad asns")
+    print(d_asn)

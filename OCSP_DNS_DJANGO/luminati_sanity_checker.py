@@ -32,5 +32,6 @@ def check_sanity():
         ocsp_response = return_ocsp_result(element.ocsp_response_as_bytes, is_bytes=True)
         if str(ocsp_response.certificate_status) != element.ocsp_cert_status or str(ocsp_response.serial_number) != element.serial:
             count += 1
+            print("Found one {}".format(element.id))
     print("Bad eggs: ", count)
     logger.info("Bad eggs: {}".format(count))

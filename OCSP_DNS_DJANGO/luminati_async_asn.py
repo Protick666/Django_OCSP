@@ -207,6 +207,7 @@ async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_asn
                     '''
                         MAKE OCSP REQUEST
                     '''
+
                     ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
                     ca_cert = pem.readPemFromString(ca_cert)
                     issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
@@ -234,10 +235,10 @@ def luminati_master_crawler_async():
 
     logger.info("Starting ocsp job now !")
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
-    # ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
-    # TOTAL_OCSP_URLS = get_ocsp_url_number(len(ocsp_urls_set))
-    # ocsp_urls_lst = [item.decode() for item in ocsp_urls_set][0: TOTAL_OCSP_URLS]
-    ocsp_urls_lst = ['http://ocsp.sectigochina.com']
+    ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
+    TOTAL_OCSP_URLS = get_ocsp_url_number(len(ocsp_urls_set))
+    ocsp_urls_lst = [item.decode() for item in ocsp_urls_set][0: TOTAL_OCSP_URLS]
+    # ocsp_urls_lst = ['http://ocsp.sectigochina.com']
 
     logger.info("Processing total {} ocsp urls".format(len(ocsp_urls_lst)))
 

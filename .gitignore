@@ -8,3 +8,5 @@
 
 /ocsp_top_30.json
 /ocsp_remote.json
+/ocsp_cert_db_id_to_string.json
+/ocsp_cert_string_search_results.json

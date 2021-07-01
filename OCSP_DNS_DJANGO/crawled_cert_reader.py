@@ -1,5 +1,6 @@
 from OCSP_DNS_DJANGO.management.commands.scheduler import return_ocsp_result
-from OCSP_DNS_DJANGO.models import OcspResponsesWrtAsn, ocsp_data_luminati
+from OCSP_DNS_DJANGO.models import OcspResponsesWrtAsn, ocsp_data_luminati, dns_record
+from OCSP_DNS_DJANGO.tools import get_dns_records
 
 CDN_HINTS = ["Akam", "cloud", "edge", "fast", "tiny", 'CDN', 'DELIGATED', 'DELIGATE', 'Cloudfront', ]
 
@@ -45,14 +46,15 @@ CDNS = ['Akamai',
         'WebMobi',
         'CDNvideo']
 
-def find_all_relevant_strings(delegated_cert):
+def find_all_relevant_strings(delegated_cert, only_subject=False):
     relevant_strings = []
     relevant_strings.append(("subject", str(delegated_cert.subject).lower()))
-    relevant_strings.append(("issuer", str(delegated_cert.issuer).lower()))
-    e_count = 0
-    for extension in delegated_cert.extensions._extensions:
-        relevant_strings.append(("ex-{}".format(e_count), str(extension).lower()))
-        e_count += 1
+    if not only_subject:
+        relevant_strings.append(("issuer", str(delegated_cert.issuer).lower()))
+        e_count = 0
+        for extension in delegated_cert.extensions._extensions:
+            relevant_strings.append(("ex-{}".format(e_count), str(extension).lower()))
+            e_count += 1
     return relevant_strings
 
 
@@ -93,6 +95,46 @@ def check_certs_for_strings():
 
     with open("ocsp_cert_db_id_to_string.json", "w") as ouf:
         json.dump(dict(response_db_id_to_string_dict), fp=ouf)
+
+
+
+def check_certs_for_strings_v2():
+    d = defaultdict(lambda : dict())
+
+    ocsp_responses_wrt_asns = OcspResponsesWrtAsn.objects.filter(delegated_response=True)
+    for response in ocsp_responses_wrt_asns:
+        try:
+            delegated_response = return_ocsp_result(response.ocsp_response_as_bytes, is_bytes=True)
+            delegated_cert = delegated_response.certificates[0]
+
+            subject = find_all_relevant_strings(delegated_cert, only_subject=True)[0]
+            if delegated_cert.serial_number in d[response.ocsp_url.url]:
+                continue
+            # dns_records = dns_record.objects.filter(ocsp_url=response.ocsp_url)
+            dns_records = get_dns_records(response.ocsp_url.url)
+            a_record = [record[1] for record in dns_records if record[0] == 'A_RECORD'][0]
+            cnames = [record[1] for record in dns_records if record[0] == 'CNAME']
+            if cnames:
+                cname = cnames[0]
+
+            d[response.ocsp_url.url][delegated_cert.serial_number] = {
+                "url": response.ocsp_url.url,
+                "serial": delegated_cert.serial_number,
+                "subject": subject,
+                "cname": cname,
+                "a_record": a_record
+            }
+
+        except Exception as e:
+            a = 1
+            pass
+
+
+    import json
+    with open("cert_subjects.json", "w") as ouf:
+        json.dump(d, fp=ouf, indent=2)
+
+
 
 
 

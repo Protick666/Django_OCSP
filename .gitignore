@@ -12,3 +12,5 @@
 /ocsp_cert_string_search_results.json
 /latency_results.json
 /cert_subjects.json
+/cache_exp.json
+/url_to_ips.json

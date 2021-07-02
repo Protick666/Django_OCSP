@@ -158,6 +158,51 @@ def luminati_master_crawler_cloudflare_cache():
         json.dump(ans, fp=ouf, indent=2)
 
 
+def luminati_master_crawler_cloudflare_cache_v2():
+    logger.info("Starting ocsp job now !")
+
+    r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
+
+    ocsp_url = 'http://ocsp2.globalsign.com/gsdomainvalsha2g3'
+    ip_host = 'http://104.18.21.226/gsdomainvalsha2g3'
+    OCSP_URL_ID = 110
+
+    old_list = []
+    new_list = []
+
+    random_list = []
+    master_akid = '3D808279C54882A3C312EEDF990F5735489ED0CB'
+
+    ex_serial = '10028015818766309226464494355'
+
+
+    import random
+    # old_list = random.sample(old_list, 5)
+
+    new_list = ['1055965136913638756275944619', '25019381422291326016234169286', '38604205910516199250541591589', '26351170549277952125406067382', '26470410281959639070536568135']
+
+
+
+    from collections import defaultdict
+    ans = defaultdict(lambda: dict())
+    import time
+
+    d = {}
+    for element in new_list:
+        d_d = {}
+        serial_number = element
+        for c in range(2):
+            data = make_ocsp_query(serial_number=serial_number, akid=master_akid, r=r, ocsp_url=ocsp_url, ip_host=ip_host)
+            time.sleep(10)
+            d_d[c] = data
+        d[serial_number] = d_d
+    ans['new'] = d
+
+
+    with open("cache_exp.json", "w") as ouf:
+        json.dump(ans, fp=ouf, indent=2)
+
+
 
 
 

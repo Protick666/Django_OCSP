@@ -179,7 +179,7 @@ def luminati_master_crawler_cloudflare_cache_v2():
     import random
     # old_list = random.sample(old_list, 5)
 
-    new_list = ['1055965136913638756275944619', '25019381422291326016234169286', '38604205910516199250541591589', '26351170549277952125406067382', '26470410281959639070536568135']
+    random_list = ['47901382578257582476611959918', '94606194882573272956985698604', '77292347294016299247283911213', '90090007779075498731559960921', '65099188835406091494518264786']
 
 
 
@@ -188,7 +188,7 @@ def luminati_master_crawler_cloudflare_cache_v2():
     import time
 
     d = {}
-    for element in new_list:
+    for element in random_list:
         d_d = {}
         serial_number = element
         for c in range(2):
@@ -196,7 +196,7 @@ def luminati_master_crawler_cloudflare_cache_v2():
             time.sleep(10)
             d_d[c] = data
         d[serial_number] = d_d
-    ans['new'] = d
+    ans['random'] = d
 
 
     with open("cache_exp.json", "w") as ouf:

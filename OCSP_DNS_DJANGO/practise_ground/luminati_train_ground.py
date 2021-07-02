@@ -102,9 +102,9 @@ def luminati_master_crawler_cloudflare_cache():
 
     old_list = OcspResponsesWrtAsn.objects.filter(ocsp_url_id=OCSP_URL_ID,
                                                        ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
-                                                       ocsp_cert_status='OCSPCertStatus.GOOD')[0: 200]
+                                                       ocsp_cert_status='OCSPCertStatus.GOOD')[20: 25]
     import random
-    old_list = random.sample(old_list, 5)
+    # old_list = random.sample(old_list, 5)
 
 
 

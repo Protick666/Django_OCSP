@@ -102,9 +102,11 @@ def luminati_master_crawler_cloudflare_cache():
 
     old_list = OcspResponsesWrtAsn.objects.filter(ocsp_url_id=OCSP_URL_ID,
                                                        ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
-                                                       ocsp_cert_status='OCSPCertStatus.GOOD')[0: 5]
-
+                                                       ocsp_cert_status='OCSPCertStatus.GOOD')[0: 200]
     import random
+    old_list = random.sample(old_list, 5)
+
+
 
 
     q_key = "ocsp:serial:" + ocsp_url
@@ -124,9 +126,9 @@ def luminati_master_crawler_cloudflare_cache():
     d = {}
     for e in old_list:
         d_d = {}
-        for c in range(3):
+        for c in range(10):
             data = make_ocsp_query(serial_number=e.serial, akid=e.akid, r=r, ocsp_url=ocsp_url, ip_host=ip_host)
-            time.sleep(10)
+            time.sleep(60)
             d_d[c] = data
         d[e.serial] = d_d
     ans['old'] = d
@@ -135,9 +137,9 @@ def luminati_master_crawler_cloudflare_cache():
     for element in new_list:
         d_d = {}
         serial_number, akid, fingerprint = element.split(":")
-        for c in range(3):
+        for c in range(10):
             data = make_ocsp_query(serial_number=serial_number, akid=akid, r=r, ocsp_url=ocsp_url, ip_host=ip_host)
-            time.sleep(10)
+            time.sleep(60)
             d_d[c] = data
         d[serial_number] = d_d
     ans['new'] = d
@@ -145,9 +147,9 @@ def luminati_master_crawler_cloudflare_cache():
     d = {}
     for e in random_list:
         d_d = {}
-        for c in range(3):
+        for c in range(10):
             data = make_ocsp_query(serial_number=e, akid=master_akid, r=r, ocsp_url=ocsp_url, ip_host=ip_host)
-            time.sleep(10)
+            time.sleep(60)
             d_d[c] = data
         d[e] = d_d
     ans['random'] = d

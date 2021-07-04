@@ -183,11 +183,13 @@ def cache_exp_init():
     d['akamai2']["OCSP_URL_ID"] = 125
     d['akamai2']["cdn"] = "akamai"
 
-    for key in d:
-        luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
-                                      ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
-                                      OCSP_URL_ID=d[key]['OCSP_URL_ID'], cdn=d[key]['cdn'])
-        time.sleep(120)
+    for i in range(3):
+        for key in d:
+            luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
+                                          ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
+                                          OCSP_URL_ID=d[key]['OCSP_URL_ID'], cdn=d[key]['cdn'])
+            time.sleep(120)
+        time.sleep(1800)
 
 
 def luminati_master_crawler_cloudflare_cache_v2():

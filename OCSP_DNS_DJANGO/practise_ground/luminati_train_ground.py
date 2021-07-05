@@ -83,7 +83,7 @@ def get_ips_of_urls():
         json.dump(d, fp=ouf, indent=2)
 
 
-def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, cdn):
+def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, cdn, key):
 
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
 
@@ -151,7 +151,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
         d[e] = d_d
     ans['random'] = d
 
-    with open("{}-cache_exp-{}-{}.json".format(cdn, ocsp_url, time.time()), "w") as ouf:
+    with open("{}-cache_exp-{}-{}.json".format(cdn, key, time.time()), "w") as ouf:
         json.dump(ans, fp=ouf, indent=2)
 
 
@@ -187,7 +187,7 @@ def cache_exp_init():
         for key in d:
             luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
                                           ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
-                                          OCSP_URL_ID=d[key]['OCSP_URL_ID'], cdn=d[key]['cdn'])
+                                          OCSP_URL_ID=d[key]['OCSP_URL_ID'], cdn=d[key]['cdn'], key=key)
             time.sleep(120)
         time.sleep(1800)
 

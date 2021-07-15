@@ -17,6 +17,7 @@ urllib3==1.26.5
 validators==0.18.2
 django-channels
 channels
+telegram-send
 
 
 

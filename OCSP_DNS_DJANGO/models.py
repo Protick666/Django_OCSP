@@ -1,5 +1,6 @@
 from django.db import models
 
+ASN, CN = 'ASN', 'CN'
 
 class ocsp_url_db(models.Model):
     url = models.CharField(max_length=300, unique=True)
@@ -64,8 +65,8 @@ class OcspResponsesWrtAsn(models.Model):
     ocsp_response_as_bytes = models.BinaryField(null=True, blank=True)
 
     luminati_headers = models.TextField(null=True, blank=True)
-    country_code = models.CharField(max_length=1000)
-    asn = models.CharField(max_length=1000)
+    country_code = models.CharField(max_length=1000, null=True, blank=True)
+    hop = models.CharField(max_length=1000)
 
     error = models.TextField(null=True, blank=True)
     has_error = models.BooleanField(default=False)
@@ -73,10 +74,12 @@ class OcspResponsesWrtAsn(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
 
+    # TODO check change
+    mode = models.CharField(max_length=1000, default=ASN)
+
     class Meta:
         db_table = 'ocsp_response_wrt_asn'
-        unique_together = ('ocsp_url', 'serial', 'asn')
-
+        unique_together = ('ocsp_url', 'serial', 'hop', 'mode')
 
 
 class dns_record(models.Model):

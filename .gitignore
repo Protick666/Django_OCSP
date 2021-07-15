@@ -5,7 +5,7 @@
 /OCSP_DNS_DJANGO/.idea
 /.idea
 /ocsp_luminati.json
-
+/cache_exp
 /ocsp_top_30.json
 /ocsp_remote.json
 /ocsp_cert_db_id_to_string.json
@@ -14,3 +14,4 @@
 /cert_subjects.json
 /cache_exp.json
 /url_to_ips.json
+/cache_exp/

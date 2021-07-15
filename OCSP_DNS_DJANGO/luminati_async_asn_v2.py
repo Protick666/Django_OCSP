@@ -254,7 +254,7 @@ def luminati_master_crawler_async_v2():
     chosen_hop_list = choose_hops()
 
     logger.info("Chosen total {} hops".format(len(chosen_hop_list)))
-    print(chosen_hop_list)
+    #print(chosen_hop_list)
 
     for ocsp_url in ocsp_urls_lst:
         ocsp_url_instance = None

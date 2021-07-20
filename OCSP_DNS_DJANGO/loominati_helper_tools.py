@@ -16,6 +16,7 @@ def get_total_cert_per_ocsp_url():
     else:
         return 20
 
+
 def choose_candidate_asns():
     f = open('luminati_country_to_asn.json')
     country_to_asn_list = json.load(f)
@@ -49,9 +50,9 @@ def choose_hops():
     if LOCAL:
         global_asn_split = 10
     else:
-        global_asn_split = 300
+        global_asn_split = 400
     asn_list = json.load(f)
-    asn_list = random.sample(asn_list, dash_board_split)
+    asn_list = random.sample(asn_list, global_asn_split)
 
     all_asns = dash_board_asns + asn_list
     all_asns = [(element, ASN) for element in all_asns]

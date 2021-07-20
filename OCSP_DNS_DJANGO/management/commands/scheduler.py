@@ -1,4 +1,5 @@
 import logging
+import random
 
 import django
 django.setup()
@@ -113,7 +114,9 @@ def makeOcspRequest(issuerCert, userSerialNumber=None, userCert=None, add_nonce=
         extension.setComponentByName('critical', 0)
 
         nonce = "0410EAE354B142FE6DE525BE7708307F80C2"
-        nonce = nonce[:-10] + str(int(time.time()))
+        nonce = nonce[:-10] + str(int(time.time())) + str(random.randint(1, 100000))
+        if len(nonce) % 2 == 1:
+            nonce = nonce[: - 1]
         ## ASN1: Tag (04: Integer) - Length (10:16 bytes) - Value  Encoding
         ## See: http://commandlinefanatic.com/cgi-bin/showarticle.cgi?article=art062
         ## current version of pyasn1_modules do not support nonce

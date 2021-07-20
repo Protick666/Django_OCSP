@@ -1,0 +1,307 @@
+import json
+import logging
+import time
+from random import randint
+
+import django
+import requests
+
+from OCSP_DNS_DJANGO.management.commands.scheduler import get_ocsp_host, makeOcspRequest, \
+    return_ocsp_result, get_ocsp_request_headers
+from OCSP_DNS_DJANGO.models import OcspResponsesWrtAsn
+
+django.setup()
+
+logger = logging.getLogger(__name__)
+import redis
+from OCSP_DNS_DJANGO.local import LOCAL, LOCAL_REDIS_HOST, REMOTE_REDIS_HOST
+
+if LOCAL:
+    redis_host = LOCAL_REDIS_HOST
+else:
+    redis_host = REMOTE_REDIS_HOST
+
+
+r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
+
+import redis
+
+from OCSP_DNS_DJANGO.tools import fix_cert_indentation, get_dns_records
+
+from OCSP_DNS_DJANGO.pyasn1_modules import rfc2459
+from OCSP_DNS_DJANGO.pyasn1_modules import pem
+from pyasn1.codec.der import decoder
+from pyasn1.codec.der import encoder
+
+
+def random_with_N_digits(n):
+    range_start = 10**(n-1)
+    range_end = (10**n)-1
+    return randint(range_start, range_end)
+
+
+def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce):
+    response = None
+    ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
+    ca_cert = pem.readPemFromString(ca_cert)
+    issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
+    ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)
+    ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(serial_number)),
+                              userCert=None, add_nonce=nonce)
+    headers = get_ocsp_request_headers(ocsp_host)
+
+    try:
+        d = {}
+
+        starting_time = time.monotonic()
+        response_temp = requests.get(ip_host)
+        connection_time = time.monotonic() - starting_time - response_temp.elapsed.total_seconds()
+        d['connection_time'] = connection_time
+
+        starting_time = time.monotonic()
+        response = requests.post(ip_host, data=encoder.encode(ocspReq), headers=headers)
+        response_time = time.monotonic() - starting_time
+        decoded_response = return_ocsp_result(response.content, is_bytes=True)
+
+        d['response_status'] = str(decoded_response.response_status)
+        if str(decoded_response.response_status) == "OCSPResponseStatus.SUCCESSFUL":
+            d['cert_status'] = str(decoded_response.certificate_status)
+        d['elapsed_time'] = response.elapsed.total_seconds()
+        d['response_time'] = response_time
+        return d
+
+    except Exception as e:
+        #d = {}
+        d['error'] = e
+        if response:
+            d['elapsed_time'] = response.elapsed.total_seconds()
+        return d
+
+def get_ips_of_urls():
+    r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
+    ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
+    ocsp_urls_lst = [item.decode() for item in ocsp_urls_set]
+
+    from collections import defaultdict
+    d = defaultdict(lambda: list())
+
+    for url in ocsp_urls_lst:
+        records = get_dns_records(url)
+        a_records = [e[1] for e in records if e[0] == 'A_RECORD']
+        for a_record in a_records:
+            d[url].append(a_record)
+
+    with open("url_to_ips.json", "w") as ouf:
+        json.dump(d, fp=ouf, indent=2)
+
+
+def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, cdn, key, meta):
+
+    r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
+
+    #TODO change
+    certs_per_bucket = 3
+    query_number = 100
+
+    random_list = []
+
+    ex_serial = '10028015818766309226464494355'
+
+    akid_c = None
+
+
+    import random
+
+    q_key = "ocsp:serial:" + ocsp_url
+    elements = r.lrange(q_key, 0, -1)
+    elements = [e.decode() for e in elements]
+    print(ocsp_url)
+    elements = list(set(elements))
+    elements = random.sample(elements, certs_per_bucket)
+    new_list = elements
+
+    for i in range(certs_per_bucket):
+        random_list.append(random_with_N_digits(len(ex_serial)))
+
+    from collections import defaultdict
+    ans = defaultdict(lambda: dict())
+    import time
+
+
+    d = {}
+    for element in new_list:
+        d_d = {"with_nonce": {}, "without_nonce": {}}
+        serial_number, akid, fingerprint = element.split(":")
+        akid_c = akid
+        for c in range(query_number):
+            data = make_ocsp_query(serial_number=serial_number,
+                                   akid=akid, r=r, ocsp_url=ocsp_url,
+                                   ip_host=ip_host, nonce=False)
+            d_d['without_nonce'][c] = data
+
+        for c in range(query_number):
+            data = make_ocsp_query(serial_number=serial_number,
+                                   akid=akid, r=r, ocsp_url=ocsp_url,
+                                   ip_host=ip_host, nonce=True)
+            d_d['with_nonce'][c] = data
+
+        d[serial_number] = d_d
+    ans['new'] = d
+
+    d = {}
+    for e in random_list:
+        d_d = {"with_nonce": {}, "without_nonce": {}}
+        for c in range(query_number):
+            data = make_ocsp_query(serial_number=e,
+                                   akid=akid_c, r=r,
+                                   ocsp_url=ocsp_url,
+                                   ip_host=ip_host, nonce=False)
+            d_d['without_nonce'][c] = data
+
+        for c in range(query_number):
+            data = make_ocsp_query(serial_number=e,
+                                   akid=akid_c, r=r,
+                                   ocsp_url=ocsp_url,
+                                   ip_host=ip_host, nonce=True)
+            d_d['with_nonce'][c] = data
+
+        d[e] = d_d
+    ans['random'] = d
+
+    try:
+        with open("jsons_v4/{}-cache_exp-{}-{}.json".format(cdn, key, time.time()), "w") as ouf:
+            json.dump(ans, fp=ouf, indent=2)
+    except Exception as e:
+        print(e)
+        pass
+
+
+def cache_exp_init_v3():
+    d = {}
+    d['cloudflare'] = {}
+    d['akamai1'] = {}
+    d['akamai2'] = {}
+
+    ## Info for cloudflare
+
+    d['cloudflare']["ocsp_url"] = 'http://ocsp2.globalsign.com/gsdomainvalsha2g3'
+    d['cloudflare']["ip_host"] = 'http://104.18.21.226/gsdomainvalsha2g3'
+    d['cloudflare']["master_akid"] = '3D808279C54882A3C312EEDF990F5735489ED0CB'
+    d['cloudflare']["OCSP_URL_ID"] = 110
+    d['cloudflare']["cdn"] = "cloudflare"
+
+    d['akamai1']["ocsp_url"] = 'http://nazwassl2sha2.ocsp-certum.com'
+    d['akamai1']["ip_host"] = 'http://23.212.251.132'
+    d['akamai1']["master_akid"] = '54DC90BB9D471951C379682C84ED2EDF5F46BAC7'
+    d['akamai1']["OCSP_URL_ID"] = 81
+    d['akamai1']["cdn"] = "akamai"
+
+    d['akamai2']["ocsp_url"] = 'http://r3.o.lencr.org'
+    d['akamai2']["ip_host"] = 'http://23.205.105.167'
+    d['akamai2']["master_akid"] = '142EB317B75856CBAE500940E61FAF9D8B14C2C6'
+    d['akamai2']["OCSP_URL_ID"] = 125
+    d['akamai2']["cdn"] = "akamai"
+
+    for i in range(1):
+        for key in d:
+            luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
+                                          ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
+                                          OCSP_URL_ID=d[key]['OCSP_URL_ID'], cdn=d[key]['cdn'], key=key)
+            time.sleep(10)
+        #time.sleep(1800)
+
+
+def cache_exp_init_v4():
+    from collections import defaultdict
+    d = defaultdict(lambda : dict())
+
+
+    ## Info for cloudflare
+    # cloudflare globalsign done, now mocsp, akamai lc
+
+    d['highwind-1']["ocsp_url"] = 'http://ocsp.comodoca.com'
+    d['highwind-1']["ip_host"] = 'http://151.139.128.14'
+    d['highwind-1']["master_akid"] = '7E035A65416BA77E0AE1B89D08EA1D8E1D6AC765'
+    d['highwind-1']["cdn"] = "Highwind Networks"
+    #d['highwind-1']["ocsp_url"] = "ocsp.comodoca.com"
+    d['highwind-1']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
+
+    d['highwind-2']["ocsp_url"] = 'http://ocsp.sectigo.com'
+    d['highwind-2']["ip_host"] = 'http://151.139.128.14'
+    d['highwind-2']["master_akid"] = '8D8C5EC454AD8AE177E99BF99B05E1B8018D61E1'
+    d['highwind-2']["cdn"] = "Highwind Networks"
+    #d['highwind-2']["ocsp_url"] = "ocsp.sectigo.com"
+    d['highwind-2']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
+
+
+    d['verizon']["ocsp_url"] = 'http://ocsp.digicert.com'
+    d['verizon']["ip_host"] = 'http://72.21.91.29'
+    d['verizon']["master_akid"] = None # TODO
+    d['verizon']["cdn"] = "Verizon"
+    #d['verizon']["ocsp_url"] = "ocsp.digicert.com"
+    d['verizon']["meta"] = "Serves non-delegated OCSP response from peer's infrastructure"
+
+
+
+    d['Alibaba']["ocsp_url"] = 'http://ocsp.digicert.cn'
+    d['Alibaba']["ip_host"] = 'http://47.246.23.118'
+    d['Alibaba']["master_akid"] = None  # TODO
+    d['Alibaba']["cdn"] = "Alibaba"
+    #d['Alibaba']["ocsp_url"] = "ocsp.digicert.cn"
+    d['Alibaba']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
+
+
+    d['akamai']["ocsp_url"] = 'http://r3.o.lencr.org'
+    d['akamai']["ip_host"] = 'http://23.205.105.170'
+    d['akamai']["master_akid"] = '142EB317B75856CBAE500940E61FAF9D8B14C2C6'
+    #d['akamai']["ocsp_url"] = 'r3.o.lencr.org'
+    d['akamai']["cdn"] = "akamai"
+    d['akamai']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
+
+    d['cloudflare']["ocsp_url"] = 'http://ocsp.msocsp.com'
+    d['cloudflare']["ip_host"] = 'http://104.18.25.243'
+    d['cloudflare']["master_akid"] = None
+    d['cloudflare']["cdn"] = "cloudflare"
+    #d['cloudflare']["ocsp_url"] = 'ocsp.msocsp.com'
+    d['cloudflare']["meta"] = "Serves delegated OCSP response from others infrastructure"
+
+    d['sukuri']["ocsp_url"] = 'http://ocsp.godaddy.com/'
+    d['sukuri']["ip_host"] = 'http://192.124.249.36'
+    d['sukuri']["master_akid"] = None
+    d['sukuri']["cdn"] = "sukuri"
+    #d['sukuri']["ocsp_url"] = 'ocsp.godaddy.com'
+    d['sukuri']["meta"] = "Serves delegated OCSP response from owner's infrastructure"
+
+    d['apple']["ocsp_url"] = 'http://ocsp.apple.com/ocsp03-apsrsa12g101'
+    d['apple']["ip_host"] = 'http://17.253.21.203/ocsp03-apsrsa12g101'
+    d['apple']["master_akid"] = None
+    d['apple']["cdn"] = "apple"
+    #d['apple']["ocsp_url"] = 'ocsp.apple.com/ocsp03-apsrsa12g101'
+    d['apple']["meta"] = "Serves delegated OCSP response from own infrastructure"
+
+    d['amazon']["ocsp_url"] = 'http://ocsp.wisekey.com'
+    d['amazon']["ip_host"] = 'http://3.66.5.77'
+    d['amazon']["master_akid"] = None
+    d['amazon']["cdn"] = "amazon"
+    #d['amazon']["ocsp_url"] = 'ocsp.wisekey.com'
+    d['amazon']["meta"] = "Serves delegated OCSP response from other's infrastructure"
+
+    # TODO do next ssocsp.cybertrust.ne.jp, ocsps.ssl.com
+
+
+
+    for i in range(1):
+        for key in d:
+            luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
+                                          ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
+                                          OCSP_URL_ID=1, cdn=d[key]['cdn'], key=key, meta=d[key]['meta'])
+            time.sleep(1)
+        #time.sleep(1800)
+
+
+
+
+
+
+
+

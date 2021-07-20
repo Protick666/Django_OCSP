@@ -35,7 +35,7 @@ def choose_candidate_asns():
     return chosen_asn_outer
 
 
-def choose_hops():
+def choose_hops(only_asns=False, ban_list=[]):
     # 17844
     dash_board_asns = choose_candidate_asns()
     dash_board_asns = [element[0] for element in dash_board_asns]
@@ -56,6 +56,9 @@ def choose_hops():
 
     all_asns = dash_board_asns + asn_list
     all_asns = [(element, ASN) for element in all_asns]
+
+    if only_asns:
+        return all_asns
 
 
     f = open("OCSP_DNS_DJANGO/countries.json")

@@ -49,7 +49,7 @@ def choose_hops():
     if LOCAL:
         global_asn_split = 10
     else:
-        global_asn_split = 100
+        global_asn_split = 300
     asn_list = json.load(f)
     asn_list = random.sample(asn_list, dash_board_split)
 

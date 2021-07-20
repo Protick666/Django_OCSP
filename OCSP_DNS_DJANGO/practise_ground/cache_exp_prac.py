@@ -292,10 +292,13 @@ def cache_exp_init_v4():
 
     for i in range(1):
         for key in d:
-            luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
-                                          ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
-                                          OCSP_URL_ID=1, cdn=d[key]['cdn'], key=key, meta=d[key]['meta'])
-            time.sleep(1)
+            try:
+                luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
+                                              ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
+                                              OCSP_URL_ID=1, cdn=d[key]['cdn'], key=key, meta=d[key]['meta'])
+                time.sleep(1)
+            except Exception as e:
+                pass
         #time.sleep(1800)
 
 

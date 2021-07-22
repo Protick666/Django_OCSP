@@ -239,6 +239,8 @@ async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_hop
 
 def luminati_master_crawler_async_v2():
     starting_time = time.time()
+    msg = "Luminati crawling started at {}".format(starting_time)
+    send_telegram_msg(msg=msg)
 
     logger.info("Starting ocsp job now !")
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
@@ -275,10 +277,11 @@ def luminati_master_crawler_async_v2():
 
     elapsed_time = time.time() - starting_time
     print("Elapsed time {}".format(elapsed_time))
-    send_telegram_msg(elapsed_time=elapsed_time)
 
-
-def send_telegram_msg(elapsed_time):
-    import telegram_send
     msg = "Luminati crawling done, elapsed time {}".format(elapsed_time)
+    send_telegram_msg(msg=msg)
+
+
+def send_telegram_msg(msg):
+    import telegram_send
     telegram_send.send(messages=[msg])

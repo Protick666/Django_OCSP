@@ -8,6 +8,7 @@ from OCSP_DNS_DJANGO.practise_ground.cache_exp_prac import cache_exp_init_v3, ca
 
 
 def ocsp_crawler_v2(request):
-    cache_exp_init_v4()
+    #cache_exp_init_v4()
+    luminati_ip_to_resolver()
     return HttpResponse("asdas")
 

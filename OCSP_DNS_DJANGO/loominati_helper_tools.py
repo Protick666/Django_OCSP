@@ -35,6 +35,13 @@ def choose_candidate_asns():
     return chosen_asn_outer
 
 
+def choose_all_available_asns():
+    f = open('OCSP_DNS_DJANGO/luminati_data/successful_asns.json')
+    asn_list = json.load(f)
+    #print(len(asn_list))
+    return asn_list
+
+
 def choose_hops(only_asns=False, ban_list=[]):
     # 17844
     dash_board_asns = choose_candidate_asns()

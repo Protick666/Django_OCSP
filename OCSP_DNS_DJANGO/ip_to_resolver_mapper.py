@@ -98,7 +98,7 @@ async def run_crawler(chosen_hop_list):
 
 
 def luminati_ip_to_resolver():
-    for i in range(6):
+    for i in range(15):
         starting_time = time.time()
 
         logger.info("Starting ip to resolver crawler job now !")

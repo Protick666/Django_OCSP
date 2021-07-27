@@ -288,10 +288,9 @@ def cache_exp_init_v7():
 
     seen_dict = {}
 
-    c = 0
     for key in d:
         try:
-            c += 1
+
             if d[key]['root_domain'] in seen_dict:
                 continue
 
@@ -301,8 +300,6 @@ def cache_exp_init_v7():
 
             seen_dict[d[key]['root_domain']] = 1
 
-            if c == 5:
-                break
         except Exception as e:
             print("Exception: {}-{}".format(key, e))
 

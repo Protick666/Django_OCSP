@@ -72,7 +72,7 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce):
 
     except Exception as e:
         #d = {}
-        d['error'] = e
+        d['error'] = str(e)
         if response:
             d['elapsed_time'] = response.elapsed.total_seconds()
         return d
@@ -100,7 +100,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
 
     #TODO change
-    certs_per_bucket = 3
+    certs_per_bucket = 4
     query_number = 100
 
     random_list = []
@@ -169,7 +169,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     ans['random'] = d
 
     try:
-        with open("jsons_v4/{}-cache_exp-{}-{}.json".format(cdn, key, time.time()), "w") as ouf:
+        with open("jsons_v5/{}-cache_exp-{}-{}.json".format(cdn, key, time.time()), "w") as ouf:
             json.dump(ans, fp=ouf, indent=2)
     except Exception as e:
         print(e)
@@ -219,27 +219,27 @@ def cache_exp_init_v4():
     ## Info for cloudflare
     # cloudflare globalsign done, now mocsp, akamai lc
 
-    d['highwind-1']["ocsp_url"] = 'http://ocsp.comodoca.com'
-    d['highwind-1']["ip_host"] = 'http://151.139.128.14'
-    d['highwind-1']["master_akid"] = '7E035A65416BA77E0AE1B89D08EA1D8E1D6AC765'
-    d['highwind-1']["cdn"] = "Highwind Networks"
-    #d['highwind-1']["ocsp_url"] = "ocsp.comodoca.com"
-    d['highwind-1']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
-
-    d['highwind-2']["ocsp_url"] = 'http://ocsp.sectigo.com'
-    d['highwind-2']["ip_host"] = 'http://151.139.128.14'
-    d['highwind-2']["master_akid"] = '8D8C5EC454AD8AE177E99BF99B05E1B8018D61E1'
-    d['highwind-2']["cdn"] = "Highwind Networks"
-    #d['highwind-2']["ocsp_url"] = "ocsp.sectigo.com"
-    d['highwind-2']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
-
-
-    d['verizon']["ocsp_url"] = 'http://ocsp.digicert.com'
-    d['verizon']["ip_host"] = 'http://72.21.91.29'
-    d['verizon']["master_akid"] = None # TODO
-    d['verizon']["cdn"] = "Verizon"
-    #d['verizon']["ocsp_url"] = "ocsp.digicert.com"
-    d['verizon']["meta"] = "Serves non-delegated OCSP response from peer's infrastructure"
+    # d['highwind-1']["ocsp_url"] = 'http://ocsp.comodoca.com'
+    # d['highwind-1']["ip_host"] = 'http://151.139.128.14'
+    # d['highwind-1']["master_akid"] = '7E035A65416BA77E0AE1B89D08EA1D8E1D6AC765'
+    # d['highwind-1']["cdn"] = "Highwind Networks"
+    # #d['highwind-1']["ocsp_url"] = "ocsp.comodoca.com"
+    # d['highwind-1']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
+    #
+    # d['highwind-2']["ocsp_url"] = 'http://ocsp.sectigo.com'
+    # d['highwind-2']["ip_host"] = 'http://151.139.128.14'
+    # d['highwind-2']["master_akid"] = '8D8C5EC454AD8AE177E99BF99B05E1B8018D61E1'
+    # d['highwind-2']["cdn"] = "Highwind Networks"
+    # #d['highwind-2']["ocsp_url"] = "ocsp.sectigo.com"
+    # d['highwind-2']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
+    #
+    #
+    # d['verizon']["ocsp_url"] = 'http://ocsp.digicert.com'
+    # d['verizon']["ip_host"] = 'http://72.21.91.29'
+    # d['verizon']["master_akid"] = None # TODO
+    # d['verizon']["cdn"] = "Verizon"
+    # #d['verizon']["ocsp_url"] = "ocsp.digicert.com"
+    # d['verizon']["meta"] = "Serves non-delegated OCSP response from peer's infrastructure"
 
 
 
@@ -251,40 +251,40 @@ def cache_exp_init_v4():
     d['Alibaba']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
 
 
-    d['akamai']["ocsp_url"] = 'http://r3.o.lencr.org'
-    d['akamai']["ip_host"] = 'http://23.205.105.170'
-    d['akamai']["master_akid"] = '142EB317B75856CBAE500940E61FAF9D8B14C2C6'
-    #d['akamai']["ocsp_url"] = 'r3.o.lencr.org'
-    d['akamai']["cdn"] = "akamai"
-    d['akamai']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
+    # d['akamai']["ocsp_url"] = 'http://r3.o.lencr.org'
+    # d['akamai']["ip_host"] = 'http://23.205.105.170'
+    # d['akamai']["master_akid"] = '142EB317B75856CBAE500940E61FAF9D8B14C2C6'
+    # #d['akamai']["ocsp_url"] = 'r3.o.lencr.org'
+    # d['akamai']["cdn"] = "akamai"
+    # d['akamai']["meta"] = "Serves non-delegated OCSP response from others infrastructure"
 
-    d['cloudflare']["ocsp_url"] = 'http://ocsp.msocsp.com'
-    d['cloudflare']["ip_host"] = 'http://104.18.25.243'
-    d['cloudflare']["master_akid"] = None
-    d['cloudflare']["cdn"] = "cloudflare"
-    #d['cloudflare']["ocsp_url"] = 'ocsp.msocsp.com'
-    d['cloudflare']["meta"] = "Serves delegated OCSP response from others infrastructure"
+    # d['cloudflare']["ocsp_url"] = 'http://ocsp.msocsp.com'
+    # d['cloudflare']["ip_host"] = 'http://104.18.25.243'
+    # d['cloudflare']["master_akid"] = None
+    # d['cloudflare']["cdn"] = "cloudflare"
+    # #d['cloudflare']["ocsp_url"] = 'ocsp.msocsp.com'
+    # d['cloudflare']["meta"] = "Serves delegated OCSP response from others infrastructure"
 
-    d['sukuri']["ocsp_url"] = 'http://ocsp.godaddy.com/'
-    d['sukuri']["ip_host"] = 'http://192.124.249.36'
-    d['sukuri']["master_akid"] = None
-    d['sukuri']["cdn"] = "sukuri"
-    #d['sukuri']["ocsp_url"] = 'ocsp.godaddy.com'
-    d['sukuri']["meta"] = "Serves delegated OCSP response from owner's infrastructure"
+    # d['sukuri']["ocsp_url"] = 'http://ocsp.godaddy.com/'
+    # d['sukuri']["ip_host"] = 'http://192.124.249.36'
+    # d['sukuri']["master_akid"] = None
+    # d['sukuri']["cdn"] = "sukuri"
+    # #d['sukuri']["ocsp_url"] = 'ocsp.godaddy.com'
+    # d['sukuri']["meta"] = "Serves delegated OCSP response from owner's infrastructure"
 
-    d['apple']["ocsp_url"] = 'http://ocsp.apple.com/ocsp03-apsrsa12g101'
-    d['apple']["ip_host"] = 'http://17.253.21.203/ocsp03-apsrsa12g101'
-    d['apple']["master_akid"] = None
-    d['apple']["cdn"] = "apple"
-    #d['apple']["ocsp_url"] = 'ocsp.apple.com/ocsp03-apsrsa12g101'
-    d['apple']["meta"] = "Serves delegated OCSP response from own infrastructure"
-
-    d['amazon']["ocsp_url"] = 'http://ocsp.wisekey.com'
-    d['amazon']["ip_host"] = 'http://3.66.5.77'
-    d['amazon']["master_akid"] = None
-    d['amazon']["cdn"] = "amazon"
-    #d['amazon']["ocsp_url"] = 'ocsp.wisekey.com'
-    d['amazon']["meta"] = "Serves delegated OCSP response from other's infrastructure"
+    # d['apple']["ocsp_url"] = 'http://ocsp.apple.com/ocsp03-apsrsa12g101'
+    # d['apple']["ip_host"] = 'http://17.253.21.203/ocsp03-apsrsa12g101'
+    # d['apple']["master_akid"] = None
+    # d['apple']["cdn"] = "apple"
+    # #d['apple']["ocsp_url"] = 'ocsp.apple.com/ocsp03-apsrsa12g101'
+    # d['apple']["meta"] = "Serves delegated OCSP response from own infrastructure"
+    #
+    # d['amazon']["ocsp_url"] = 'http://ocsp.wisekey.com'
+    # d['amazon']["ip_host"] = 'http://3.66.5.77'
+    # d['amazon']["master_akid"] = None
+    # d['amazon']["cdn"] = "amazon"
+    # #d['amazon']["ocsp_url"] = 'ocsp.wisekey.com'
+    # d['amazon']["meta"] = "Serves delegated OCSP response from other's infrastructure"
 
     # TODO do next ssocsp.cybertrust.ne.jp, ocsps.ssl.com
 
@@ -293,10 +293,11 @@ def cache_exp_init_v4():
     for i in range(1):
         for key in d:
             try:
-                luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
-                                              ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
-                                              OCSP_URL_ID=1, cdn=d[key]['cdn'], key=key, meta=d[key]['meta'])
-                time.sleep(1)
+                for i in range(4):
+                    luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
+                                                  ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
+                                                  OCSP_URL_ID=1, cdn=d[key]['cdn'], key=key, meta=d[key]['meta'])
+                    time.sleep(1)
             except Exception as e:
                 pass
         #time.sleep(1800)

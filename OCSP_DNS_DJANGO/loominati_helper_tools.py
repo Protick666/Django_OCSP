@@ -1,7 +1,13 @@
 from OCSP_DNS_DJANGO.local import LOCAL
 import json
 import random
-from OCSP_DNS_DJANGO.models import ASN,CN
+from OCSP_DNS_DJANGO.models import *
+
+def get_ocsp_hosts():
+    # TODO test
+    ocsp_hosts = ocsp_url_db.objects.all()
+    return [e.url for e in ocsp_hosts]
+
 
 def choose_asn_number_per_country(number):
     if LOCAL:

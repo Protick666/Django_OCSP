@@ -96,12 +96,19 @@ def get_ips_of_urls():
 
 
 def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, cdn, key, meta):
+    cdn = cdn.replace(" ", "-")
+    cdn = cdn.replace(",", "")
+    cdn = cdn.replace(".", "")
+    cdn = cdn.replace("/", "-")
+
+    ip_host = 'http://' + ip_host
+
 
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
 
     #TODO change
-    certs_per_bucket = 4
-    query_number = 100
+    certs_per_bucket = 2
+    query_number = 50
 
     random_list = []
 
@@ -115,12 +122,12 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     q_key = "ocsp:serial:" + ocsp_url
     elements = r.lrange(q_key, 0, -1)
     elements = [e.decode() for e in elements]
-    print(ocsp_url)
+    #print(ocsp_url)
     elements = list(set(elements))
     elements = random.sample(elements, certs_per_bucket)
     new_list = elements
 
-    for i in range(certs_per_bucket):
+    for i in range(1):
         random_list.append(random_with_N_digits(len(ex_serial)))
 
     from collections import defaultdict
@@ -167,51 +174,19 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
 
         d[e] = d_d
     ans['random'] = d
+    ans['url'] = key
 
     try:
-        with open("jsons_v5/{}-cache_exp-{}-{}.json".format(cdn, key, time.time()), "w") as ouf:
+        with open("jsons_v7/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
             json.dump(ans, fp=ouf, indent=2)
     except Exception as e:
         print(e)
         pass
 
 
-def cache_exp_init_v3():
-    d = {}
-    d['cloudflare'] = {}
-    d['akamai1'] = {}
-    d['akamai2'] = {}
-
-    ## Info for cloudflare
-
-    d['cloudflare']["ocsp_url"] = 'http://ocsp2.globalsign.com/gsdomainvalsha2g3'
-    d['cloudflare']["ip_host"] = 'http://104.18.21.226/gsdomainvalsha2g3'
-    d['cloudflare']["master_akid"] = '3D808279C54882A3C312EEDF990F5735489ED0CB'
-    d['cloudflare']["OCSP_URL_ID"] = 110
-    d['cloudflare']["cdn"] = "cloudflare"
-
-    d['akamai1']["ocsp_url"] = 'http://nazwassl2sha2.ocsp-certum.com'
-    d['akamai1']["ip_host"] = 'http://23.212.251.132'
-    d['akamai1']["master_akid"] = '54DC90BB9D471951C379682C84ED2EDF5F46BAC7'
-    d['akamai1']["OCSP_URL_ID"] = 81
-    d['akamai1']["cdn"] = "akamai"
-
-    d['akamai2']["ocsp_url"] = 'http://r3.o.lencr.org'
-    d['akamai2']["ip_host"] = 'http://23.205.105.167'
-    d['akamai2']["master_akid"] = '142EB317B75856CBAE500940E61FAF9D8B14C2C6'
-    d['akamai2']["OCSP_URL_ID"] = 125
-    d['akamai2']["cdn"] = "akamai"
-
-    for i in range(1):
-        for key in d:
-            luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
-                                          ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
-                                          OCSP_URL_ID=d[key]['OCSP_URL_ID'], cdn=d[key]['cdn'], key=key)
-            time.sleep(10)
-        #time.sleep(1800)
 
 
-def cache_exp_init_v4():
+def cache_exp_init_v5():
     from collections import defaultdict
     d = defaultdict(lambda : dict())
 
@@ -296,11 +271,41 @@ def cache_exp_init_v4():
                 for i in range(4):
                     luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
                                                   ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
-                                                  OCSP_URL_ID=1, cdn=d[key]['cdn'], key=key, meta=d[key]['meta'])
+                                                  OCSP_URL_ID=1, cdn=d[key]['cdn'], key=key, meta=d[key]['is_delegated'])
                     time.sleep(1)
             except Exception as e:
                 pass
         #time.sleep(1800)
+
+
+def cache_exp_init_v7():
+    from collections import defaultdict
+    d = defaultdict(lambda: dict())
+
+    f = open('ocsp_url_info.json')
+    d = json.load(f)
+    s = set()
+
+    seen_dict = {}
+
+    c = 0
+    for key in d:
+        try:
+            c += 1
+            if d[key]['root_domain'] in seen_dict:
+                continue
+
+            luminati_master_crawler_cache(ocsp_url=key,
+                                          ip_host=d[key]['a_record'], master_akid=None,
+                                          OCSP_URL_ID=1, cdn=d[key]['org'], key=key, meta=d[key]['is_delegated'])
+
+            seen_dict[d[key]['root_domain']] = 1
+
+            if c == 5:
+                break
+        except Exception as e:
+            print("Exception: {}-{}".format(key, e))
+
 
 
 

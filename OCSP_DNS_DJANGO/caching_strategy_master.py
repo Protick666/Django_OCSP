@@ -76,7 +76,9 @@ def get_asn(ip):
 
 
 def get_org(asn):
-    return as2isp.getISP("20221212", asn)[0]
+    ans = str(as2isp.getISP("20221212", asn)[0])
+    ans.replace("\"", "")
+    return ans
 
 
 def get_root_domain(url):

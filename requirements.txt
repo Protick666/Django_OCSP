@@ -18,6 +18,9 @@ validators==0.18.2
 django-channels
 channels
 telegram-send
+pyasn==1.6.1
+intervaltree
+
 
 
 

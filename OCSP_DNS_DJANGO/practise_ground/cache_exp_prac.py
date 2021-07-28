@@ -107,8 +107,8 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
 
     #TODO change
-    certs_per_bucket = 2
-    query_number = 50
+    certs_per_bucket = 3
+    query_number = 100
 
     random_list = []
 
@@ -127,7 +127,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     elements = random.sample(elements, certs_per_bucket)
     new_list = elements
 
-    for i in range(1):
+    for i in range(certs_per_bucket):
         random_list.append(random_with_N_digits(len(ex_serial)))
 
     from collections import defaultdict
@@ -177,7 +177,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     ans['url'] = key
 
     try:
-        with open("jsons_v7/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
+        with open("jsons_v8/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
             json.dump(ans, fp=ouf, indent=2)
     except Exception as e:
         print(e)
@@ -290,15 +290,15 @@ def cache_exp_init_v7():
 
     for key in d:
         try:
-
-            if d[key]['root_domain'] in seen_dict:
+            cdn = d[key]['org']
+            if cdn != "Amazon.com, Inc.":
                 continue
 
             luminati_master_crawler_cache(ocsp_url=key,
                                           ip_host=d[key]['a_record'], master_akid=None,
                                           OCSP_URL_ID=1, cdn=d[key]['org'], key=key, meta=d[key]['is_delegated'])
 
-            seen_dict[d[key]['root_domain']] = 1
+            # seen_dict[d[key]['root_domain']] = 1
 
         except Exception as e:
             print("Exception: {}-{}".format(key, e))

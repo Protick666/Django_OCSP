@@ -63,7 +63,7 @@ def choose_hops(only_asns=False, ban_list=[]):
     if LOCAL:
         global_asn_split = 10
     else:
-        global_asn_split = 400
+        global_asn_split = 800
     asn_list = json.load(f)
     asn_list = random.sample(asn_list, global_asn_split)
 

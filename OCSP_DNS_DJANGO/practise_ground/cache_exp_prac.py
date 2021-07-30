@@ -52,6 +52,7 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce):
 
     try:
         d = {}
+        d['serial_number'] = serial_number
 
         starting_time = time.monotonic()
         response_temp = requests.get(ip_host)
@@ -66,6 +67,11 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce):
         d['response_status'] = str(decoded_response.response_status)
         if str(decoded_response.response_status) == "OCSPResponseStatus.SUCCESSFUL":
             d['cert_status'] = str(decoded_response.certificate_status)
+
+        d['produced_at'] = decoded_response.produced_at
+        d['this_update'] = decoded_response.this_update
+        d['next_update'] = decoded_response.next_update
+
         d['elapsed_time'] = response.elapsed.total_seconds()
         d['response_time'] = response_time
         return d
@@ -76,6 +82,7 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce):
         if response:
             d['elapsed_time'] = response.elapsed.total_seconds()
         return d
+
 
 def get_ips_of_urls():
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
@@ -111,6 +118,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     query_number = 100
 
     random_list = []
+    random_list_dynamic = []
 
     ex_serial = '10028015818766309226464494355'
 
@@ -127,8 +135,9 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     elements = random.sample(elements, certs_per_bucket)
     new_list = elements
 
-    for i in range(certs_per_bucket):
+    for i in range(2):
         random_list.append(random_with_N_digits(len(ex_serial)))
+        random_list_dynamic.append(random_with_N_digits(len(ex_serial)))
 
     from collections import defaultdict
     ans = defaultdict(lambda: dict())
@@ -174,10 +183,33 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
 
         d[e] = d_d
     ans['random'] = d
+
+    d = {}
+    for e in random_list_dynamic:
+        d_d = {"with_nonce": {}, "without_nonce": {}}
+        for c in range(query_number):
+            data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
+                                   akid=akid_c, r=r,
+                                   ocsp_url=ocsp_url,
+                                   ip_host=ip_host, nonce=False)
+            d_d['without_nonce'][c] = data
+
+        for c in range(query_number):
+            data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
+                                   akid=akid_c, r=r,
+                                   ocsp_url=ocsp_url,
+                                   ip_host=ip_host, nonce=True)
+            d_d['with_nonce'][c] = data
+
+        d[e] = d_d
+    ans['random_dynamic'] = d
+
+
+
     ans['url'] = key
 
     try:
-        with open("jsons_v8/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
+        with open("jsons_v9/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
             json.dump(ans, fp=ouf, indent=2)
     except Exception as e:
         print(e)
@@ -263,8 +295,6 @@ def cache_exp_init_v5():
 
     # TODO do next ssocsp.cybertrust.ne.jp, ocsps.ssl.com
 
-
-
     for i in range(1):
         for key in d:
             try:
@@ -291,14 +321,15 @@ def cache_exp_init_v7():
     for key in d:
         try:
             cdn = d[key]['org']
-            if cdn != "Amazon.com, Inc.":
+
+            if d[key]['root_domain'] in seen_dict:
                 continue
 
             luminati_master_crawler_cache(ocsp_url=key,
                                           ip_host=d[key]['a_record'], master_akid=None,
                                           OCSP_URL_ID=1, cdn=d[key]['org'], key=key, meta=d[key]['is_delegated'])
 
-            # seen_dict[d[key]['root_domain']] = 1
+            seen_dict[d[key]['root_domain']] = 1
 
         except Exception as e:
             print("Exception: {}-{}".format(key, e))

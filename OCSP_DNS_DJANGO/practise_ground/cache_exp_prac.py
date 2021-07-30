@@ -68,9 +68,9 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce):
         if str(decoded_response.response_status) == "OCSPResponseStatus.SUCCESSFUL":
             d['cert_status'] = str(decoded_response.certificate_status)
 
-        d['produced_at'] = decoded_response.produced_at
-        d['this_update'] = decoded_response.this_update
-        d['next_update'] = decoded_response.next_update
+        d['produced_at'] = str(decoded_response.produced_at)
+        d['this_update'] = str(decoded_response.this_update)
+        d['next_update'] = str(decoded_response.next_update)
 
         d['elapsed_time'] = response.elapsed.total_seconds()
         d['response_time'] = response_time
@@ -115,7 +115,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
 
     #TODO change
     certs_per_bucket = 3
-    query_number = 100
+    query_number = 50
 
     random_list = []
     random_list_dynamic = []

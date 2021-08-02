@@ -67,10 +67,9 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce):
         d['response_status'] = str(decoded_response.response_status)
         if str(decoded_response.response_status) == "OCSPResponseStatus.SUCCESSFUL":
             d['cert_status'] = str(decoded_response.certificate_status)
-
-        d['produced_at'] = str(decoded_response.produced_at)
-        d['this_update'] = str(decoded_response.this_update)
-        d['next_update'] = str(decoded_response.next_update)
+            d['produced_at'] = str(decoded_response.produced_at)
+            d['this_update'] = str(decoded_response.this_update)
+            d['next_update'] = str(decoded_response.next_update)
 
         d['elapsed_time'] = response.elapsed.total_seconds()
         d['response_time'] = response_time
@@ -209,7 +208,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     ans['url'] = key
 
     try:
-        with open("jsons_v9/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
+        with open("jsons_v10/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
             json.dump(ans, fp=ouf, indent=2)
     except Exception as e:
         print(e)

@@ -40,7 +40,7 @@ def random_with_N_digits(n):
     return randint(range_start, range_end)
 
 
-def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce):
+def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
     response = None
     ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
     ca_cert = pem.readPemFromString(ca_cert)
@@ -70,12 +70,19 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce):
             d['produced_at'] = str(decoded_response.produced_at)
             d['this_update'] = str(decoded_response.this_update)
             d['next_update'] = str(decoded_response.next_update)
+            d['signature'] = str(decoded_response.signature)
+            if pre[0] == -1:
+                d['sig_same'] = True
+            else:
+                d['sig_same'] = (pre[0] == str(decoded_response.signature))
+            pre[0] = str(decoded_response.signature)
 
         d['elapsed_time'] = response.elapsed.total_seconds()
         d['response_time'] = response_time
         return d
 
     except Exception as e:
+        print(e)
         #d = {}
         d['error'] = str(e)
         if response:
@@ -148,16 +155,20 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
         d_d = {"with_nonce": {}, "without_nonce": {}}
         serial_number, akid, fingerprint = element.split(":")
         akid_c = akid
+
+        pre = [-1]
         for c in range(query_number):
             data = make_ocsp_query(serial_number=serial_number,
                                    akid=akid, r=r, ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=False)
+                                   ip_host=ip_host, nonce=False, pre=pre)
+
             d_d['without_nonce'][c] = data
 
+        pre = [-1]
         for c in range(query_number):
             data = make_ocsp_query(serial_number=serial_number,
                                    akid=akid, r=r, ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=True)
+                                   ip_host=ip_host, nonce=True, pre=pre)
             d_d['with_nonce'][c] = data
 
         d[serial_number] = d_d
@@ -166,18 +177,20 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     d = {}
     for e in random_list:
         d_d = {"with_nonce": {}, "without_nonce": {}}
+        pre = [-1]
         for c in range(query_number):
             data = make_ocsp_query(serial_number=e,
                                    akid=akid_c, r=r,
                                    ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=False)
+                                   ip_host=ip_host, nonce=False, pre=pre)
             d_d['without_nonce'][c] = data
 
+        pre = [-1]
         for c in range(query_number):
             data = make_ocsp_query(serial_number=e,
                                    akid=akid_c, r=r,
                                    ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=True)
+                                   ip_host=ip_host, nonce=True, pre=pre)
             d_d['with_nonce'][c] = data
 
         d[e] = d_d
@@ -186,29 +199,30 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     d = {}
     for e in random_list_dynamic:
         d_d = {"with_nonce": {}, "without_nonce": {}}
+
+        pre = [-1]
         for c in range(query_number):
             data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
                                    akid=akid_c, r=r,
                                    ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=False)
+                                   ip_host=ip_host, nonce=False, pre=pre)
             d_d['without_nonce'][c] = data
 
+        pre = [-1]
         for c in range(query_number):
             data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
                                    akid=akid_c, r=r,
                                    ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=True)
+                                   ip_host=ip_host, nonce=True, pre=pre)
             d_d['with_nonce'][c] = data
 
         d[e] = d_d
     ans['random_dynamic'] = d
 
-
-
     ans['url'] = key
 
     try:
-        with open("jsons_v10/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
+        with open("jsons_v11/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
             json.dump(ans, fp=ouf, indent=2)
     except Exception as e:
         print(e)

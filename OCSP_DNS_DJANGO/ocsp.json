@@ -1,0 +1,1170 @@
+[
+  {
+    "url": "http://ocsp.comodoca.com",
+    "c": 90936
+  },
+  {
+    "url": "http://ocsp.sca1b.amazontrust.com",
+    "c": 89000
+  },
+  {
+    "url": "http://ocsp.digicert.com",
+    "c": 88630
+  },
+  {
+    "url": "http://r3.o.lencr.org",
+    "c": 88364
+  },
+  {
+    "url": "http://zerossl.ocsp.sectigo.com",
+    "c": 87359
+  },
+  {
+    "url": "http://ocsp.sectigo.com",
+    "c": 87062
+  },
+  {
+    "url": "http://ocsp.usertrust.com",
+    "c": 80938
+  },
+  {
+    "url": "http://oneocsp.microsoft.com/ocsp",
+    "c": 79477
+  },
+  {
+    "url": "http://ocsp.godaddy.com/",
+    "c": 79337
+  },
+  {
+    "url": "http://ocsp.msocsp.com",
+    "c": 77436
+  },
+  {
+    "url": "http://statuse.digitalcertvalidation.com",
+    "c": 77417
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1d4",
+    "c": 73198
+  },
+  {
+    "url": "http://ocsp.entrust.net",
+    "c": 68702
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsgccr3dvtlsca2020",
+    "c": 66596
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsalphasha2g2",
+    "c": 65884
+  },
+  {
+    "url": "http://GEANT.ocsp.sectigo.com",
+    "c": 60744
+  },
+  {
+    "url": "http://ocsp06.actalis.it/VA/AUTHDV-G3",
+    "c": 57765
+  },
+  {
+    "url": "http://certcloud.ocsp.trust-provider.com",
+    "c": 54849
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1d4int",
+    "c": 53749
+  },
+  {
+    "url": "http://e1.o.lencr.org",
+    "c": 53577
+  },
+  {
+    "url": "http://status.geotrust.com",
+    "c": 53451
+  },
+  {
+    "url": "http://ocsp.starfieldtech.com/",
+    "c": 53006
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsrsaovsslca2018",
+    "c": 52920
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsdomainvalsha2g3",
+    "c": 52863
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/attatlasr3ovtlsca2020",
+    "c": 52632
+  },
+  {
+    "url": "http://nazwassl2sha2.ocsp-certum.com",
+    "c": 52404
+  },
+  {
+    "url": "http://ocsp.comodoca4.com",
+    "c": 51935
+  },
+  {
+    "url": "http://ocspx.digicert.com",
+    "c": 50834
+  },
+  {
+    "url": "http://globessl.ocsp.sectigo.com",
+    "c": 50687
+  },
+  {
+    "url": "http://ocsp.incommon-ecc.org",
+    "c": 50579
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsextendvalsha2g3r3",
+    "c": 50563
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1c3",
+    "c": 50134
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsorganizationvalsha2g2",
+    "c": 50059
+  },
+  {
+    "url": "http://ocsp.netsolssl.com",
+    "c": 49924
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1p5",
+    "c": 49713
+  },
+  {
+    "url": "http://dvcasha2.ocsp-certum.com",
+    "c": 49310
+  },
+  {
+    "url": "http://ocsp.securecore-ca.com",
+    "c": 49243
+  },
+  {
+    "url": "http://ocsp.int-x3.letsencrypt.org",
+    "c": 48784
+  },
+  {
+    "url": "http://ocsp.quovadisglobal.com",
+    "c": 48734
+  },
+  {
+    "url": "http://statusf.digitalcertvalidation.com",
+    "c": 48667
+  },
+  {
+    "url": "http://status.thawte.com",
+    "c": 48564
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/cloudsslsha2g3",
+    "c": 48547
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/dhltlscai5",
+    "c": 48279
+  },
+  {
+    "url": "http://ocsp.digicert.cn",
+    "c": 48084
+  },
+  {
+    "url": "http://status.rapidssl.com",
+    "c": 47557
+  },
+  {
+    "url": "http://lh.ocsp-certum.com",
+    "c": 47078
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1o1",
+    "c": 47064
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/gsatlasr3dvtlsca2020",
+    "c": 46672
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1o1core",
+    "c": 46330
+  },
+  {
+    "url": "http://ocsp.trustcor.ca",
+    "c": 45837
+  },
+  {
+    "url": "http://ocsp.securetrust.com/",
+    "c": 45704
+  },
+  {
+    "url": "http://alpiro.ocsp.sectigo.com",
+    "c": 45411
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts1d2",
+    "c": 45271
+  },
+  {
+    "url": "http://ocsps.ssl.com",
+    "c": 44418
+  },
+  {
+    "url": "http://ssl-c3-ca1-2009.ocsp.d-trust.net",
+    "c": 44379
+  },
+  {
+    "url": "http://ocsp.trust.telia.com",
+    "c": 43953
+  },
+  {
+    "url": "http://statusd.digitalcertvalidation.com",
+    "c": 43773
+  },
+  {
+    "url": "http://ocsp.buypass.com",
+    "c": 43612
+  },
+  {
+    "url": "http://ocsp03.sbca.telesec.de/ocspr",
+    "c": 43579
+  },
+  {
+    "url": "http://h.ocsp-certum.com",
+    "c": 43551
+  },
+  {
+    "url": "http://ocsp.swisssign.net/DBBCBF821859DC69FAF8ABAA834D771D0BB08BD8",
+    "c": 43453
+  },
+  {
+    "url": "http://trustocean.ocsp.sectigo.com",
+    "c": 42983
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/gsoveccg4r3",
+    "c": 42665
+  },
+  {
+    "url": "http://ocsp.globalsign.com/rnpicpeduovsslca2019",
+    "c": 42585
+  },
+  {
+    "url": "http://ocsp.dcocsp.cn",
+    "c": 41795
+  },
+  {
+    "url": "http://shoperssl.ocsp-certum.com",
+    "c": 40860
+  },
+  {
+    "url": "http://eMudhra.ocsp.sectigo.com",
+    "c": 40214
+  },
+  {
+    "url": "http://ocsp09.actalis.it/VA/AUTHOV-G3",
+    "c": 39866
+  },
+  {
+    "url": "http://xinchachadv.ocsp-certum.com",
+    "c": 39717
+  },
+  {
+    "url": "http://ocsp.serverpass.telesec.de/ocspr",
+    "c": 39090
+  },
+  {
+    "url": "http://ocsp.e-tugra.com/status/ocsp",
+    "c": 39041
+  },
+  {
+    "url": "http://rootnetworksdv.ocsp-certum.com",
+    "c": 38845
+  },
+  {
+    "url": "http://ocsp.pca.dfn.de/OCSP-Server/OCSP",
+    "c": 38844
+  },
+  {
+    "url": "http://yandex.ocsp-responder.com",
+    "c": 38760
+  },
+  {
+    "url": "http://servicesca.ocsp.dhimyotis.com",
+    "c": 37501
+  },
+  {
+    "url": "http://ocsp.pki.goog/gts2a1",
+    "c": 37377
+  },
+  {
+    "url": "http://ocsp.swisssign.net/E7F1E7FD2E53AD11E5811A57A4738F127D98C8AE",
+    "c": 37099
+  },
+  {
+    "url": "http://pki-ocsp.atos.net",
+    "c": 37086
+  },
+  {
+    "url": "http://itrusdv.ocsp-certum.com",
+    "c": 36768
+  },
+  {
+    "url": "http://ovcasha2.ocsp-certum.com",
+    "c": 36260
+  },
+  {
+    "url": "http://twcasslocsp.twca.com.tw/",
+    "c": 35773
+  },
+  {
+    "url": "http://ocsp.incommon-igtf.org",
+    "c": 35684
+  },
+  {
+    "url": "http://nijimo3.ocsp.secomtrust.net",
+    "c": 34874
+  },
+  {
+    "url": "http://genious.ocsp.sectigo.com",
+    "c": 34785
+  },
+  {
+    "url": "http://commercial.ocsp.identrust.com",
+    "c": 34731
+  },
+  {
+    "url": "http://unitedtrustov.ocsp-certum.com",
+    "c": 34607
+  },
+  {
+    "url": "http://ocsp2020.managedpki.com",
+    "c": 34589
+  },
+  {
+    "url": "http://ocsp.crlocsp.cn",
+    "c": 34379
+  },
+  {
+    "url": "http://ocsp.swisssign.net/EEFD46CAF7275E91BC5AB6E787CD0AFA550A2642",
+    "c": 34066
+  },
+  {
+    "url": "http://statush.digitalcertvalidation.com",
+    "c": 34051
+  },
+  {
+    "url": "http://tiTrust.ocsp.sectigo.com",
+    "c": 33955
+  },
+  {
+    "url": "http://wildca.ocsp.dhimyotis.com",
+    "c": 33203
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsorganizationvalsha2g3",
+    "c": 33095
+  },
+  {
+    "url": "http://ssocsp.cybertrust.ne.jp/OcspServer",
+    "c": 32995
+  },
+  {
+    "url": "http://evocsp.cybertrust.ne.jp/OcspServer",
+    "c": 32329
+  },
+  {
+    "url": "http://niig7rsa.ocsp.secom-cert.jp",
+    "c": 32291
+  },
+  {
+    "url": "http://dv.g4.ocsp.pubcert.jprs.jp",
+    "c": 32273
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apsrsa12g101",
+    "c": 31624
+  },
+  {
+    "url": "http://ocsp.publicca.hinet.net/OCSP/ocspG2",
+    "c": 31072
+  },
+  {
+    "url": "http://xinchachaov.ocsp-certum.com",
+    "c": 31049
+  },
+  {
+    "url": "http://ocsp1.netlock.hu/olsslgca.cgi",
+    "c": 30138
+  },
+  {
+    "url": "http://sr30.ocsp.secomtrust.net",
+    "c": 29139
+  },
+  {
+    "url": "http://ocsp1.netlock.hu/cbca.cgi",
+    "c": 28592
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apevsrsa2g101",
+    "c": 28493
+  },
+  {
+    "url": "http://dvca5.ocsp.secomtrust.net",
+    "c": 27972
+  },
+  {
+    "url": "http://ov.g4.ocsp.pubcert.jprs.jp",
+    "c": 26726
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gseccovsslca2018",
+    "c": 26594
+  },
+  {
+    "url": "http://ocsp.gtlsca.nat.gov.tw/OCSP",
+    "c": 26554
+  },
+  {
+    "url": "http://ocsp1.eCert.gov.hk",
+    "c": 26458
+  },
+  {
+    "url": "http://evcasha2.ocsp-certum.com",
+    "c": 25732
+  },
+  {
+    "url": "http://ocsp.cfca.com.cn/ocsp",
+    "c": 25254
+  },
+  {
+    "url": "http://onesign.ocsp.sectigo.com",
+    "c": 25205
+  },
+  {
+    "url": "http://ocsp.izenpe.com",
+    "c": 25103
+  },
+  {
+    "url": "http://ocsp.sectigochina.com",
+    "c": 23714
+  },
+  {
+    "url": "http://ocsp3.sheca.com/ocsp/sheca/sheca.ocsp",
+    "c": 23436
+  },
+  {
+    "url": "http://ocsp.harica.gr",
+    "c": 23318
+  },
+  {
+    "url": "http://nijimo.ocsp.sectigo.com",
+    "c": 22789
+  },
+  {
+    "url": "http://ocspap.cert.fnmt.es/ocspap/OcspResponder",
+    "c": 22478
+  },
+  {
+    "url": "http://ssl-c3-ca1-ev-2009.ocsp.d-trust.net",
+    "c": 21276
+  },
+  {
+    "url": "http://bitcert.ocsp.sectigo.com",
+    "c": 20712
+  },
+  {
+    "url": "http://intecca3.ocsp.secomtrust.net",
+    "c": 20579
+  },
+  {
+    "url": "http://ocsp.globalsign.com/validalphasslca2018",
+    "c": 20452
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/gsovsha2g4r3",
+    "c": 20269
+  },
+  {
+    "url": "http://ocsp06.actalis.it/VA/AUTHDV-G2",
+    "c": 20024
+  },
+  {
+    "url": "http://ocsp1.netlock.hu/ccca.cgi",
+    "c": 19977
+  },
+  {
+    "url": "http://ocsp.sslcom.cn",
+    "c": 19333
+  },
+  {
+    "url": "http://ev2.ocsp.secomtrust.net",
+    "c": 18361
+  },
+  {
+    "url": "http://ocsp.fineid.fi/vrkshsp",
+    "c": 18199
+  },
+  {
+    "url": "http://sslca2014-ocsp1.e-szigno.hu",
+    "c": 18045
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsrsadvsslca2018",
+    "c": 17754
+  },
+  {
+    "url": "http://ocsp.firmaprofesional.com",
+    "c": 17324
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-appleistca2g128",
+    "c": 16208
+  },
+  {
+    "url": "http://ocsp.accv.es",
+    "c": 15973
+  },
+  {
+    "url": "http://ocspcomp.cert.fnmt.es/ocsp/OcspResponder",
+    "c": 14430
+  },
+  {
+    "url": "http://fnetcas2.ocsp.secomtrust.net",
+    "c": 14399
+  },
+  {
+    "url": "http://ovca5.ocsp.secomtrust.net",
+    "c": 13917
+  },
+  {
+    "url": "http://ocsp.wisekey.com",
+    "c": 13825
+  },
+  {
+    "url": "http://ocsp.oaticerts.com/ocsp",
+    "c": 13183
+  },
+  {
+    "url": "http://ocsp.postsignum.cz/OCSP/VCA5/",
+    "c": 11818
+  },
+  {
+    "url": "http://ocsp.fina.hr",
+    "c": 11679
+  },
+  {
+    "url": "http://ocsp.fineid.fi/vrksp3",
+    "c": 11403
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apevsrsa1g101",
+    "c": 10931
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-appleistca2g129",
+    "c": 10806
+  },
+  {
+    "url": "http://ocsp.elektronicznypodpis.pl",
+    "c": 10197
+  },
+  {
+    "url": "http://ziwit.ocsp.sectigo.com",
+    "c": 9794
+  },
+  {
+    "url": "http://ssl-ocsp-gov.gpki.go.kr:8100",
+    "c": 9460
+  },
+  {
+    "url": "http://gold-server-g2.ocsp.swisssign.net/E7F1E7FD2E53AD11E5811A57A4738F127D98C8AE",
+    "c": 8942
+  },
+  {
+    "url": "http://ocsp.ica.cz/sca15_rsa",
+    "c": 8649
+  },
+  {
+    "url": "http://dv.g3.ocsp.pubcert.jprs.jp",
+    "c": 8559
+  },
+  {
+    "url": "http://ocsp.serpro.gov.br/acserprosslv1",
+    "c": 8343
+  },
+  {
+    "url": "http://ocsp05.actalis.it/VA/AUTHEV-G3",
+    "c": 8338
+  },
+  {
+    "url": "http://ocsp.globalsign.com/alibabacloudgccr3tlsovca2021",
+    "c": 8044
+  },
+  {
+    "url": "http://evsslocsp.twca.com.tw/",
+    "c": 7576
+  },
+  {
+    "url": "http://dnencrypt.ocsp.sectigo.com",
+    "c": 7384
+  },
+  {
+    "url": "http://ocsp.certsign.ro",
+    "c": 7169
+  },
+  {
+    "url": "http://ocsp.globalsign.com/crowdstrikegccr3tlsovca2020",
+    "c": 7015
+  },
+  {
+    "url": "http://servicesca.ocsp.certigna.fr",
+    "c": 6676
+  },
+  {
+    "url": "http://ocspfnmtss1.cert.fnmt.es/ocspss1/OcspResponder",
+    "c": 6626
+  },
+  {
+    "url": "http://digitaltrust.ocsp.sectigo.com",
+    "c": 6488
+  },
+  {
+    "url": "http://ocsp.affirmtrust.com",
+    "c": 6180
+  },
+  {
+    "url": "http://gdcadv.ocsp-certum.com",
+    "c": 5812
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apsecc12g101",
+    "c": 5776
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apevsecc1g101",
+    "c": 5560
+  },
+  {
+    "url": "http://wotrus-ovca.ocsp-certum.com",
+    "c": 5360
+  },
+  {
+    "url": "http://ssl-ocsp-pub.gpki.go.kr:8100",
+    "c": 5237
+  },
+  {
+    "url": "http://gdcaov.ocsp-certum.com",
+    "c": 4871
+  },
+  {
+    "url": "http://xnetcas2.ocsp.secomtrust.net",
+    "c": 4517
+  },
+  {
+    "url": "http://ocsp-ac-certisign-icp-br-ssl.certisign.com.br",
+    "c": 3770
+  },
+  {
+    "url": "http://ocsp.trustwave.com/",
+    "c": 3753
+  },
+  {
+    "url": "http://commercial.ocsp.identrust.com/",
+    "c": 3691
+  },
+  {
+    "url": "http://ev.ocsp.quovadisglobal.com",
+    "c": 3428
+  },
+  {
+    "url": "http://ocsp.ssl.com",
+    "c": 3404
+  },
+  {
+    "url": "http://ssl-ca2-2020.ocsp.d-trust.net",
+    "c": 3255
+  },
+  {
+    "url": "http://ocsp.globalsign.com/validsslevca2018",
+    "c": 3192
+  },
+  {
+    "url": "http://shuididv.ocsp-certum.com",
+    "c": 3186
+  },
+  {
+    "url": "http://wildca.ocsp.certigna.fr",
+    "c": 3165
+  },
+  {
+    "url": "http://niig5.ocsp.secomtrust.net",
+    "c": 3105
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsgccr3evqwacca2020",
+    "c": 3054
+  },
+  {
+    "url": "http://ocspssls1.kamusm.gov.tr",
+    "c": 2758
+  },
+  {
+    "url": "http://ocsp.camerfirma.com",
+    "c": 2693
+  },
+  {
+    "url": "http://d-trust-ca-2-2-ev-2016.ocsp.d-trust.net",
+    "c": 2673
+  },
+  {
+    "url": "http://public.ocsp.identrust.com",
+    "c": 2660
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gsdomainvalsha2g2",
+    "c": 2647
+  },
+  {
+    "url": "http://ocsp4.gdca.com.cn/ov",
+    "c": 2574
+  },
+  {
+    "url": "http://ocsp1.netlock.hu/caca.cgi",
+    "c": 2380
+  },
+  {
+    "url": "http://kingnettechdv.ocsp-certum.com",
+    "c": 2368
+  },
+  {
+    "url": "http://shuidiov.ocsp-certum.com",
+    "c": 2298
+  },
+  {
+    "url": "http://itrusov.ocsp-certum.com",
+    "c": 2238
+  },
+  {
+    "url": "http://ocsp.globaltrust.eu",
+    "c": 2235
+  },
+  {
+    "url": "http://sl.ocsp.quovadisglobal.com",
+    "c": 2227
+  },
+  {
+    "url": "http://gold-ev-g2.ocsp.swisssign.net/EEFD46CAF7275E91BC5AB6E787CD0AFA550A2642",
+    "c": 2210
+  },
+  {
+    "url": "http://silver-server-g2.ocsp.swisssign.net/DBBCBF821859DC69FAF8ABAA834D771D0BB08BD8",
+    "c": 2204
+  },
+  {
+    "url": "http://ocsp.ica.cz/qcw17_rsa",
+    "c": 2192
+  },
+  {
+    "url": "http://itso.ocsp.sectigo.com",
+    "c": 2172
+  },
+  {
+    "url": "http://ocsp.pki.goog/GIAG4",
+    "c": 2133
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/solutiovsha256g3",
+    "c": 2029
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gseccevsslca2018",
+    "c": 2029
+  },
+  {
+    "url": "http://kica.ocsp.sectigo.com",
+    "c": 1877
+  },
+  {
+    "url": "http://xinchachaev.ocsp-certum.com",
+    "c": 1649
+  },
+  {
+    "url": "http://certdata.ocsp.sectigo.com",
+    "c": 1604
+  },
+  {
+    "url": "http://statusg.digitalcertvalidation.com",
+    "c": 1603
+  },
+  {
+    "url": "http://ocsp.serpro.gov.br/ACSERPRORFBSSL",
+    "c": 1600
+  },
+  {
+    "url": "http://ocsp1.netlock.hu/qtrustev3.cgi",
+    "c": 1586
+  },
+  {
+    "url": "http://subcar2i2-ocsp.disig.sk/ocsp/subcar2i2",
+    "c": 1324
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/solutidvsha256g3",
+    "c": 1306
+  },
+  {
+    "url": "http://yektadv.ocsp-certum.com",
+    "c": 1258
+  },
+  {
+    "url": "http://niig7ecc.ocsp.secom-cert.jp",
+    "c": 1191
+  },
+  {
+    "url": "http://eqtlsca2018-ocsp1.e-szigno.hu",
+    "c": 1166
+  },
+  {
+    "url": "http://ocsp.a-trust.at/ocsp",
+    "c": 1052
+  },
+  {
+    "url": "http://statusa.digitalcertvalidation.com",
+    "c": 1044
+  },
+  {
+    "url": "http://ocsp1.siths.se",
+    "c": 1044
+  },
+  {
+    "url": "http://wotrus-dvca.ocsp-certum.com",
+    "c": 1044
+  },
+  {
+    "url": "http://ocsp.cybertrust.ne.jp/OcspServer",
+    "c": 1027
+  },
+  {
+    "url": "http://ocsp.digicert-cn.com",
+    "c": 1027
+  },
+  {
+    "url": "http://ocsp.globalsign.com/validssldvca2018",
+    "c": 980
+  },
+  {
+    "url": "http://ocsp-pki.certinomis.com/",
+    "c": 906
+  },
+  {
+    "url": "http://wotrus.ocsp.sectigo.com",
+    "c": 905
+  },
+  {
+    "url": "http://ocsp.globalsign.com/vtbbankgccr6ovca2021",
+    "c": 904
+  },
+  {
+    "url": "http://verokey.ocsp.sectigo.com",
+    "c": 886
+  },
+  {
+    "url": "http://ocsp.vr-ident.de/gtnocsp/OCSPResponder/VR%20IDENT%20EXTERNAL%20ROOT%20CA%202013",
+    "c": 885
+  },
+  {
+    "url": "http://evca2.ocsp.certum.pl",
+    "c": 883
+  },
+  {
+    "url": "http://hcaocsp.nat.gov.tw/cgi-bin/OCSP/ocsp_server.exe",
+    "c": 840
+  },
+  {
+    "url": "http://ocsp.globalsign.com/cuisecgccr3tlsdvca2021",
+    "c": 840
+  },
+  {
+    "url": "http://qtlsca2018-ocsp1.e-szigno.hu",
+    "c": 837
+  },
+  {
+    "url": "http://kingnettechov.ocsp-certum.com",
+    "c": 766
+  },
+  {
+    "url": "http://shenzhendv.ocsp-certum.com",
+    "c": 760
+  },
+  {
+    "url": "http://ocsp.sca3b.amazontrust.com",
+    "c": 700
+  },
+  {
+    "url": "http://ocsp2.digicert.com",
+    "c": 698
+  },
+  {
+    "url": "http://omitsecurity.ocsp.sectigo.com",
+    "c": 697
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/dhltlscai4",
+    "c": 632
+  },
+  {
+    "url": "http://ocsp09.actalis.it/VA/AUTHOV-G2",
+    "c": 631
+  },
+  {
+    "url": "http://ocsp3.gdca.com.cn/ev",
+    "c": 621
+  },
+  {
+    "url": "http://ocsp.globalsign.com/cuisecgccr3tlsovca2021",
+    "c": 560
+  },
+  {
+    "url": "http://ocsp.acedicom.edicomgroup.com/caedicom01",
+    "c": 560
+  },
+  {
+    "url": "http://ocsp.globalsign.com/cuisecgccr3tlsevca2021",
+    "c": 560
+  },
+  {
+    "url": "http://shenzhenov.ocsp-certum.com",
+    "c": 560
+  },
+  {
+    "url": "http://ocsp.pkioverheid-server-ca-2020.digidentity-pki.com",
+    "c": 486
+  },
+  {
+    "url": "http://ocsp.geotrust.com",
+    "c": 485
+  },
+  {
+    "url": "http://uw.ocsp.quovadisglobal.com",
+    "c": 484
+  },
+  {
+    "url": "http://ocsp-ica.navercorp.com/ocsp",
+    "c": 484
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/gspersonalsignptnrssha2g2",
+    "c": 484
+  },
+  {
+    "url": "http://webnic.ocsp.sectigo.com",
+    "c": 483
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp04-asi03",
+    "c": 482
+  },
+  {
+    "url": "http://vr-ident-ssl-ca-2020.ocsp.d-trust.net",
+    "c": 420
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-aaica6g102",
+    "c": 420
+  },
+  {
+    "url": "http://vr-ident-ev-ssl-ca-2020.ocsp.d-trust.net",
+    "c": 420
+  },
+  {
+    "url": "http://va.tuntrust.tn",
+    "c": 420
+  },
+  {
+    "url": "http://ocsp.visa.com/ocsp",
+    "c": 418
+  },
+  {
+    "url": "http://evrsaca.ocsp-certum.com",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.ovcf.intesasanpaolo.com/",
+    "c": 280
+  },
+  {
+    "url": "http://s2.symcb.com",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.trustasiassl.com",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp2.e-guven.com/ocsp.xuda",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp09.actalis.it/VA/AUTHCL-G3",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.sca2a.amazontrust.com",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.sca0a.amazontrust.com",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp04-devid01",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.globalsign.com/vtbbankgccr6evca2021",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.globalsign.com/vtbbankgccr6dvca2021",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.trustcor.ca/",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.globalsign.com/ca/attovca2019",
+    "c": 280
+  },
+  {
+    "url": "http://eveccca.ocsp-certum.com",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.anf.es/spain/AV",
+    "c": 280
+  },
+  {
+    "url": "http://ec3sslca2017-ocsp1.e-szigno.hu",
+    "c": 280
+  },
+  {
+    "url": "http://moica.nat.gov.tw/cgi-bin/OCSP2/ocsp_server.exe",
+    "c": 280
+  },
+  {
+    "url": "http://ocsp.ovcf.ca3.infocert.it",
+    "c": 277
+  },
+  {
+    "url": "http://ocsp.pki.goog/GTSY1",
+    "c": 277
+  },
+  {
+    "url": "http://ca1.agid.gov.it/OCSP",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-apcrsa12g101",
+    "c": 140
+  },
+  {
+    "url": "http://pca-g3-ocsp.geotrust.com",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp1.digicert.com",
+    "c": 140
+  },
+  {
+    "url": "http://mh2.ocsp.secomtrust.net",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-appleistca2g127",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.turktrust.com.tr",
+    "c": 140
+  },
+  {
+    "url": "http://kingnettechev.ocsp-certum.com",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.sca4a.amazontrust.com",
+    "c": 140
+  },
+  {
+    "url": "http://rs.ocsp.quovadisglobal.com",
+    "c": 140
+  },
+  {
+    "url": "http://gca.nat.gov.tw/cgi-bin/OCSP2/ocsp_server.exe",
+    "c": 140
+  },
+  {
+    "url": "http://rootglobaldv.ocsp-certum.com",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.sigov-ca.gov.si",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.acsoluti.com.br",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.certisign.com.br",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.globalsign.com/gsrsaevqwac2019",
+    "c": 140
+  },
+  {
+    "url": "http://dv.g2.ocsp.pubcert.jprs.jp",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp2.globalsign.com/solutievsha256g3",
+    "c": 140
+  },
+  {
+    "url": "http://g3ocsp.managedpki.com",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp03-appleistca8g111",
+    "c": 140
+  },
+  {
+    "url": "http://ov.g3.ocsp.pubcert.jprs.jp",
+    "c": 140
+  },
+  {
+    "url": "http://ocsp.ws.symantec.com",
+    "c": 138
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp04-aaica02",
+    "c": 137
+  },
+  {
+    "url": "http://ocsp.apple.com/ocsp-devid01",
+    "c": 137
+  },
+  {
+    "url": "http://ocsp.ca.posta.rs/ocsp",
+    "c": 137
+  }
+]

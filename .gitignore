@@ -10,6 +10,7 @@
 /ocsp_remote.json
 /ocsp_cert_db_id_to_string.json
 /ocsp_cert_string_search_results.json
+/ocsp_cert_string_search_results.json
 /latency_results.json
 /cert_subjects.json
 /cache_exp.json
@@ -27,3 +28,5 @@
 /ocsp_url_info.json
 /jsons_v7/
 /jsons_v9/
+/jsons_v11/
+/luminati_stats/

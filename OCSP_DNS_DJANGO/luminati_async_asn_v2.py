@@ -51,9 +51,9 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
     try:
 
         if type == ASN:
-            proxy_url = 'http://lum-customer-c_9c799542-zone-residential-asn-{}:xm4jk9845cgb@zproxy.lum-superproxy.io:22225'.format(element)
+            proxy_url = 'http://lum-customer-c_9c799542-zone-protick-asn-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(element)
         elif type == CN:
-            proxy_url = 'http://lum-customer-c_9c799542-zone-residential-country-{}:xm4jk9845cgb@zproxy.lum-superproxy.io:22225'.format(element)
+            proxy_url = 'http://lum-customer-c_9c799542-zone-protick-country-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(element)
 
         async with session.post(url=ocsp_url,
                                 proxy=proxy_url,

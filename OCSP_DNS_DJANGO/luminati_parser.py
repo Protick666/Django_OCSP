@@ -23,10 +23,8 @@ class LuminatiModelManager:
                                  "OCSPCertStatus.UNKNOWN"]
 
         self.proxy_errors = [
-            "Proxy Error: No peers available",
-            "Bad Port. Ports we support: https://brightdata.com/faq#integration-ports",
-            "Proxy Error: socket hang up",
-            "Proxy Error: Failed to establish connection with peer",
+            "Proxy Error",
+            "Bad Port"
         ]
 
     # TODO read from db
@@ -46,6 +44,12 @@ class LuminatiModelManager:
     def get_responders():
         return ocsp_url_db.objects.all()
 
+    def is_proxy_error(self, error):
+        for e in self.proxy_errors:
+            if e in error:
+                return True
+        return False
+
     def get_responder_data(self, responder):
         ocsp_responses = OcspResponsesWrtAsn.objects.filter(ocsp_url=responder)
         total, error_count, proxy_error_count, timeout_count = ocsp_responses.count(), 0, 0, 0
@@ -61,8 +65,10 @@ class LuminatiModelManager:
                     timeout_count += 1
                     if response.mode == 'ASN':
                         responder_to_asn_timeout_freq[response.hop] += 1
-                if response.error in self.proxy_errors:
+                if self.is_proxy_error(response.error):
                     proxy_error_count += 1
+                # if response.error in self.proxy_errors:
+                #     proxy_error_count += 1
             else:
                 response_dict[response.ocsp_response_status] += 1
                 responder_to_asn_data[response.hop].append(self.find_response_time(response.luminati_headers))
@@ -81,11 +87,62 @@ class LuminatiModelManager:
             "response_cert_status_dict": response_cert_status_dict
         }
 
+    def error_weird_cases(self, responder):
+        ocsp_responses = OcspResponsesWrtAsn.objects.filter(ocsp_url=responder)
+
+        asn_to_error = {}
+
+        for response in ocsp_responses:
+            if response.mode != 'ASN':
+                continue
+            if response.has_error:
+                if response.error == 'TimeoutError' or self.is_proxy_error(response.error):
+                    pass
+                else:
+                    if response.hop not in asn_to_error:
+                        asn_to_error[response.hop] = {"count": 0}
+                    asn_to_error[response.hop]['error'] = True
+                    asn_to_error[response.hop]['count'] = asn_to_error[response.hop]['count'] + 1
+            else:
+                if response.hop not in asn_to_error:
+                    asn_to_error[response.hop] = {"count": 0}
+                asn_to_error[response.hop]['no_error'] = True
+                asn_to_error[response.hop]['count'] = asn_to_error[response.hop]['count'] + 1
+
+        return asn_to_error
+
 
 def get_url_file_name(url):
     url = url[7:]
     url = url.replace("/", "-")
     return url
+
+
+def luminati_parser_error():
+    from pathlib import Path
+
+    Path('luminati_error_case/').mkdir(parents=True, exist_ok=True)
+    luminati_model_manager = LuminatiModelManager()
+
+    # responders_count_stat = luminati_model_manager.get_responder_count_stat()
+    all_responders = LuminatiModelManager.get_responders()
+    mother_dict = {}
+    for responder in all_responders:
+        try:
+            relevant_data = luminati_model_manager.error_weird_cases(responder=responder)
+            mother_dict[responder.url] = relevant_data
+
+            url_file_name = get_url_file_name(responder.url)
+
+            with open("luminati_error_case/{}.json".format(url_file_name), "w") as ouf:
+                json.dump(relevant_data, fp=ouf)
+            print("Done with processing {}".format(responder.url))
+
+        except Exception as e:
+            print("Exception when processing {}, {}".format(responder.url, e))
+
+    with open("luminati_error_case/all_data.json", "w") as ouf:
+        json.dump(mother_dict, fp=ouf)
 
 
 def luminati_parser():

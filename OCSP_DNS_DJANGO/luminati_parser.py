@@ -84,7 +84,7 @@ class LuminatiModelManager:
 
 def get_url_file_name(url):
     url = url[7:]
-    url = url.replace("/", "\\")
+    url = url.replace("/", "-")
     return url
 
 
@@ -114,6 +114,78 @@ def luminati_parser():
 
     with open("luminati_stats/all_data.json", "w") as ouf:
         json.dump(mother_dict, fp=ouf)
+
+
+def get_stat_file():
+    f = open('luminati_stats/all_data.json')
+    d = json.load(f)
+    return d
+
+
+def get_objective_rate(objective_str, count=10):
+    candidate_c = 0
+    data = get_stat_file()
+    objective_perc = {}
+    for key in data:
+        #print("pre", key)
+        total_records = data[key]['total_records']
+        objective_count = data[key][objective_str]
+        if objective_count > 0:
+            candidate_c += 1
+        proxy_error_count = data[key]['proxy_error_count']
+        if total_records - proxy_error_count == 0:
+            continue
+        # TODO only error calculation e objective_count - proxy_error_count hobe in first term
+        objective_perc[key] = (objective_count) / (total_records - proxy_error_count)
+        #print((objective_count), (total_records - proxy_error_count), (objective_count - proxy_error_count) / (total_records - proxy_error_count))
+        #print("post", key)
+
+    objective_perc = dict(sorted(objective_perc.items(), key=lambda item: item[1]))
+
+    with open("luminati_stats/{}_rate.json".format(objective_str), "w") as ouf:
+        json.dump(objective_perc, fp=ouf)
+
+    for e in reversed(list(objective_perc.items())[-count:]):
+        print(e[0], "       ", e[1])
+    print("Total candidates", candidate_c)
+
+import numpy as np
+
+import statistics
+def get_latency_dist():
+    data = get_stat_file()
+    m_dict = {}
+    for key in data:
+
+        median_latency = []
+        candidate = 0
+        for asn in data[key]['responder_to_asn_data']:
+            if len(data[key]['responder_to_asn_data'][asn]) < 10:
+                continue
+            candidate += 1
+            median_latency.append((asn, statistics.median(data[key]['responder_to_asn_data'][asn])))
+
+        if candidate < 5:
+            continue
+        m_dict[key] = {}
+
+        m_dict[key]['variance'] = np.var([e[1] for e in median_latency])
+        m_dict[key]['max_latency'] = max([e[1] for e in median_latency])
+        m_dict[key]['min_latency'] = min([e[1] for e in median_latency])
+        m_dict[key]['max_latency_asn'] = [e[0] for e in median_latency if e[1] ==  m_dict[key]['max_latency']][0]
+        m_dict[key]['min_latency_asn'] = [e[0] for e in median_latency if e[1] == m_dict[key]['min_latency']][0]
+
+    m_dict = dict(sorted(m_dict.items(), key=lambda item: item[1]['variance']))
+
+    print("Low variance")
+    for e in list(m_dict.items())[0: 5]:
+        print(e[0], e[1])
+
+
+    print("High variance")
+    for e in list(m_dict.items())[-5: ]:
+        print(e[0], e[1])
+
 
 
 def send_telegram_msg(msg):

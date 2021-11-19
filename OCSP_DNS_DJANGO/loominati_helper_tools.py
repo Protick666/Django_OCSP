@@ -24,21 +24,29 @@ def get_total_cert_per_ocsp_url():
 
 
 def choose_candidate_asns():
-    f = open('luminati_country_to_asn.json')
-    country_to_asn_list = json.load(f)
-
-    chosen_asn_outer = []
-    for country in country_to_asn_list:
-        asn_list = country_to_asn_list[country]
-        total_available_asn = len(asn_list)
-        allowed_asn_number = choose_asn_number_per_country(total_available_asn)
-        chosen_asn_s = random.sample(asn_list, allowed_asn_number)
-        chosen_asn_s = [(element[0], country) for element in chosen_asn_s]
-        chosen_asn_outer = chosen_asn_outer + chosen_asn_s
-
-    if LOCAL:
-        chosen_asn_outer = chosen_asn_outer[0: 10]
-    return chosen_asn_outer
+    f = open('lum_dash_asns_list.json')
+    asn_list = json.load(f)
+    asn_cn_tuple_list = [(e, "N/A") for e in asn_list]
+    return asn_cn_tuple_list
+    '''
+    
+    prev implementation
+    '''
+    #f = open('luminati_country_to_asn.json')
+    # country_to_asn_list = json.load(f)
+    #
+    # chosen_asn_outer = []
+    # for country in country_to_asn_list:
+    #     asn_list = country_to_asn_list[country]
+    #     total_available_asn = len(asn_list)
+    #     allowed_asn_number = choose_asn_number_per_country(total_available_asn)
+    #     chosen_asn_s = random.sample(asn_list, allowed_asn_number)
+    #     chosen_asn_s = [(element[0], country) for element in chosen_asn_s]
+    #     chosen_asn_outer = chosen_asn_outer + chosen_asn_s
+    #
+    # if LOCAL:
+    #     chosen_asn_outer = chosen_asn_outer[0: 10]
+    # return chosen_asn_outer
 
 
 def choose_all_available_asns():
@@ -55,18 +63,19 @@ def choose_hops(only_asns=False, ban_list=[]):
     if LOCAL:
         dash_board_split = 10
     else:
-        dash_board_split = 50
+        dash_board_split = 150
 
     dash_board_asns = random.sample(dash_board_asns, dash_board_split)
 
-    f = open('OCSP_DNS_DJANGO/luminati_data/successful_asns.json')
-    if LOCAL:
-        global_asn_split = 10
-    else:
-        global_asn_split = 800
-    asn_list = json.load(f)
-    asn_list = random.sample(asn_list, global_asn_split)
-
+    ## TODO masssive: rebuild this json after scanning
+    # f = open('OCSP_DNS_DJANGO/luminati_data/successful_asns.json')
+    # if LOCAL:
+    #     global_asn_split = 10
+    # else:
+    #     global_asn_split = 800
+    # asn_list = json.load(f)
+    # asn_list = random.sample(asn_list, global_asn_split)
+    asn_list = []
     all_asns = dash_board_asns + asn_list
     all_asns = [(element, ASN) for element in all_asns]
 

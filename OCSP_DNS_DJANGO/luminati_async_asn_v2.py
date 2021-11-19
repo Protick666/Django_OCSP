@@ -49,11 +49,27 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
                                  ocsp_url_id, serial_number, akid,
                                  fingerprint, type, session, element):
     try:
+        import random, string, time
+        letters = string.ascii_lowercase
+        session_key = ''.join(random.choice(letters) for i in range(5)) + str(int(time.time()))
 
         if type == ASN:
-            proxy_url = 'http://lum-customer-c_9c799542-zone-protick-asn-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(element)
+            proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}-session-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(element, session_key)
         elif type == CN:
-            proxy_url = 'http://lum-customer-c_9c799542-zone-protick-country-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(element)
+            proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-country-{}-session-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(element, session_key)
+
+
+        end_node_meta_data = ""
+
+        async with session.get(url='http://lumtest.com/myip.json', proxy=proxy_url) as response:
+            try:
+                result_data = await response.read()
+                end_node_meta_data = str(json.loads(result_data))
+            except Exception as e:
+                logger.error(
+                    "Error in getting ip address through lumtest ({})".format(e))
+
+
 
         async with session.post(url=ocsp_url,
                                 proxy=proxy_url,
@@ -82,23 +98,24 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
                                       serial_number=serial_number,
                                       akid=akid, fingerprint=fingerprint,
                                       type=type,
-                                      per_cert_dict=per_cert_dict, b_ocsp_response=result_data, element=element)
+                                      per_cert_dict=per_cert_dict, b_ocsp_response=result_data, element=element,
+                                      end_node_meta_data=end_node_meta_data)
 
     except Exception as e:
         serial_exists = await database_sync_to_async(
             OcspResponsesWrtAsn.objects.filter(ocsp_url_id=ocsp_url_id, serial=serial_number, hop=element, mode=type).exists)()
         if serial_exists:
             return
-
+        # TODO pass per cert dict
         await store_error_msg_of_ocsp_response(e=e, ocsp_url_id=ocsp_url_id, serial_number=serial_number,
                                                akid=akid, fingerprint=fingerprint,
-                                               type=type, element=element)
+                                               type=type, element=element, end_node_meta_data=end_node_meta_data)
 
 
 @sync_to_async
 def store_error_msg_of_ocsp_response(e, ocsp_url_id, serial_number, akid,
                                      fingerprint,
-                                     type, element):
+                                     type, element, end_node_meta_data):
     try:
         if hasattr(e, 'hdrs'):
             err_msg = str(e) + "\n" + str(e.hdrs)
@@ -113,7 +130,7 @@ def store_error_msg_of_ocsp_response(e, ocsp_url_id, serial_number, akid,
                                            akid=akid,
                                            fingerprint=fingerprint,
                                            hop=element,
-                                           mode=type, has_error=True, error=err_msg)
+                                           mode=type, has_error=True, error=err_msg, node_meta=end_node_meta_data)
 
     except Exception as e:
         pass
@@ -122,7 +139,7 @@ def store_error_msg_of_ocsp_response(e, ocsp_url_id, serial_number, akid,
 @sync_to_async
 def store_ocsp_response(decoded_response, ocsp_url_id, serial_number, akid,
                         fingerprint, type,
-                        per_cert_dict, b_ocsp_response, element):
+                        per_cert_dict, b_ocsp_response, element, end_node_meta_data):
 
 
 
@@ -137,7 +154,7 @@ def store_ocsp_response(decoded_response, ocsp_url_id, serial_number, akid,
                                                    decoded_response.response_status),
                                                hop=element,
                                                mode=type,
-                                               luminati_headers=str(per_cert_dict))
+                                               luminati_headers=str(per_cert_dict), node_meta=end_node_meta_data)
         else:
             delegated_responder = False
             if len(decoded_response.certificates) > 0:
@@ -152,7 +169,7 @@ def store_ocsp_response(decoded_response, ocsp_url_id, serial_number, akid,
                                                ocsp_cert_status=decoded_response.certificate_status,
                                                hop=element,
                                                mode=type, delegated_response=delegated_responder,
-                                               luminati_headers=str(per_cert_dict))
+                                               luminati_headers=str(per_cert_dict), node_meta=end_node_meta_data)
 
     except Exception as e:
         pass

@@ -65,6 +65,9 @@ class OcspResponsesWrtAsn(models.Model):
     ocsp_response_as_bytes = models.BinaryField(null=True, blank=True)
 
     luminati_headers = models.TextField(null=True, blank=True)
+
+    node_meta = models.TextField(null=True, blank=True)
+
     country_code = models.CharField(max_length=1000, null=True, blank=True)
     hop = models.CharField(max_length=1000)
 

@@ -7,8 +7,8 @@ import pyasn, json
 
 from OCSP_DNS_DJANGO.tools import get_dns_records, AS2ISP
 
-asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
-as2isp = AS2ISP()
+# asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
+# as2isp = AS2ISP()
 
 CDNS = ['Akamai',
         'Amazon',

@@ -10,6 +10,7 @@ from OCSP_DNS_DJANGO.luminati_async_asn_v2 import *
 
 logger = logging.getLogger(__name__)
 
+#luminati_master_crawler_async_v2
 
 def my_job():
     luminati_master_crawler_async_v2()
@@ -20,16 +21,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
-        #scheduler.print_jobs()
         scheduler.remove_all_jobs()
-        #scheduler.print_jobs()
 
         scheduler.add_jobstore(DjangoJobStore(), "default")
 
         scheduler.add_job(
             my_job,
-            trigger=CronTrigger(hour=23, minute=0, second=0),  # Every 10 seconds
-            id="luminati_ocsp_crawling",  # The `id` assigned to each job MUST be unique
+            trigger=CronTrigger(hour=23, minute=0, second=0),
+            id="luminati_ocsp_crawling_v2",  # The `id` assigned to each job MUST be unique
             max_instances=1,
             replace_existing=True,
         )

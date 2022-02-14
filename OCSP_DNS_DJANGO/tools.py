@@ -236,3 +236,54 @@ def get_ns_records(ocsp_url):
     except Exception as e:
         return []
 
+
+# TODO telegram check!!
+def get_all_active_asns():
+    import ujson
+    f = open("AS_INFO.json")
+    asn_info = ujson.load(f)
+    available_asns = []
+
+    import urllib.request
+
+    asn_keys = list(asn_info.keys())
+
+    counter = 0
+    for asn_key in asn_keys:
+        counter += 1
+        if counter % 1000 == 0:
+            send_telegram_msg("ASN check done for {}".format(counter))
+        try:
+            asn = asn_key[2:]
+            opener = urllib.request.build_opener(
+                urllib.request.ProxyHandler(
+                    {
+                        'http': 'http://lum-customer-c_9c799542-zone-protick-asn-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(asn)}))
+
+            data = opener.open('http://lumtest.com/myip.json').read()
+            data = json.loads(data.decode("utf-8"))
+            available_asns.append(asn)
+            # if int(asn) > 30:
+            #     break
+        except Exception as e:
+            pass
+
+    from datetime import date
+    today = date.today()
+    d1 = today.strftime("%d/%m/%Y")
+    d1 = d1.replace("/", "-")
+    out_file = open("available_asns-{}.json".format(d1), "w")
+    json.dump(available_asns, out_file)
+
+
+def send_telegram_msg(msg):
+    import telegram_send
+    telegram_send.send(messages=[msg])
+
+
+
+
+
+
+
+

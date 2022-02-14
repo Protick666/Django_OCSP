@@ -7,6 +7,7 @@ import json
 from datetime import datetime
 import os
 import pathlib
+import asyncio
 
 
 class AS2ISP:
@@ -236,54 +237,111 @@ def get_ns_records(ocsp_url):
     except Exception as e:
         return []
 
+def chunks(lst, n):
+    ans = []
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        ans.append(lst[i:i + n])
+    return ans
+
+
 
 # TODO telegram check!!
+import aiohttp
+import logging
+logger = logging.getLogger(__name__)
+
+available_asns = []
+
+async def query_through_luminati(hop, session):
+    try:
+        import random, string, time
+
+        #session_key = ''.join(random.choice(letters) for i in range(5)) + str(int(time.time()))
+
+        proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(hop)
+
+        async with session.get(url='http://lumtest.com/myip.json', proxy=proxy_url) as response:
+            try:
+                # TODO check data
+                result_data = await response.read()
+                data = json.loads(result_data.decode("utf-8"))
+
+                global available_asns
+                available_asns.append(hop)
+
+            except Exception as e:
+                a = 1
+                logger.error(
+                    "Error in getting ip address through lumtest ({})".format(e))
+
+    except Exception as e:
+        pass
+
+async def process_asn_chunks(chosen_hop_list):
+    timeout = aiohttp.ClientTimeout(total=30)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
+        tasks = []
+        for hop in chosen_hop_list:
+            try:
+                import random
+                task = asyncio.ensure_future(
+                    query_through_luminati(hop=hop[2:], session=session))
+                tasks.append(task)
+            except Exception as e:
+                logger.error("Error in Processing hop {}: {}".format(hop, e))
+        execution_results = await asyncio.gather(*tasks)
+
+
 def get_all_active_asns():
+    send_telegram_msg("Starting ASN crawling")
     import ujson
     f = open("AS_INFO.json")
     asn_info = ujson.load(f)
-    available_asns = []
 
     import urllib.request
 
     asn_keys = list(asn_info.keys())
 
+    asn_chunks = chunks(asn_keys, 500)
+
     counter = 0
-    for asn_key in asn_keys:
+    for chunk in asn_chunks:
         counter += 1
-        if counter % 1000 == 0:
-            send_telegram_msg("ASN check done for {}".format(counter))
-        try:
-            asn = asn_key[2:]
-            opener = urllib.request.build_opener(
-                urllib.request.ProxyHandler(
-                    {
-                        'http': 'http://lum-customer-c_9c799542-zone-protick-asn-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(asn)}))
+        asyncio.run(process_asn_chunks(chosen_hop_list=chunk))
+        send_telegram_msg("Done with chunk {} out of chunks {}".format(counter, len(asn_chunks)))
 
-            data = opener.open('http://lumtest.com/myip.json').read()
-            data = json.loads(data.decode("utf-8"))
-            available_asns.append(asn)
-            # if int(asn) > 30:
-            #     break
-        except Exception as e:
-            pass
+    # counter = 0
+    # for asn_key in asn_keys:
+    #     counter += 1
+    #     if counter % 1000 == 0:
+    #         send_telegram_msg("ASN check done for {}".format(counter))
+    #     try:
+    #         asn = asn_key[2:]
+    #         opener = urllib.request.build_opener(
+    #             urllib.request.ProxyHandler(
+    #                 {
+    #                     'http': 'http://lum-customer-c_9c799542-zone-protick-asn-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(asn)}))
+    #
+    #         data = opener.open('http://lumtest.com/myip.json').read()
+    #         data = json.loads(data.decode("utf-8"))
+    #         available_asns.append(asn)
+    #         # if int(asn) > 30:
+    #         #     break
+    #     except Exception as e:
+    #         pass
 
+    send_telegram_msg("Done with all the chunks")
     from datetime import date
     today = date.today()
     d1 = today.strftime("%d/%m/%Y")
     d1 = d1.replace("/", "-")
     out_file = open("available_asns-{}.json".format(d1), "w")
     json.dump(available_asns, out_file)
+    #print(len(available_asns))
+    send_telegram_msg("Dumped the file!")
 
 
 def send_telegram_msg(msg):
     import telegram_send
     telegram_send.send(messages=[msg])
-
-
-
-
-
-
-
-

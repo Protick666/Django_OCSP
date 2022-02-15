@@ -105,6 +105,16 @@ def get_ocsp_url_number(total_number):
         return total_number
 
 
+def choose_hops_for_ttl_exp(file_date):
+    f = open("available_asns-{}.json".format(file_date))
+    import ujson
+
+    asns = ujson.load(f)
+    if LOCAL:
+        return asns[:40]
+    else:
+        return asns
+
 
 
 

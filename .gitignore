@@ -33,3 +33,5 @@
 /luminati_error_case/
 /local_docs/
 /AS_INFO.json
+/OCSP_DNS_DJANGO/ttldict/
+/ttldict/

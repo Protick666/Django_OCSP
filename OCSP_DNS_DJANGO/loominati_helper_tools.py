@@ -115,6 +115,34 @@ def choose_hops_for_ttl_exp(file_date):
     else:
         return asns
 
+# TODO check
+def choose_hops_for_ttl_exp_v2(total_requests):
+    # return [(asn, req_id).....]
+    tweets = []
+    for line in open('asns_full_info.json', 'r'):
+        tweets.append(json.loads(line))
+    a = 1
+    curtailed_info = []
 
+    total_prefixes = 0
+    for a in tweets:
+        curtailed_info.append((a['asn'], a['announcing']['numberPrefixes']))
+        total_prefixes += a['announcing']['numberPrefixes']
 
+    lst = []
+    for a in tweets:
+        allotment = (a['announcing']['numberPrefixes'] / total_prefixes) * total_requests
+        allotment = min(max(int(allotment), 3), 5000)
+        lst.append((a['asn'], allotment))
+
+    lst.sort(key=lambda x: -x[1])
+
+    flattened_list = []
+    id = 1
+    for e in lst:
+        for i in range(e[1]):
+            flattened_list.append((e[0], id))
+            id += 1
+
+    return flattened_list
 

@@ -144,6 +144,6 @@ def choose_hops_for_ttl_exp_v2(total_requests):
             flattened_list.append((e[0], id))
             id += 1
 
-    flattened_list = flattened_list.reverse()
+    flattened_list.reverse()
     return flattened_list
 

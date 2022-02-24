@@ -153,6 +153,7 @@ def carry_out_exp(exp_id, hops, iter, offset, ttl, cool_down, chunk_size):
         if time_now - starting_time > ttl or ttl - (time_now - starting_time) <= 30:
             return_offset = offset + chunk_count * chunk_size
             break
+        chunk_count += 1
 
     # msg = "Luminati ttl exp phase 1 done, time taken: {}".format(time.time() - starting_time)
     # send_telegram_msg(msg=msg)

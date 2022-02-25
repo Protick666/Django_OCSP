@@ -206,7 +206,7 @@ def parse_logs_ttl(exp_id):
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
     # apache_info_two_curated_phase_2 = curate_time_segment(apache_info_two, apache_phase_2_start, apache_phase_2_end)
 
-    live_log = open("ttldict/logs/{}-ttl_exp.json".format(exp_id))
+    live_log = open("ttldict/{}-ttl_exp.json".format(exp_id))
     live_data = preprocess_live_data(json.load(live_log))
 
     correct_set = set()

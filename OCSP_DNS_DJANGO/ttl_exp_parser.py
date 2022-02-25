@@ -304,8 +304,8 @@ def master_calc():
     ans = []
     for key in final_dict:
         total = final_dict[key]["ic"] + final_dict[key]["c"]
-        # if total < 3:
-        #     continue
+        if total <= 0:
+            continue
         ratio = final_dict[key]["ic"] / total
         if ratio > .85:
             ans.append(key)

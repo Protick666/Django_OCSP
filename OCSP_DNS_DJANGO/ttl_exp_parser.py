@@ -7,6 +7,7 @@ from datetime import datetime
 url_live = 'ttlexp.exp.net-measurement.net'
 event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
 
+resolver_mega = defaultdict(lambda: set())
 
 def is_event_log(log):
     for e in event_strings:
@@ -22,7 +23,6 @@ def parse_bind_logs(exp_id, bind_files, resolver_pool):
         with open(bind_file) as FileObj:
             for line in FileObj:
                 try:
-
                     if url_live not in line:
                         continue
                     if exp_id not in line:
@@ -59,7 +59,7 @@ def parse_bind_logs(exp_id, bind_files, resolver_pool):
                         if identifier not in d["req"]:
                             d["req"][identifier] = list()
                         d["req"][identifier].append(meta)
-
+                        resolver_mega[resolver_ip].add(identifier)
                 except:
                     pass
 
@@ -248,17 +248,17 @@ def parse_logs_ttl(exp_id):
     for key in resolver_pool:
         all_resolvers.add(key)
 
-    return all_resolvers, correct_resolvers, incorrect_resolvers, resolver_pool
+    return all_resolvers, correct_resolvers, incorrect_resolvers, resolver_pool, correct_set, incorrect_set
 
 
 def master_calc():
     lsts = ['live1', 'live2']
-    all_resolvers, correct_resolvers, incorrect_resolvers = set(), set(), set()
+    all_resolvers, correct_resolvers, incorrect_resolvers, correct_set, incorrect_set = set(), set(), set(), set(), set()
 
     resolver_dict = defaultdict(lambda : 0)
 
     for lst in lsts:
-        a_r, c_r, i_r, r_pool = parse_logs_ttl(exp_id=lst)
+        a_r, c_r, i_r, r_pool, cs, ics = parse_logs_ttl(exp_id=lst)
 
         for key in r_pool:
             resolver_dict[key] = resolver_dict[key] + r_pool[key]
@@ -266,6 +266,8 @@ def master_calc():
         all_resolvers.update(a_r)
         correct_resolvers.update(c_r)
         incorrect_resolvers.update(i_r)
+        correct_set.update(cs)
+        incorrect_set.update(ics)
 
     resolver_count_list = []
 
@@ -280,16 +282,44 @@ def master_calc():
     total_resolvers = len(all_resolvers)
     total_c_r = len(correct_resolvers)
     total_i_r = len(incorrect_resolvers)
-    print("ans")
-    print("Total {}".format(total_resolvers))
-    print("Total Cr {}".format(total_c_r))
-    print("Total InC {}".format(total_i_r))
+    # print("ans")
+    # print("Total {}".format(total_resolvers))
+    # print("Total Cr {}".format(total_c_r))
+    # print("Total InC {}".format(total_i_r))
+
+    final_dict = {}
+
+    for key in resolver_mega:
+        if key not in final_dict:
+            final_dict[key] = {"c": 0, "ic": 0}
+        for req_id in resolver_mega[key]:
+            # req ids
+            if req_id in correct_set:
+                final_dict[key]["c"] = 1 + final_dict[key]["c"]
+            elif req_id in incorrect_set:
+                final_dict[key]["ic"] = 1 + final_dict[key]["ic"]
+
+    print("Total {}".format(len(list(final_dict.keys()))))
+
+    ans = []
+    for key in final_dict:
+        total = final_dict[key]["ic"] + final_dict[key]["c"]
+        if total < 5:
+            continue
+        ratio = final_dict[key]["ic"] / total
+        if ratio > .85:
+            ans.append(key)
+    print("Total InC {}".format(len(ans)))
+
+
 
 
     with open("lst.json", "w") as ouf:
         json.dump(resolver_count_list, fp=ouf, indent=2)
 
+
     send_telegram_msg("Done with parsing")
+
 
 def send_telegram_msg(msg):
     import telegram_send

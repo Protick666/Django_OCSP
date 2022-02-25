@@ -190,15 +190,15 @@ def parse_logs_ttl(exp_id):
         for k in l['req']:
             l['req'][k].sort(key=lambda x: x['date'])
 
-    apache_phase_1_start = apache_info_one["phase1-start"][0]
-    apache_phase_1_divider = apache_info_one["phase1-end"][0]
-    apache_phase_2_start = apache_info_two["sleep-end"][0]
-    apache_phase_2_end = apache_info_two["phase2-end"][0]
+    apache_phase_1_start = apache_info_one["phase1-start"][0]['date']
+    apache_phase_1_divider = apache_info_one["phase1-end"][0]['date']
+    apache_phase_2_start = apache_info_two["sleep-end"][0]['date']
+    apache_phase_2_end = apache_info_two["phase2-end"][0]['date']
 
-    bind_phase_1_start = bind_info["phase1-start"][0]
-    bind_phase_1_end = bind_info["phase1-end"][0]
-    bind_phase_2_start = bind_info["sleep-end"][0]
-    bind_phase_2_end = bind_info["phase2-end"][0]
+    bind_phase_1_start = bind_info["phase1-start"][0]['date']
+    bind_phase_1_end = bind_info["phase1-end"][0]['date']
+    bind_phase_2_start = bind_info["sleep-end"][0]['date']
+    bind_phase_2_end = bind_info["phase2-end"][0]['date']
 
     bind_info_curated_first = curate_time_segment(bind_info, bind_phase_1_start, bind_phase_1_end)
     bind_info_curated_second = curate_time_segment(bind_info, bind_phase_2_start, bind_phase_2_end)

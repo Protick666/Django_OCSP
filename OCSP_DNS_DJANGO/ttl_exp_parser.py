@@ -87,7 +87,7 @@ def parse_apace_logs(exp_id, apache_files):
                     time = time.split()[0]
                     # 24-Feb-2022 00:00:58.505 bind
                     # 24/Feb/2022:00:49:45 apache
-                    time = time[: time.rfind(".")]
+                    #time = time[: time.rfind(".")]
                     datetime_object = datetime.strptime(time, '%d/%b/%Y:%H:%M:%S')
 
                     meta = {}

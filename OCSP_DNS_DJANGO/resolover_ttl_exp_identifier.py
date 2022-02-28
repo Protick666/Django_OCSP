@@ -235,6 +235,12 @@ def luminati_asn_ttl_crawler_req(exp_id, TTL_IN_SEC, TOTAL_REQUESTS, chunk_size)
         json.dump(store_dict, fp=ouf)
 
 
+def zeus():
+    for i in range(4, 7):
+        luminati_asn_ttl_crawler_req(exp_id="live{}".format(i), TTL_IN_SEC=3600, TOTAL_REQUESTS=300000, chunk_size=2000)
+        time.sleep(60*10)
+
+
 def send_telegram_msg(msg):
     import telegram_send
     telegram_send.send(messages=[msg])

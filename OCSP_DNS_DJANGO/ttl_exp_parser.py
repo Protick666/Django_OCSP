@@ -7,7 +7,10 @@ from datetime import datetime
 url_live = 'ttlexp.exp.net-measurement.net'
 event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
 
-resolver_mega = defaultdict(lambda: set())
+# resolver_mega = defaultdict(lambda: set())
+
+req_id_to_resolvers = defaultdict(lambda: [set(), set()])
+final_dict = {}
 
 def is_event_log(log):
     for e in event_strings:
@@ -59,7 +62,7 @@ def parse_bind_logs(exp_id, bind_files, resolver_pool):
                         if identifier not in d["req"]:
                             d["req"][identifier] = list()
                         d["req"][identifier].append(meta)
-                        resolver_mega[resolver_ip].add(identifier)
+                        #resolver_mega[resolver_ip].add(identifier)
                 except:
                     pass
 
@@ -190,10 +193,10 @@ def parse_logs_ttl(exp_id):
         for k in l['req']:
             l['req'][k].sort(key=lambda x: x['date'])
 
-    apache_phase_1_start = apache_info_one["phase1-start"][0]['date']
-    apache_phase_1_divider = apache_info_one["phase1-end"][0]['date']
-    apache_phase_2_start = apache_info_two["sleep-end"][0]['date']
-    apache_phase_2_end = apache_info_two["phase2-end"][0]['date']
+    # apache_phase_1_start = apache_info_one["phase1-start"][0]['date']
+    # apache_phase_1_divider = apache_info_one["phase1-end"][0]['date']
+    # apache_phase_2_start = apache_info_two["sleep-end"][0]['date']
+    # apache_phase_2_end = apache_info_two["phase2-end"][0]['date']
 
     bind_phase_1_start = bind_info["phase1-start"][0]['date']
     bind_phase_1_end = bind_info["phase1-end"][0]['date']
@@ -212,9 +215,9 @@ def parse_logs_ttl(exp_id):
     correct_set = set()
     incorrect_set = set()
 
-    correct_resolvers = set()
-    incorrect_resolvers = set()
-    common_resolvers = set()
+    # correct_resolvers = set()
+    # incorrect_resolvers = set()
+    # common_resolvers = set()
 
     for req_id in live_data:
         if live_data[req_id][0] == 1 and live_data[req_id][1] == 1:
@@ -226,97 +229,137 @@ def parse_logs_ttl(exp_id):
     print("Total correct reqs {}".format(len(correct_set)))
     print("Total incorrect reqs {}".format(len(incorrect_set)))
 
+    #req_id_to_phase_resolvers = defaultdict(lambda: [set(), set()])
+
+    # for req_id in req_id_to_resolvers:
+    #     k = None
+    #     if req_id in correct_set:
+    #         k = "c"
+    #         resolvers = req_id_to_resolvers[req_id][0].intersection(req_id_to_resolvers[req_id][1])
+    #         # final_dict[key]["c"] = 1 + final_dict[key]["c"]
+    #     elif req_id in incorrect_set:
+    #         k = "ic"
+    #         resolvers = req_id_to_resolvers[req_id][0].difference(req_id_to_resolvers[req_id][1])
+    #         # final_dict[key]["ic"] = 1 + final_dict[key]["ic"]
+    #
+    #     for key in resolvers:
+    #         if key not in final_dict:
+    #             final_dict[key] = {"c": 0, "ic": 0}
+    #         final_dict[key][k] = 1 + final_dict[key][k]
+
     for req_id in correct_set:
         phase1_resolvers = get_non_lum_resolver_ips(bind_info_curated_first, req_id, lum_resolvers)
         phase2_resolvers = get_non_lum_resolver_ips(bind_info_curated_second, req_id, lum_resolvers)
-        correct_resolvers.update(phase1_resolvers.intersection(phase2_resolvers))
+
+        considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
+
+        for key in considered_resolvers:
+            if key not in final_dict:
+                final_dict[key] = {"c": 0, "ic": 0}
+            final_dict[key]["c"] = 1 + final_dict[key]["c"]
+
+        # req_id_to_resolvers[req_id][0].update(phase1_resolvers)
+        # req_id_to_resolvers[req_id][1].update(phase2_resolvers)
+        #
+        # correct_resolvers.update(phase1_resolvers.intersection(phase2_resolvers))
 
     for req_id in incorrect_set:
         phase1_resolvers = get_non_lum_resolver_ips(bind_info_curated_first, req_id, lum_resolvers)
-        queries_from_second_phase = get_non_lum_resolver_ips(bind_info_curated_second, req_id, lum_resolvers)
+        phase2_resolvers = get_non_lum_resolver_ips(bind_info_curated_second, req_id, lum_resolvers)
 
-        common_resolvers.update(phase1_resolvers.intersection(queries_from_second_phase))
+        considered_resolvers = phase1_resolvers.difference(phase2_resolvers)
 
-        phase1_resolvers_incorrect = phase1_resolvers
-        incorrect_resolvers.update(phase1_resolvers_incorrect)
+        for key in considered_resolvers:
+            if key not in final_dict:
+                final_dict[key] = {"c": 0, "ic": 0}
+            final_dict[key]["ic"] = 1 + final_dict[key]["ic"]
 
-    incorrect_resolvers = incorrect_resolvers.difference(correct_resolvers)
-    incorrect_resolvers = incorrect_resolvers.difference(common_resolvers)
+        # req_id_to_resolvers[req_id][0].update(phase1_resolvers)
+        # req_id_to_resolvers[req_id][1].update(phase2_resolvers)
+        #
+        # queries_from_second_phase = get_non_lum_resolver_ips(bind_info_curated_second, req_id, lum_resolvers)
+        # common_resolvers.update(phase1_resolvers.intersection(queries_from_second_phase))
+        #
+        # phase1_resolvers_incorrect = phase1_resolvers
+        # incorrect_resolvers.update(phase1_resolvers_incorrect)
 
-    all_resolvers = set()
+    # incorrect_resolvers = incorrect_resolvers.difference(correct_resolvers)
+    # incorrect_resolvers = incorrect_resolvers.difference(common_resolvers)
 
-    for key in resolver_pool:
-        all_resolvers.add(key)
+    # all_resolvers = set()
+    #
+    # for key in resolver_pool:
+    #     all_resolvers.add(key)
 
-    return all_resolvers, correct_resolvers, incorrect_resolvers, resolver_pool, correct_set, incorrect_set
+    return correct_set, incorrect_set
 
-
+# global: resolver_ip_against -> ip1, ip2, ip3
 def master_calc():
-    lsts = ['live1', 'live2']
-    all_resolvers, correct_resolvers, incorrect_resolvers, correct_set, incorrect_set = set(), set(), set(), set(), set()
+    lsts = ['live1', 'live2', 'live4']
 
-    resolver_dict = defaultdict(lambda : 0)
+    #all_resolvers, correct_resolvers, incorrect_resolvers, correct_set, incorrect_set = set(), set(), set(), set(), set()
+    #resolver_dict = defaultdict(lambda: 0)
 
     for lst in lsts:
-        a_r, c_r, i_r, r_pool, cs, ics = parse_logs_ttl(exp_id=lst)
+        cs, ics = parse_logs_ttl(exp_id=lst)
 
-        for key in r_pool:
-            resolver_dict[key] = resolver_dict[key] + r_pool[key]
+        # for key in r_pool:
+        #     resolver_dict[key] = resolver_dict[key] + r_pool[key]
 
-        all_resolvers.update(a_r)
-        correct_resolvers.update(c_r)
-        incorrect_resolvers.update(i_r)
-        correct_set.update(cs)
-        incorrect_set.update(ics)
+        # for key in r_i_t_r:
+        #     req_id_to_resolvers[key][0].update(r_i_t_r[key][0])
+        #     req_id_to_resolvers[key][1].update(r_i_t_r[key][1])
 
-    resolver_count_list = []
+        # all_resolvers.update(a_r)
+        # correct_resolvers.update(c_r)
+        # incorrect_resolvers.update(i_r)
+        #
+        # correct_set.update(cs)
+        # incorrect_set.update(ics)
 
-    res_hits = 0
-    for k in resolver_dict:
-        resolver_count_list.append((k, resolver_dict[k]))
-        res_hits += resolver_dict[k]
-    resolver_count_list.sort(key=lambda x: -x[1])
+    # resolver_count_list = []
+    #
+    # res_hits = 0
+    # for k in resolver_dict:
+    #     resolver_count_list.append((k, resolver_dict[k]))
+    #     res_hits += resolver_dict[k]
+    # resolver_count_list.sort(key=lambda x: -x[1])
 
-    incorrect_resolvers = incorrect_resolvers.difference(correct_resolvers)
+    #incorrect_resolvers = incorrect_resolvers.difference(correct_resolvers)
 
-    total_resolvers = len(all_resolvers)
-    total_c_r = len(correct_resolvers)
-    total_i_r = len(incorrect_resolvers)
+    # total_resolvers = len(all_resolvers)
+    # total_c_r = len(correct_resolvers)
+    # total_i_r = len(incorrect_resolvers)
     # print("ans")
     # print("Total {}".format(total_resolvers))
     # print("Total Cr {}".format(total_c_r))
     # print("Total InC {}".format(total_i_r))
 
-    final_dict = {}
 
-    for key in resolver_mega:
-        if key not in final_dict:
-            final_dict[key] = {"c": 0, "ic": 0}
-        for req_id in resolver_mega[key]:
-            # req ids
-            if req_id in correct_set:
-                final_dict[key]["c"] = 1 + final_dict[key]["c"]
-            elif req_id in incorrect_set:
-                final_dict[key]["ic"] = 1 + final_dict[key]["ic"]
+    # req_id_to_resolvers = defaultdict(lambda: [set(), set()])
 
-    print("Total {}".format(len(list(final_dict.keys()))))
+    print("Total resolvers {}".format(len(list(final_dict.keys()))))
+    print("Total exit-nodes covered {}".format(len(list(req_id_to_resolvers.keys()))))
 
-    ans = []
-    for key in final_dict:
-        total = final_dict[key]["ic"] + final_dict[key]["c"]
-        if total <= 0:
-            continue
-        ratio = final_dict[key]["ic"] / total
-        if ratio > .85:
-            ans.append(key)
-    print("Total InC {}".format(len(ans)))
+    data_final = {}
+    data_final["Total_resolvers"] = len(list(final_dict.keys()))
+    data_final["Total_ex_nodes"] = len(list(req_id_to_resolvers.keys()))
+    data_final["data"] = final_dict
+    # ans = []
+    # for key in final_dict:
+    #     total = final_dict[key]["ic"] + final_dict[key]["c"]
+    #     if total <= 0:
+    #         continue
+    #     ratio = final_dict[key]["ic"] / total
+    #     if ratio > .85:
+    #         ans.append(key)
+    # print("Total InC {}".format(len(ans)))
 
 
 
 
-    with open("lst.json", "w") as ouf:
-        json.dump(resolver_count_list, fp=ouf, indent=2)
-
+    with open("final_data.json", "w") as ouf:
+        json.dump(data_final, fp=ouf)
 
     send_telegram_msg("Done with parsing")
 

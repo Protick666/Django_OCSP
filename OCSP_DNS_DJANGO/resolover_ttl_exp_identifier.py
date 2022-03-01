@@ -110,10 +110,13 @@ async def query_through_luminati(hop, session, exp_id, phase):
                 time_str = "{}-time".format(phase)
                 dict_of_phases[hop_identifier][time_str] = time.time()
             except Exception as e:
-                logger.error("Error ({})".format(str(e)))
+                #logger.error("Error ({})".format(str(e)))
+                pass
 
     except Exception as e:
-        logger.error("Error ({})".format(str(e)))
+        #logger.error("Error ({})".format(str(e)))
+        pass
+
 
 
 async def process_ocsp_urls_async(chosen_hop_list, exp_id, phase):
@@ -128,7 +131,8 @@ async def process_ocsp_urls_async(chosen_hop_list, exp_id, phase):
                     query_through_luminati(hop=hop, session=session, exp_id=exp_id, phase=phase))
                 tasks.append(task)
             except Exception as e:
-                logger.error("Error in Processing hop {}: {}".format(hop, str(e)))
+                #logger.error("Error in Processing hop {}: {}".format(hop, str(e)))
+                pass
         execution_results = await asyncio.gather(*tasks)
 
 

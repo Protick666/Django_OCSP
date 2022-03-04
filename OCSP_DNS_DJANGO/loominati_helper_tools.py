@@ -118,10 +118,11 @@ def choose_hops_for_ttl_exp(file_date):
 # TODO check
 def choose_hops_for_ttl_exp_v2(total_requests):
     # return [(asn, req_id).....]
+    print(total_requests)
     tweets = []
     for line in open('asns_full_info.json', 'r'):
         tweets.append(json.loads(line))
-    a = 1
+
     curtailed_info = []
 
     total_prefixes = 0
@@ -132,7 +133,8 @@ def choose_hops_for_ttl_exp_v2(total_requests):
     lst = []
     for a in tweets:
         allotment = (a['announcing']['numberPrefixes'] / total_prefixes) * total_requests
-        allotment = min(max(int(allotment), 3), 5000)
+        allotment = min(max(int(allotment), 10), 500)
+
         lst.append((a['asn'], allotment))
 
     lst.sort(key=lambda x: -x[1])
@@ -145,7 +147,18 @@ def choose_hops_for_ttl_exp_v2(total_requests):
             id += 1
 
     # flattened_list.reverse()
-    import  random
+    import random
     random.shuffle(flattened_list)
     return flattened_list
 
+
+def create_lst():
+    if LOCAL:
+        ans = choose_hops_for_ttl_exp_v2(total_requests=10000)
+    else:
+        ans = choose_hops_for_ttl_exp_v2(total_requests=1000000)
+
+    if LOCAL:
+        ans = ans[: 20000]
+    with open("ttl_data_set-live-{}.json".format(LOCAL), "w") as ouf:
+        json.dump(ans, fp=ouf)

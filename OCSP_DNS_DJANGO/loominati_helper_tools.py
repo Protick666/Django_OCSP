@@ -149,7 +149,7 @@ def choose_hops_for_ttl_exp_v2(total_requests):
     # flattened_list.reverse()
     import random
     random.shuffle(flattened_list)
-    return flattened_list[:100000]
+    return flattened_list
 
 
 def create_lst(ll):

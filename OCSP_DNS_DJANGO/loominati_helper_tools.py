@@ -157,7 +157,7 @@ def create_lst():
         ans = choose_hops_for_ttl_exp_v2(total_requests=10000)
     else:
         ans = choose_hops_for_ttl_exp_v2(total_requests=1000000)
-
+    print(len(ans))
     if LOCAL:
         ans = ans[: 20000]
     with open("ttl_data_set-live-{}.json".format(LOCAL), "w") as ouf:

@@ -152,11 +152,11 @@ def choose_hops_for_ttl_exp_v2(total_requests):
     return flattened_list
 
 
-def create_lst():
+def create_lst(ll):
     if LOCAL:
         ans = choose_hops_for_ttl_exp_v2(total_requests=10000)
     else:
-        ans = choose_hops_for_ttl_exp_v2(total_requests=100000)
+        ans = choose_hops_for_ttl_exp_v2(total_requests=ll)
     print(len(ans))
     if LOCAL:
         ans = ans[: 20000]

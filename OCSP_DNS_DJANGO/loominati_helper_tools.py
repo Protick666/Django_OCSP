@@ -133,7 +133,7 @@ def choose_hops_for_ttl_exp_v2(total_requests):
     lst = []
     for a in tweets:
         allotment = (a['announcing']['numberPrefixes'] / total_prefixes) * total_requests
-        allotment = min(max(int(allotment), 5), 100)
+        allotment = min(max(int(allotment), 10), 200)
 
         lst.append((a['asn'], allotment))
 

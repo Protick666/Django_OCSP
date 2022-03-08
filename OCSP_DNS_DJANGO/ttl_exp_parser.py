@@ -308,7 +308,8 @@ def parse_logs_ttl(exp_id):
 # global: resolver_ip_against -> ip1, ip2, ip3
 def master_calc():
     lsts = ['live_node_30_2', 'live_node_30_4', 'live_node_30_5','live_node_30_6','live_node_30_7',
-            'live_node_30_12','live_node_30_13','live_node_30_14','live_node_30_15','live_node_30_16']
+            'live_node_30_12','live_node_30_13','live_node_30_14','live_node_30_15','live_node_30_16',
+            'live_node_30_18','live_node_30_19','live_node_30_20','live_node_30_21', 'live_node_30_21']
     # live_node_30_4-out.json, live_node_30_4-out.json
 
     #all_resolvers, correct_resolvers, incorrect_resolvers, correct_set, incorrect_set = set(), set(), set(), set(), set()

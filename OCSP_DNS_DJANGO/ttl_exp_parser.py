@@ -180,14 +180,14 @@ def parse_logs_ttl(exp_id):
     lum_resolvers = []
 
     # TODO WATCH
-    bind_dir = 'ttldict/logs/bind/'
+    bind_dir = 'ttldict/logs_1/bind/'
     bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
 
-    apache_logs_phase_1_dir = 'ttldict/logs/apache_1/'
+    apache_logs_phase_1_dir = 'ttldict/logs_1/apache_1/'
     apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
                            isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
-    apache_logs_phase_2_dir = 'ttldict/logs/apache_2/'
+    apache_logs_phase_2_dir = 'ttldict/logs_1/apache_2/'
     apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 
@@ -220,7 +220,7 @@ def parse_logs_ttl(exp_id):
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
     # apache_info_two_curated_phase_2 = curate_time_segment(apache_info_two, apache_phase_2_start, apache_phase_2_end)
 
-    live_log = open("ttldict/live_log/{}-out.json".format(exp_id))
+    live_log = open("ttldict/live_log_1/{}-out.json".format(exp_id))
     live_data = preprocess_live_data(json.load(live_log))
 
     correct_set = set()

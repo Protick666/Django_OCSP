@@ -3,14 +3,28 @@ from collections import defaultdict
 from os import listdir
 from os.path import isfile, join
 from datetime import datetime
+import pyasn
+
+asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
+
+def get_asn(ip):
+    return asndb.lookup(ip)[0]
 
 url_live = 'ttlexp.exp.net-measurement.net'
 event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
 
 # resolver_mega = defaultdict(lambda: set())
 
-req_id_to_resolvers = defaultdict(lambda: [set(), set()])
+#req_id_to_resolvers = defaultdict(lambda: [set(), set()])
 final_dict = {}
+
+req_id_to_resolvers = defaultdict(lambda: set())
+req_id_to_client_ips = defaultdict(lambda: set())
+resolver_to_ips = defaultdict(lambda: set())
+
+
+
+
 
 def is_event_log(log):
     for e in event_strings:
@@ -62,6 +76,7 @@ def parse_bind_logs(exp_id, bind_files, resolver_pool):
                         if identifier not in d["req"]:
                             d["req"][identifier] = list()
                         d["req"][identifier].append(meta)
+                        req_id_to_resolvers[identifier].add(meta["resolver_ip"])
                         #resolver_mega[resolver_ip].add(identifier)
                 except:
                     pass
@@ -109,6 +124,7 @@ def parse_apace_logs(exp_id, apache_files):
                         if identifier not in d["req"]:
                             d["req"][identifier] = []
                         d["req"][identifier].append(meta)
+                        req_id_to_client_ips[identifier].add(meta["client_ip"])
                 except:
                     pass
     return d
@@ -137,7 +153,9 @@ def preprocess_live_data(data):
     for k in d:
         try:
             js = d[k]
-            req_id = js['req_id']
+            req_url = js['req_url'][7:]
+            req_id = str(req_url.split(".")[0])
+            #req_id = js['req_id']
             phase_1 = js['host-phase-1']
             phase_2 = js['host-phase-2']
             ans[req_id] = (phase_1, phase_2)
@@ -161,26 +179,19 @@ def parse_logs_ttl(exp_id):
     resolver_pool = defaultdict(lambda: 0)
     lum_resolvers = []
 
-    bind_dir = 'ttldict/logs/{}/bind/'.format(exp_id)
+    # TODO WATCH
+    bind_dir = 'ttldict/logs/bind/'
     bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
 
-    apache_logs_phase_1_dir = 'ttldict/logs/{}/apache_1/'.format(exp_id)
+    apache_logs_phase_1_dir = 'ttldict/logs/apache_1/'
     apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
                            isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
-    apache_logs_phase_2_dir = 'ttldict/logs/{}/apache_2/'.format(exp_id)
+    apache_logs_phase_2_dir = 'ttldict/logs/apache_2/'
     apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 
     bind_info = parse_bind_logs(exp_id=exp_id, bind_files=bind_files, resolver_pool=resolver_pool)
-    # resolver_count_list = []
-    #
-    # res_hits = 0
-    # for k in resolver_pool:
-    #     resolver_count_list.append((k, resolver_pool[k]))
-    #     res_hits += resolver_pool[k]
-    # resolver_count_list.sort(key=lambda x: -x[1])
-
     apache_info_one = parse_apace_logs(exp_id=exp_id, apache_files=apache_logs_phase_1)
     apache_info_two = parse_apace_logs(exp_id=exp_id, apache_files=apache_logs_phase_2)
 
@@ -209,7 +220,7 @@ def parse_logs_ttl(exp_id):
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
     # apache_info_two_curated_phase_2 = curate_time_segment(apache_info_two, apache_phase_2_start, apache_phase_2_end)
 
-    live_log = open("ttldict/{}-ttl_exp.json".format(exp_id))
+    live_log = open("ttldict/live_log/{}-out.json".format(exp_id))
     live_data = preprocess_live_data(json.load(live_log))
 
     correct_set = set()
@@ -225,9 +236,9 @@ def parse_logs_ttl(exp_id):
         elif live_data[req_id][0] == 1 and live_data[req_id][1] == 2:
             correct_set.add(req_id)
 
-    print("Total reqs {}".format(len(list(live_data.keys()))))
-    print("Total correct reqs {}".format(len(correct_set)))
-    print("Total incorrect reqs {}".format(len(incorrect_set)))
+    # print("Total reqs {}".format(len(list(live_data.keys()))))
+    # print("Total correct reqs {}".format(len(correct_set)))
+    # print("Total incorrect reqs {}".format(len(incorrect_set)))
 
     #req_id_to_phase_resolvers = defaultdict(lambda: [set(), set()])
 
@@ -269,6 +280,7 @@ def parse_logs_ttl(exp_id):
 
         considered_resolvers = phase1_resolvers.difference(phase2_resolvers)
 
+        # TODO watch distinct
         for key in considered_resolvers:
             if key not in final_dict:
                 final_dict[key] = {"c": 0, "ic": 0}
@@ -295,13 +307,16 @@ def parse_logs_ttl(exp_id):
 
 # global: resolver_ip_against -> ip1, ip2, ip3
 def master_calc():
-    lsts = ['live1', 'live2', 'live4']
+    lsts = ['live_node_30_2', 'live_node_30_4', 'live_node_30_5','live_node_30_6','live_node_30_7',
+            'live_node_30_12','live_node_30_13','live_node_30_14','live_node_30_15','live_node_30_16']
+    # live_node_30_4-out.json, live_node_30_4-out.json
 
     #all_resolvers, correct_resolvers, incorrect_resolvers, correct_set, incorrect_set = set(), set(), set(), set(), set()
     #resolver_dict = defaultdict(lambda: 0)
 
     for lst in lsts:
         cs, ics = parse_logs_ttl(exp_id=lst)
+        send_telegram_msg("Done with parsing {}".format(lst))
 
         # for key in r_pool:
         #     resolver_dict[key] = resolver_dict[key] + r_pool[key]
@@ -339,11 +354,11 @@ def master_calc():
     # req_id_to_resolvers = defaultdict(lambda: [set(), set()])
 
     print("Total resolvers {}".format(len(list(final_dict.keys()))))
-    print("Total exit-nodes covered {}".format(len(list(req_id_to_resolvers.keys()))))
+    # print("Total exit-nodes covered {}".format(len(list(req_id_to_resolvers.keys()))))
 
     data_final = {}
     data_final["Total_resolvers"] = len(list(final_dict.keys()))
-    data_final["Total_ex_nodes"] = len(list(req_id_to_resolvers.keys()))
+    # data_final["Total_ex_nodes"] = len(list(req_id_to_resolvers.keys()))
     data_final["data"] = final_dict
     # ans = []
     # for key in final_dict:
@@ -354,14 +369,34 @@ def master_calc():
     #     if ratio > .85:
     #         ans.append(key)
     # print("Total InC {}".format(len(ans)))
-
-
-
-
     with open("final_data.json", "w") as ouf:
         json.dump(data_final, fp=ouf)
 
-    send_telegram_msg("Done with parsing")
+    send_telegram_msg("Done with parsing phase 1")
+
+    distinct_ips = set()
+
+    for req_id in req_id_to_resolvers:
+        resolvers = req_id_to_resolvers[req_id]
+        ips = req_id_to_client_ips[req_id]
+        distinct_ips.update(ips)
+        for resolver in resolvers:
+            resolver_to_ips[resolver].update(ips)
+
+    ip_to_asn_dict = dict()
+    for ip in distinct_ips:
+        ip_to_asn_dict[ip] = get_asn(ip)
+
+    resolver_to_asns = defaultdict(lambda: list())
+    for resolver in resolver_to_ips:
+        for ip in resolver_to_ips[resolver]:
+            resolver_to_asns[resolver].append((ip, ip_to_asn_dict[ip]))
+
+
+    with open("final_asn_to_resolver.json", "w") as ouf:
+        json.dump(resolver_to_asns, fp=ouf)
+
+    send_telegram_msg("Done with parsing phase 2")
 
 
 def send_telegram_msg(msg):

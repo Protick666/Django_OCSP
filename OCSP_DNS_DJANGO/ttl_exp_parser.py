@@ -316,9 +316,12 @@ def master_calc():
     #resolver_dict = defaultdict(lambda: 0)
 
     for lst in lsts:
-        cs, ics = parse_logs_ttl(exp_id=lst)
-        send_telegram_msg("Done with parsing {}".format(lst))
+        try:
+            cs, ics = parse_logs_ttl(exp_id=lst)
+            send_telegram_msg("Done with parsing {}".format(lst))
 
+        except:
+            pass
         # for key in r_pool:
         #     resolver_dict[key] = resolver_dict[key] + r_pool[key]
 

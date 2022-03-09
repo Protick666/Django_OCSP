@@ -165,7 +165,7 @@ def create_lst(ll):
 
 
 def create_lst_v2():
-    f = open("incorrect_ans_set.json")
+    f = open("ttl_exp_asn_list.json")
     ans = []
     id = 1
     for e in f:

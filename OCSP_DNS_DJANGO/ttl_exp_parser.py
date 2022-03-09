@@ -10,6 +10,8 @@ asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
 def get_asn(ip):
     return asndb.lookup(ip)[0]
 
+incorrect_asn_set = set()
+
 file_iter = 3
 url_live = 'ttlexp.exp.net-measurement.net'
 event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
@@ -162,7 +164,8 @@ def preprocess_live_data(data):
             #req_id = js['req_id']
             phase_1 = js['host-phase-1']
             phase_2 = js['host-phase-2']
-            ans[req_id] = (phase_1, phase_2)
+            # ans[req_id] = (phase_1, phase_2)
+            ans[req_id] = (phase_1, phase_2, js['asn'])
             req_id_to_ip_hash[req_id] = js['ip_hash']
         except Exception as e:
             pass
@@ -238,6 +241,7 @@ def parse_logs_ttl(exp_id):
     for req_id in live_data:
         if live_data[req_id][0] == 1 and live_data[req_id][1] == 1:
             incorrect_set.add(req_id)
+            incorrect_asn_set.add(live_data[req_id][2])
         elif live_data[req_id][0] == 1 and live_data[req_id][1] == 2:
             correct_set.add(req_id)
 
@@ -389,6 +393,9 @@ def master_calc():
     # print("Total InC {}".format(len(ans)))
     with open("final_data.json", "w") as ouf:
         json.dump(data_final, fp=ouf)
+
+    with open("incorrect_ans_set.json", "w") as ouf:
+        json.dump(list(incorrect_asn_set), fp=ouf)
 
     send_telegram_msg("Done with parsing phase 1")
 

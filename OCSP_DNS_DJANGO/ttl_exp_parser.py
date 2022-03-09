@@ -299,9 +299,9 @@ def parse_logs_ttl(exp_id):
                 final_dict[key] = {"c": 0, "ic": 0}
             final_dict[key]["ic"] = 1 + final_dict[key]["ic"]
 
-        if key not in final_dict_elaborate:
-            final_dict_elaborate[key] = {"c": list(), "ic": list()}
-        final_dict_elaborate[key]["ic"].append((req_id, req_id_to_ip_hash[req_id]))
+            if key not in final_dict_elaborate:
+                final_dict_elaborate[key] = {"c": list(), "ic": list()}
+            final_dict_elaborate[key]["ic"].append((req_id, req_id_to_ip_hash[req_id]))
 
         # req_id_to_resolvers[req_id][0].update(phase1_resolvers)
         # req_id_to_resolvers[req_id][1].update(phase2_resolvers)

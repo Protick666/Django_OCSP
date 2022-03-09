@@ -322,6 +322,25 @@ def parse_logs_ttl(exp_id):
 
     return correct_set, incorrect_set
 
+
+def get_all_asns():
+    live_jsons_dir = 'ttldict/live_log_{}/'.format(file_iter)
+    run_jsons = [f for f in listdir(live_jsons_dir) if isfile(join(live_jsons_dir, f))
+                 and '.json' in f and 'live_node' in f]
+
+    asn_set = set()
+    for e in run_jsons:
+        live_log = open("ttldict/live_log_{}/{}".format(file_iter, e))
+        live_data, req_id_to_ip_hash = preprocess_live_data(json.load(live_log))
+        for key in live_data:
+            asn_set.add(live_data[key][2])
+
+    with open("ttl_exp_asn_list.json", "w") as ouf:
+        json.dump(list(asn_set), fp=ouf)
+
+
+
+
 # global: resolver_ip_against -> ip1, ip2, ip3
 def master_calc():
     live_jsons_dir = 'ttldict/live_log_{}/'.format(file_iter)
@@ -336,7 +355,6 @@ def master_calc():
         try:
             cs, ics = parse_logs_ttl(exp_id=lst)
             send_telegram_msg("Done with parsing {}".format(lst))
-
         except:
             pass
         # for key in r_pool:

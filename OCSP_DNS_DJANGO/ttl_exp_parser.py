@@ -10,13 +10,15 @@ asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
 def get_asn(ip):
     return asndb.lookup(ip)[0]
 
+file_iter = 3
 url_live = 'ttlexp.exp.net-measurement.net'
 event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
-
+banned_exp_ids = ['live_node_30_8', 'live_node_30_1', 'live_node_30_68']
 # resolver_mega = defaultdict(lambda: set())
 
 #req_id_to_resolvers = defaultdict(lambda: [set(), set()])
 final_dict = {}
+final_dict_elaborate = {}
 
 req_id_to_resolvers = defaultdict(lambda: set())
 req_id_to_client_ips = defaultdict(lambda: set())
@@ -148,6 +150,8 @@ def curate_time_segment(info, d1, d2):
 
 
 def preprocess_live_data(data):
+    req_id_to_ip_hash = {}
+
     d = data['dict_of_phases']
     ans = {}
     for k in d:
@@ -159,9 +163,10 @@ def preprocess_live_data(data):
             phase_1 = js['host-phase-1']
             phase_2 = js['host-phase-2']
             ans[req_id] = (phase_1, phase_2)
+            req_id_to_ip_hash[req_id] = js['ip_hash']
         except Exception as e:
             pass
-    return ans
+    return ans, req_id_to_ip_hash
 
 
 def get_non_lum_resolver_ips(bind_info, req_id, lum_resolvers):
@@ -180,14 +185,14 @@ def parse_logs_ttl(exp_id):
     lum_resolvers = []
 
     # TODO WATCH
-    bind_dir = 'ttldict/logs_1/bind/'
+    bind_dir = 'ttldict/logs_{}/bind/'.format(file_iter)
     bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
 
-    apache_logs_phase_1_dir = 'ttldict/logs_1/apache_1/'
+    apache_logs_phase_1_dir = 'ttldict/logs_{}/apache_1/'.format(file_iter)
     apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
                            isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
-    apache_logs_phase_2_dir = 'ttldict/logs_1/apache_2/'
+    apache_logs_phase_2_dir = 'ttldict/logs_{}/apache_2/'.format(file_iter)
     apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 
@@ -220,8 +225,8 @@ def parse_logs_ttl(exp_id):
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
     # apache_info_two_curated_phase_2 = curate_time_segment(apache_info_two, apache_phase_2_start, apache_phase_2_end)
 
-    live_log = open("ttldict/live_log_1/{}-out.json".format(exp_id))
-    live_data = preprocess_live_data(json.load(live_log))
+    live_log = open("ttldict/live_log_{}/{}-out.json".format(file_iter, exp_id))
+    live_data, req_id_to_ip_hash = preprocess_live_data(json.load(live_log))
 
     correct_set = set()
     incorrect_set = set()
@@ -269,6 +274,10 @@ def parse_logs_ttl(exp_id):
                 final_dict[key] = {"c": 0, "ic": 0}
             final_dict[key]["c"] = 1 + final_dict[key]["c"]
 
+            if key not in final_dict_elaborate:
+                final_dict_elaborate[key] = {"c": list(), "ic": list()}
+            final_dict_elaborate[key]["c"].append((req_id, req_id_to_ip_hash[req_id]))
+
         # req_id_to_resolvers[req_id][0].update(phase1_resolvers)
         # req_id_to_resolvers[req_id][1].update(phase2_resolvers)
         #
@@ -285,6 +294,10 @@ def parse_logs_ttl(exp_id):
             if key not in final_dict:
                 final_dict[key] = {"c": 0, "ic": 0}
             final_dict[key]["ic"] = 1 + final_dict[key]["ic"]
+
+        if key not in final_dict_elaborate:
+            final_dict_elaborate[key] = {"c": list(), "ic": list()}
+        final_dict_elaborate[key]["ic"].append((req_id, req_id_to_ip_hash[req_id]))
 
         # req_id_to_resolvers[req_id][0].update(phase1_resolvers)
         # req_id_to_resolvers[req_id][1].update(phase2_resolvers)
@@ -307,13 +320,13 @@ def parse_logs_ttl(exp_id):
 
 # global: resolver_ip_against -> ip1, ip2, ip3
 def master_calc():
-    lsts = ['live_node_30_2', 'live_node_30_4', 'live_node_30_5','live_node_30_6','live_node_30_7',
-            'live_node_30_12','live_node_30_13','live_node_30_14','live_node_30_15','live_node_30_16',
-            'live_node_30_18','live_node_30_19','live_node_30_20','live_node_30_21', 'live_node_30_21']
-    # live_node_30_4-out.json, live_node_30_4-out.json
+    live_jsons_dir = 'ttldict/live_log_{}/'.format(file_iter)
+    run_jsons = [f for f in listdir(live_jsons_dir) if isfile(join(live_jsons_dir, f))
+                 and '.json' in f and 'live_node' in f]
+    lsts = []
 
-    #all_resolvers, correct_resolvers, incorrect_resolvers, correct_set, incorrect_set = set(), set(), set(), set(), set()
-    #resolver_dict = defaultdict(lambda: 0)
+    for l in run_jsons:
+        lsts.append(l[: - len("-out.json")])
 
     for lst in lsts:
         try:
@@ -364,6 +377,7 @@ def master_calc():
     data_final["Total_resolvers"] = len(list(final_dict.keys()))
     # data_final["Total_ex_nodes"] = len(list(req_id_to_resolvers.keys()))
     data_final["data"] = final_dict
+    data_final["data_elaborate"] = final_dict_elaborate
     # ans = []
     # for key in final_dict:
     #     total = final_dict[key]["ic"] + final_dict[key]["c"]
@@ -395,7 +409,6 @@ def master_calc():
     for resolver in resolver_to_ips:
         for ip in resolver_to_ips[resolver]:
             resolver_to_asns[resolver].append((ip, ip_to_asn_dict[ip]))
-
 
     with open("final_asn_to_resolver.json", "w") as ouf:
         json.dump(resolver_to_asns, fp=ouf)

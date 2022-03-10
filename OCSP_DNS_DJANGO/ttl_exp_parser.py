@@ -356,8 +356,8 @@ def master_calc(file_it):
         try:
             cs, ics = parse_logs_ttl(exp_id=lst)
             send_telegram_msg("Done with parsing {}".format(lst))
-        except:
-            pass
+        except Exception as e:
+            print(e)
         # for key in r_pool:
         #     resolver_dict[key] = resolver_dict[key] + r_pool[key]
 

@@ -170,7 +170,7 @@ def create_lst_v2():
     id = 1
     for e in f:
         for i in range(10):
-            ans.append((str(e), id))
+            ans.append((e, id))
             id += 1
     with open("targeted_ttl_data_set-live-{}.json".format(LOCAL), "w") as ouf:
         json.dump(ans, fp=ouf)

@@ -166,11 +166,13 @@ def create_lst(ll):
 
 def create_lst_v2():
     f = open("ttl_exp_asn_list.json")
+    d = json.load(f)
     ans = []
     id = 1
-    for e in f:
+    for e in d:
         for i in range(10):
             ans.append((e, id))
             id += 1
+    a = 1
     with open("targeted_ttl_data_set-live-{}.json".format(LOCAL), "w") as ouf:
         json.dump(ans, fp=ouf)

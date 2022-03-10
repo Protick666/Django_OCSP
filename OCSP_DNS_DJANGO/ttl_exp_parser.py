@@ -12,7 +12,7 @@ def get_asn(ip):
 
 incorrect_asn_set = set()
 
-file_iter = 3
+file_iter = None
 url_live = 'ttlexp.exp.net-measurement.net'
 event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
 banned_exp_ids = ['live_node_30_8', 'live_node_30_1', 'live_node_30_68']
@@ -342,7 +342,8 @@ def get_all_asns():
 
 
 # global: resolver_ip_against -> ip1, ip2, ip3
-def master_calc():
+def master_calc(file_it):
+    file_iter = file_it
     live_jsons_dir = 'ttldict/live_log_{}/'.format(file_iter)
     run_jsons = [f for f in listdir(live_jsons_dir) if isfile(join(live_jsons_dir, f))
                  and '.json' in f and 'live_node' in f]

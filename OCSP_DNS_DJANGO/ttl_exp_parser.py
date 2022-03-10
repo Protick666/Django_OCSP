@@ -188,14 +188,14 @@ def parse_logs_ttl(exp_id, file_iter):
     lum_resolvers = []
 
     # TODO WATCH
-    bind_dir = '/ocsp_dns_django/ttldict/logs_final/bind/bind'
+    bind_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/bind/bind'
     bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
 
-    apache_logs_phase_1_dir = '/ocsp_dns_django/ttldict/logs_final/apache_1/apache2'.format(file_iter)
+    apache_logs_phase_1_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/apache_1/apache2'.format(file_iter)
     apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
                            isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
-    apache_logs_phase_2_dir = '/ocsp_dns_django/ttldict/logs_final/apache_2/apache2'.format(file_iter)
+    apache_logs_phase_2_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/apache_2/apache2'.format(file_iter)
     apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 

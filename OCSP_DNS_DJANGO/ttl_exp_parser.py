@@ -25,8 +25,9 @@ final_dict_elaborate = {}
 req_id_to_resolvers = defaultdict(lambda: set())
 req_id_to_client_ips = defaultdict(lambda: set())
 resolver_to_ips = defaultdict(lambda: set())
+req_id_to_bind_ips = defaultdict(lambda: set())
 
-
+jaccard_index = []
 
 
 
@@ -142,6 +143,13 @@ def segment(lst, d1, d2):
     return ans
 
 
+def track_bind_hits_per_req(info):
+    for req in info:
+        for e in info[req]:
+            resolver_ip = e["resolver_ip"]
+            req_id_to_bind_ips[req].add(resolver_ip)
+
+
 def curate_time_segment(info, d1, d2):
     data = info["req"]
     ans = {}
@@ -228,6 +236,8 @@ def parse_logs_ttl(exp_id):
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
     # apache_info_two_curated_phase_2 = curate_time_segment(apache_info_two, apache_phase_2_start, apache_phase_2_end)
 
+    track_bind_hits_per_req(bind_info_curated_first)
+
     live_log = open("/home/protick/ocsp_dns_django/ttldict/logs_final/live/node_code/{}-out.json".format(exp_id))
     live_data, req_id_to_ip_hash = preprocess_live_data(json.load(live_log))
 
@@ -272,7 +282,8 @@ def parse_logs_ttl(exp_id):
         phase2_resolvers = get_non_lum_resolver_ips(bind_info_curated_second, req_id, lum_resolvers)
 
         considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
-
+        all_resolvers = phase1_resolvers.union(phase2_resolvers)
+        jaccard_index.append(len(considered_resolvers) / len(all_resolvers))
         for key in considered_resolvers:
             if key not in final_dict:
                 final_dict[key] = {"c": 0, "ic": 0}
@@ -292,6 +303,10 @@ def parse_logs_ttl(exp_id):
         phase2_resolvers = get_non_lum_resolver_ips(bind_info_curated_second, req_id, lum_resolvers)
 
         considered_resolvers = phase1_resolvers.difference(phase2_resolvers)
+
+        common_resolvers = phase1_resolvers.intersection(phase2_resolvers)
+        all_resolvers = phase1_resolvers.union(phase2_resolvers)
+        jaccard_index.append(len(common_resolvers) / len(all_resolvers))
 
         # TODO watch distinct
         for key in considered_resolvers:
@@ -430,15 +445,30 @@ def master_calc(file_it):
     for ip in distinct_ips:
         ip_to_asn_dict[ip] = get_asn(ip)
 
+    resolver_to_asn_own = {}
     resolver_to_asns = defaultdict(lambda: list())
     for resolver in resolver_to_ips:
+        resolver_to_asn_own[resolver] = get_asn(resolver)
         for ip in resolver_to_ips[resolver]:
             resolver_to_asns[resolver].append((ip, ip_to_asn_dict[ip]))
 
+    resolver_asn_bonanza = {
+        "resolver_to_asns": resolver_to_asns,
+        "resolver_to_asn_own": resolver_to_asn_own
+    }
     with open("final_asn_to_resolver.json", "w") as ouf:
-        json.dump(resolver_to_asns, fp=ouf)
+        json.dump(resolver_asn_bonanza, fp=ouf)
+
+    with open("req_id_to_bind_ips.json", "w") as ouf:
+        json.dump(req_id_to_bind_ips, fp=ouf)
+
+    with open("jaccard_index.json", "w") as ouf:
+        json.dump(jaccard_index, fp=ouf)
 
     send_telegram_msg("Done with parsing phase 2")
+
+
+
 
 
 def send_telegram_msg(msg):

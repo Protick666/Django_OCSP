@@ -228,7 +228,7 @@ def parse_logs_ttl(exp_id, file_iter):
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
     # apache_info_two_curated_phase_2 = curate_time_segment(apache_info_two, apache_phase_2_start, apache_phase_2_end)
 
-    live_log = open("/home/protick/ocsp_dns_django/ttldict/logs_final/live/node_code/{}-out.json".format(file_iter, exp_id))
+    live_log = open("/home/protick/ocsp_dns_django/ttldict/logs_final/live/node_code/{}-out.json".format(exp_id))
     live_data, req_id_to_ip_hash = preprocess_live_data(json.load(live_log))
 
     correct_set = set()
@@ -343,7 +343,7 @@ def get_all_asns(file_iter):
 # global: resolver_ip_against -> ip1, ip2, ip3
 def master_calc(file_it):
     file_iter = file_it
-    live_jsons_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/live/node_code'.format(file_iter)
+    live_jsons_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/live/node_code'
     run_jsons = [f for f in listdir(live_jsons_dir) if isfile(join(live_jsons_dir, f))
                  and '.json' in f and 'live_node' in f]
     lsts = []

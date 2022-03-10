@@ -182,7 +182,7 @@ def get_non_lum_resolver_ips(bind_info, req_id, lum_resolvers):
     return resolvers
 
 
-def parse_logs_ttl(exp_id, file_iter):
+def parse_logs_ttl(exp_id):
     print("Doing {}".format(exp_id))
     resolver_pool = defaultdict(lambda: 0)
     lum_resolvers = []
@@ -191,11 +191,11 @@ def parse_logs_ttl(exp_id, file_iter):
     bind_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/bind/bind/'
     bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
 
-    apache_logs_phase_1_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/apache_1/apache2/'.format(file_iter)
+    apache_logs_phase_1_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/apache_1/apache2/'
     apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
                            isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
-    apache_logs_phase_2_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/apache_2/apache2/'.format(file_iter)
+    apache_logs_phase_2_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/apache_2/apache2/'
     apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 
@@ -353,7 +353,7 @@ def master_calc(file_it):
 
     for lst in lsts:
         try:
-            cs, ics = parse_logs_ttl(exp_id=lst, file_iter=file_iter)
+            cs, ics = parse_logs_ttl(exp_id=lst)
             send_telegram_msg("Done with parsing {}".format(lst))
         except Exception as e:
             print(e)

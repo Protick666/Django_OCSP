@@ -147,8 +147,8 @@ def choose_hops_for_ttl_exp_v2(total_requests):
             id += 1
 
     # flattened_list.reverse()
-    import random
-    random.shuffle(flattened_list)
+    # import random
+    # random.shuffle(flattened_list)
     return flattened_list
 
 

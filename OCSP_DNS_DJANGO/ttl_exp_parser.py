@@ -12,7 +12,7 @@ def get_asn(ip):
 
 incorrect_asn_set = set()
 
-file_iter = None
+#file_iter = None
 url_live = 'ttlexp.exp.net-measurement.net'
 event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
 banned_exp_ids = ['live_node_30_8', 'live_node_30_1', 'live_node_30_68']
@@ -182,7 +182,7 @@ def get_non_lum_resolver_ips(bind_info, req_id, lum_resolvers):
     return resolvers
 
 
-def parse_logs_ttl(exp_id):
+def parse_logs_ttl(exp_id, file_iter):
     print("Doing {}".format(exp_id))
     resolver_pool = defaultdict(lambda: 0)
     lum_resolvers = []
@@ -323,7 +323,7 @@ def parse_logs_ttl(exp_id):
     return correct_set, incorrect_set
 
 
-def get_all_asns():
+def get_all_asns(file_iter):
     live_jsons_dir = 'ttldict/live_log_{}/'.format(file_iter)
     run_jsons = [f for f in listdir(live_jsons_dir) if isfile(join(live_jsons_dir, f))
                  and '.json' in f and 'live_node' in f]
@@ -354,7 +354,7 @@ def master_calc(file_it):
 
     for lst in lsts:
         try:
-            cs, ics = parse_logs_ttl(exp_id=lst)
+            cs, ics = parse_logs_ttl(exp_id=lst, file_iter=file_iter)
             send_telegram_msg("Done with parsing {}".format(lst))
         except Exception as e:
             print(e)

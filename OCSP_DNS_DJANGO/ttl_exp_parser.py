@@ -283,7 +283,8 @@ def parse_logs_ttl(exp_id):
 
         considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
         all_resolvers = phase1_resolvers.union(phase2_resolvers)
-        jaccard_index.append(len(considered_resolvers) / len(all_resolvers))
+        if len(all_resolvers) > 0:
+            jaccard_index.append(len(considered_resolvers) / len(all_resolvers))
         for key in considered_resolvers:
             if key not in final_dict:
                 final_dict[key] = {"c": 0, "ic": 0}
@@ -306,7 +307,8 @@ def parse_logs_ttl(exp_id):
 
         common_resolvers = phase1_resolvers.intersection(phase2_resolvers)
         all_resolvers = phase1_resolvers.union(phase2_resolvers)
-        jaccard_index.append(len(common_resolvers) / len(all_resolvers))
+        if len(all_resolvers) > 0:
+            jaccard_index.append(len(common_resolvers) / len(all_resolvers))
 
         # TODO watch distinct
         for key in considered_resolvers:

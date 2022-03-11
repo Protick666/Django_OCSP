@@ -461,8 +461,11 @@ def master_calc(file_it):
     with open("final_asn_to_resolver.json", "w") as ouf:
         json.dump(resolver_asn_bonanza, fp=ouf)
 
+    req_id_to_bind_ips_cp = {}
+    for key in req_id_to_bind_ips:
+        req_id_to_bind_ips_cp[key] = list(req_id_to_bind_ips[key])
     with open("req_id_to_bind_ips.json", "w") as ouf:
-        json.dump(req_id_to_bind_ips, fp=ouf)
+        json.dump(req_id_to_bind_ips_cp, fp=ouf)
 
     with open("jaccard_index.json", "w") as ouf:
         json.dump(jaccard_index, fp=ouf)

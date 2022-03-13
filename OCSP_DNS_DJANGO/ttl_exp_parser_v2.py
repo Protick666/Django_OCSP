@@ -161,8 +161,8 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                             req_id_to_resolvers[identifier].add(meta["resolver_ip"])
                         else:
                             req_id_to_client_ips[identifier].add(meta["client_ip"])
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
 
     return ans_dict
 
@@ -205,7 +205,7 @@ def preprocess_live_data(data):
             ans[req_id] = (phase_1, phase_2, js['asn'])
             req_id_to_ip_hash[req_id] = js['ip_hash']
         except Exception as e:
-            pass
+            print(e)
     return ans, req_id_to_ip_hash
 
 

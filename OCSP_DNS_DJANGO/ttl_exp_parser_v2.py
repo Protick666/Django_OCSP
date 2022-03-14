@@ -386,7 +386,7 @@ def master_calc(file_it):
                                      apache_info_two=apache_info_two_global[exp_id])
             send_telegram_msg("Done with parsing {}".format(exp_id))
         except Exception as e:
-            print('master_calc ' , e)
+            print('master_calc ' , e, exp_id)
 
 
     print("Total resolvers {}".format(len(list(final_dict.keys()))))

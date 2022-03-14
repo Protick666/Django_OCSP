@@ -176,7 +176,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                         else:
                             req_id_to_client_ips[identifier].add(meta["client_ip"])
                 except Exception as e:
-                    print('parse bind apache logs ' + e)
+                    print('parse bind apache logs ' , e)
 
     return ans_dict
 
@@ -220,7 +220,7 @@ def preprocess_live_data(data):
             ans[req_id] = (phase_1, phase_2, js['asn'])
             req_id_to_ip_hash[req_id] = js['ip_hash']
         except Exception as e:
-            print('preprocess_live_data ' + e)
+            print('preprocess_live_data ' , e)
     return ans, req_id_to_ip_hash
 
 
@@ -386,7 +386,7 @@ def master_calc(file_it):
                                      apache_info_two=apache_info_two_global[exp_id])
             send_telegram_msg("Done with parsing {}".format(exp_id))
         except Exception as e:
-            print('master_calc ' + e)
+            print('master_calc ' , e)
 
 
     print("Total resolvers {}".format(len(list(final_dict.keys()))))

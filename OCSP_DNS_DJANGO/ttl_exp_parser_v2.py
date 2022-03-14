@@ -4,8 +4,16 @@ from os import listdir
 from os.path import isfile, join
 from datetime import datetime
 import pyasn
+from OCSP_DNS_DJANGO.local import LOCAL
 
-asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
+if LOCAL:
+    asndb = pyasn.pyasn('../OCSP_DNS_DJANGO/ipsan_db.dat')
+else:
+    asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
+
+
+
+
 
 def get_asn(ip):
     return asndb.lookup(ip)[0]
@@ -63,6 +71,11 @@ Global:
 Per request id
 '''
 jaccard_index = []
+
+if LOCAL:
+    BASE_URL = '/Users/protick.bhowmick/PriyoRepos/OCSP_DNS_DJANGO/logs_final/'
+else:
+    BASE_URL = '/home/protick/ocsp_dns_django/ttldict/logs_final/'
 
 
 def is_event_log(log):
@@ -134,7 +147,8 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                     if not is_exp_id_present:
                         continue
                     d = ans_dict[exp_id]
-                    d["req"] = {}
+                    if "req" not in d:
+                        d["req"] = {}
 
                     if is_bind:
                         if line.startswith("client"):
@@ -165,6 +179,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                     print(e)
 
     return ans_dict
+
 
 def segment(lst, d1, d2):
     ans = []
@@ -220,14 +235,14 @@ def get_non_lum_resolver_ips(bind_info, req_id, lum_resolvers):
 
 
 def parse_logs_together(allowed_exp_ids):
-    bind_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/bind/bind/'
+    bind_dir = BASE_URL + 'bind/bind/'
     bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
 
-    apache_logs_phase_1_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/apache_1/apache2/'
+    apache_logs_phase_1_dir = BASE_URL + 'apache_1/apache2/'
     apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
                            isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
-    apache_logs_phase_2_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/apache_2/apache2/'
+    apache_logs_phase_2_dir = BASE_URL + 'apache_2/apache2/'
     apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 
@@ -283,7 +298,7 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two):
 
     track_bind_hits_per_req(bind_info_curated_first)
 
-    live_log = open("/home/protick/ocsp_dns_django/ttldict/logs_final/live/node_code/{}-out.json".format(exp_id))
+    live_log = open(BASE_URL + "live/node_code/{}-out.json".format(exp_id))
 
     # live_data: req_id -> (phase_1_webserver, phase_2_webserver, asn)
     # req_id_to_ip_hash: req_id -> ip_hash'
@@ -314,7 +329,6 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two):
                                  ip_hash=req_id_to_ip_hash[req_id],
                                  is_correct_set=True)
 
-
     for req_id in incorrect_set:
         phase1_resolvers = get_non_lum_resolver_ips(bind_info_curated_first, req_id, [])
         phase2_resolvers = get_non_lum_resolver_ips(bind_info_curated_second, req_id, [])
@@ -335,13 +349,13 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two):
 
 
 def get_all_asns(file_iter):
-    live_jsons_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/live/node_code/'.format(file_iter)
+    live_jsons_dir = BASE_URL + 'live/node_code/'.format(file_iter)
     run_jsons = [f for f in listdir(live_jsons_dir) if isfile(join(live_jsons_dir, f))
                  and '.json' in f and 'live_node' in f]
 
     asn_set = set()
     for e in run_jsons:
-        live_log = open("/home/protick/ocsp_dns_django/ttldict/logs_final/live/node_code/{}".format(file_iter, e))
+        live_log = open(BASE_URL + "live/node_code/{}".format(file_iter, e))
         live_data, req_id_to_ip_hash = preprocess_live_data(json.load(live_log))
         for key in live_data:
             asn_set.add(live_data[key][2])
@@ -354,7 +368,7 @@ def get_all_asns(file_iter):
 # global: resolver_ip_against -> ip1, ip2, ip3
 def master_calc(file_it):
     file_iter = file_it
-    live_jsons_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/live/node_code'
+    live_jsons_dir = BASE_URL + 'live/node_code'
     run_jsons = [f for f in listdir(live_jsons_dir) if isfile(join(live_jsons_dir, f))
                  and '.json' in f and 'live_node' in f]
 

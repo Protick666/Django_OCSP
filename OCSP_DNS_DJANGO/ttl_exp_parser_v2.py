@@ -373,6 +373,7 @@ def master_calc(file_it):
                  and '.json' in f and 'live_node' in f]
 
     exp_id_list = []
+    pp = []
     for element in run_jsons:
         exp_id_list.append(element[: - len("-out.json")])
 
@@ -386,6 +387,7 @@ def master_calc(file_it):
                                      apache_info_two=apache_info_two_global[exp_id])
             send_telegram_msg("Done with parsing {}".format(exp_id))
         except Exception as e:
+            pp.append('master_calc {} {}'.format(e, exp_id))
             print('master_calc ' , e, exp_id)
 
 
@@ -451,6 +453,8 @@ def master_calc(file_it):
 
     with open("jaccard_index.json", "w") as ouf:
         json.dump(jaccard_index, fp=ouf)
+
+    print(pp)
 
     send_telegram_msg("Done with parsing phase 2")
 

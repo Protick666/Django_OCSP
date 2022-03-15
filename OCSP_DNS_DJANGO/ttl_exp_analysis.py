@@ -28,7 +28,26 @@ def test():
         print(get_org(e))
 
 
-def table_maker():
+def table_maker() :
+    pass
+    # ans_lst.sort(key=lambda x: x[0], reverse=True)
+    # c_ans_lst.sort(key=lambda x: x[0], reverse=True)
+    # a = 1
+    #
+    # table_1 = [['Country', 'Org/ISP', 'Incorrect Resolvers', 'Exit nodes', 'Correct Resolvers']]
+    # for i in range(30):
+    #     a = [ans_lst[i][3], ans_lst[i][2], ans_lst[i][0], ans_lst[i][1], ans_lst[i][4]]
+    #     table_1.append(a)
+    # print(tabulate(table_1, headers='firstrow', tablefmt='fancy_grid'))
+    #
+    # table_2 = [['Country', 'Org/ISP', 'Correct Resolvers', 'Exit nodes', 'Incorrect Resolvers']]
+    # for i in range(30):
+    #     a = [c_ans_lst[i][3], c_ans_lst[i][2], c_ans_lst[i][0], c_ans_lst[i][1], c_ans_lst[i][4]]
+    #     table_2.append(a)
+    # print(tabulate(table_2, headers='firstrow', tablefmt='fancy_grid'))
+
+
+def table_maker_preprocess():
     ans = defaultdict(lambda: [0, set()])
     c_ans = defaultdict(lambda: [0, set()])
     f = open("../final_data.json")
@@ -46,10 +65,10 @@ def table_maker():
             correct_set.add(e[1])
         total = len(correct_set) + len(incorrect_set)
         total_set = correct_set.union(incorrect_set)
-        if total < 4:
+        if total < 5:
             continue
         ratio = len(incorrect_set) / total
-        if ratio >= .7:
+        if ratio >= .8:
             asn = get_asn(key)
             org, cntry = get_org(asn)
             ans[org][0] += 1
@@ -80,23 +99,12 @@ def table_maker():
             in_correct_count = ans[key][0]
         c_ans_lst.append((c_ans[key][0],  len(c_ans[key][1]), key, cn[key], in_correct_count))
 
+    k = {}
+    k['ic_ans_lst'] = ans_lst
+    k['c_ans_lst'] = c_ans_lst
+    with open("table_data.json", "w") as ouf:
+        json.dump(k, fp=ouf)
 
-    ans_lst.sort(key=lambda x: x[0], reverse=True)
-    c_ans_lst.sort(key=lambda x: x[0], reverse=True)
-    a = 1
-
-
-    table_1 = [['Country', 'Org/ISP', 'Incorrect Resolvers', 'Exit nodes', 'Correct Resolvers']]
-    for i in range(30):
-        a = [ans_lst[i][3], ans_lst[i][2], ans_lst[i][0], ans_lst[i][1], ans_lst[i][4]]
-        table_1.append(a)
-    print(tabulate(table_1, headers='firstrow', tablefmt='fancy_grid'))
-
-    table_2 = [['Country', 'Org/ISP', 'Correct Resolvers', 'Exit nodes', 'Incorrect Resolvers']]
-    for i in range(30):
-        a = [c_ans_lst[i][3], c_ans_lst[i][2], c_ans_lst[i][0], c_ans_lst[i][1], c_ans_lst[i][4]]
-        table_2.append(a)
-    print(tabulate(table_2, headers='firstrow', tablefmt='fancy_grid'))
 
     # with open("isp_table.json", "w") as ouf:
     #     json.dump(ans_lst, fp=ouf)

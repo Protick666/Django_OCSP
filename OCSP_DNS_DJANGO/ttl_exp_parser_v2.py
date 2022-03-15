@@ -26,6 +26,8 @@ event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
 banned_exp_ids = ['live_node_30_8', 'live_node_30_1', 'live_node_30_68']
 # resolver_mega = defaultdict(lambda: set())
 
+phase_wise_resolver_correlation = defaultdict(lambda: defaultdict(lambda: 0))
+
 '''
 Global:
 req_id -> {Correct: 5, Incorrect: 20}
@@ -35,7 +37,7 @@ final_dict = {}
 '''
 Global:
                         *List* Not Set*
-req_id -> {Correct: [(req_id, ip_hash),(req_id, ip_hash)....], Incorrect: [(req_id, ip_hash),(req_id, ip_hash)....]}
+resolver -> {Correct: [(req_id, ip_hash),(req_id, ip_hash)....], Incorrect: [(req_id, ip_hash),(req_id, ip_hash)....]}
 '''
 final_dict_elaborate = {}
 
@@ -58,13 +60,17 @@ Global:
 resolver_to_ips: resolver -> ips from req ids that hit those resolvers
                                 *** not only considered resolvers from our method ***
 '''
+
 resolver_to_ips = defaultdict(lambda: set())
 
+# TODO second phase pagne
 '''
 Global:
 First phase
 '''
 req_id_to_bind_ips = defaultdict(lambda: set())
+
+req_id_to_bind_ips_phase_2 = defaultdict(lambda: set())
 
 '''
 Global:
@@ -83,6 +89,13 @@ def is_event_log(log):
         if e in log:
             return e
     return None
+
+
+def calc_correlation_matrix(phase1_resolvers, phase2_resolvers):
+    for e1 in phase1_resolvers:
+        for e2 in phase2_resolvers:
+            phase_wise_resolver_correlation[e1][e2] += 1
+            phase_wise_resolver_correlation[e2][e1] += 1
 
 
 def does_exp_id_match(line, exp_id_list):
@@ -189,11 +202,11 @@ def segment(lst, d1, d2):
     return ans
 
 
-def track_bind_hits_per_req(info):
+def track_bind_hits_per_req(info, req_to_bind_ip):
     for req in info:
         for e in info[req]:
             resolver_ip = e["resolver_ip"]
-            req_id_to_bind_ips[req].add(resolver_ip)
+            req_to_bind_ip[req].add(resolver_ip)
 
 
 def curate_time_segment(info, d1, d2):
@@ -296,7 +309,9 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two):
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
     # apache_info_two_curated_phase_2 = curate_time_segment(apache_info_two, apache_phase_2_start, apache_phase_2_end)
 
-    track_bind_hits_per_req(bind_info_curated_first)
+    track_bind_hits_per_req(bind_info_curated_first, req_to_bind_ip=req_id_to_bind_ips)
+    track_bind_hits_per_req(bind_info_curated_second, req_to_bind_ip=req_id_to_bind_ips_phase_2)
+
 
     live_log = open(BASE_URL + "live/node_code/{}-out.json".format(exp_id))
 
@@ -318,6 +333,8 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two):
         phase1_resolvers = get_non_lum_resolver_ips(bind_info_curated_first, req_id, [])
         phase2_resolvers = get_non_lum_resolver_ips(bind_info_curated_second, req_id, [])
 
+        calc_correlation_matrix(phase1_resolvers, phase2_resolvers)
+
         considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
         all_resolvers = phase1_resolvers.union(phase2_resolvers)
 
@@ -332,6 +349,8 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two):
     for req_id in incorrect_set:
         phase1_resolvers = get_non_lum_resolver_ips(bind_info_curated_first, req_id, [])
         phase2_resolvers = get_non_lum_resolver_ips(bind_info_curated_second, req_id, [])
+
+        calc_correlation_matrix(phase1_resolvers, phase2_resolvers)
 
         considered_resolvers = phase1_resolvers.difference(phase2_resolvers)
 
@@ -448,11 +467,22 @@ def master_calc(file_it):
     req_id_to_bind_ips_cp = {}
     for key in req_id_to_bind_ips:
         req_id_to_bind_ips_cp[key] = list(req_id_to_bind_ips[key])
+
+    req_id_to_bind_ips_cp_2 = {}
+    for key in req_id_to_bind_ips_phase_2:
+        req_id_to_bind_ips_cp_2[key] = list(req_id_to_bind_ips_phase_2[key])
+
     with open("req_id_to_bind_ips.json", "w") as ouf:
         json.dump(req_id_to_bind_ips_cp, fp=ouf)
 
+    with open("req_id_to_bind_ips_phase_2.json", "w") as ouf:
+        json.dump(req_id_to_bind_ips_cp_2, fp=ouf)
+
     with open("jaccard_index.json", "w") as ouf:
         json.dump(jaccard_index, fp=ouf)
+
+    with open("correlation_resolvers.json", "w") as ouf:
+        json.dump(phase_wise_resolver_correlation, fp=ouf)
 
     print(pp)
 

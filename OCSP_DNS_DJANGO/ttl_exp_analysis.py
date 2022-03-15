@@ -151,4 +151,8 @@ def local_public_analyzer():
 #table_maker()
 # test()
 
-local_public_analyzer()
+def init():
+    local_public_analyzer()
+    table_maker_preprocess()
+
+

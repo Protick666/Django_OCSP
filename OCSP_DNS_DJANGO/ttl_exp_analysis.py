@@ -121,7 +121,7 @@ def local_public_analyzer():
     d = json.load(f)
     resolver_to_asns = d['resolver_to_asns']
     resolver_to_asn_own = d['resolver_to_asn_own']
-
+    resolver_to_org_country = {}
     is_resolver_public = {}
     local_count, public_count = 0, 0
     for resolver in resolver_to_asns:
@@ -130,7 +130,8 @@ def local_public_analyzer():
         cntry_set = set()
 
         resolver_asn = resolver_to_asn_own[resolver]
-        res_org = get_org(resolver_asn)[0]
+        res_org, cntry = get_org(resolver_asn)
+        resolver_to_org_country[resolver] = (res_org, cntry)
 
         for ip_tuple in ip_list:
             asn = ip_tuple[1]
@@ -151,6 +152,9 @@ def local_public_analyzer():
 
     with open("resolver_public_local_dict.json", "w") as ouf:
         json.dump(is_resolver_public, fp=ouf)
+
+    with open("resolver_to_org_country.json", "w") as ouf:
+        json.dump(resolver_to_org_country, fp=ouf)
 
 
 #table_maker()

@@ -55,7 +55,7 @@ def table_maker() :
 def table_maker_preprocess():
     ans = defaultdict(lambda: [0, set()])
     c_ans = defaultdict(lambda: [0, set()])
-    f = open("../final_data.json")
+    f = open("final_data.json")
     d = json.load(f)
     final_dict = d["data_elaborate"]
     print(d["Total_resolvers"])
@@ -117,7 +117,7 @@ def table_maker_preprocess():
 
 def local_public_analyzer():
 
-    f = open("../final_resolver_to_asn.json")
+    f = open("final_resolver_to_asn.json")
     d = json.load(f)
     resolver_to_asns = d['resolver_to_asns']
     resolver_to_asn_own = d['resolver_to_asn_own']

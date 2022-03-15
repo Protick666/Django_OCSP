@@ -3,8 +3,13 @@ import pyasn
 from OCSP_DNS_DJANGO.tools import get_dns_records, AS2ISP
 from collections import defaultdict
 from tabulate import tabulate
+from OCSP_DNS_DJANGO.local import  LOCAL
 
-asndb = pyasn.pyasn('../OCSP_DNS_DJANGO/ipsan_db.dat')
+if LOCAL:
+    asndb = pyasn.pyasn('../OCSP_DNS_DJANGO/ipsan_db.dat')
+else:
+    asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
+
 as2isp = AS2ISP()
 
 

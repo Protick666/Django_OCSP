@@ -47,6 +47,7 @@ req_id_to_resolvers: both phases!
 '''
 req_id_to_resolvers = defaultdict(lambda: set())
 
+first_hit_resolvers = []
 
 '''
 Global:
@@ -114,8 +115,9 @@ def parse_bind_line_and_build_meta(line):
     resolver_ip = resolver_ip[: resolver_ip.rfind("#")]
 
     url = segments[8]
-    time = time[: time.rfind(".")]
-    datetime_object = datetime.strptime(time, '%d-%b-%Y-%H:%M:%S')
+    # time = time[: time.rfind(".")]
+    # 00:00:03.533
+    datetime_object = datetime.strptime(time, '%d-%b-%Y-%H:%M:%S.%f')
 
     meta = {}
     meta["date"] = datetime_object
@@ -189,7 +191,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                         else:
                             req_id_to_client_ips[identifier].add(meta["client_ip"])
                 except Exception as e:
-                    print('parse bind apache logs ' , e)
+                    print('parse bind apache logs ', e)
 
     return ans_dict
 
@@ -292,6 +294,12 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two):
                 l[k].sort(key=lambda x: x['date'])
         for k in l['req']:
             l['req'][k].sort(key=lambda x: x['date'])
+
+        # TIME
+        for k in bind_info['req']:
+            if len(bind_info['req'][k] > 0):
+                first_item_resolver_ip = bind_info['req'][k][0]['resolver_ip']
+                first_hit_resolvers.append(first_item_resolver_ip)
 
     # apache_phase_1_start = apache_info_one["phase1-start"][0]['date']
     # apache_phase_1_divider = apache_info_one["phase1-end"][0]['date']
@@ -451,6 +459,11 @@ def master_calc(file_it):
         for ip in resolver_to_ips[resolver]:
             resolver_to_asns[resolver].append((ip, ip_to_asn_dict[ip]))
 
+    first_hit_set = set(first_hit_resolvers)
+    for resolver in first_hit_set:
+        if resolver not in resolver_to_asn_own:
+            resolver_to_asn_own[resolver] = get_asn(resolver)
+
     resolver_asn_bonanza = {
         "resolver_to_asns": resolver_to_asns,
         "resolver_to_asn_own": resolver_to_asn_own
@@ -483,6 +496,9 @@ def master_calc(file_it):
 
     with open("correlation_resolvers.json", "w") as ouf:
         json.dump(phase_wise_resolver_correlation, fp=ouf)
+
+    with open("first_hit_resolvers.json", "w") as ouf:
+        json.dump(first_hit_resolvers, fp=ouf)
 
     print(pp)
 

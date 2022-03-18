@@ -297,7 +297,7 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two):
 
         # TIME
         for k in bind_info['req']:
-            if len(bind_info['req'][k] > 0):
+            if len(bind_info['req'][k]) > 0:
                 first_item_resolver_ip = bind_info['req'][k][0]['resolver_ip']
                 first_hit_resolvers.append(first_item_resolver_ip)
 

@@ -33,23 +33,32 @@ def test():
         print(get_org(e))
 
 
-def table_maker() :
-    pass
-    # ans_lst.sort(key=lambda x: x[0], reverse=True)
-    # c_ans_lst.sort(key=lambda x: x[0], reverse=True)
-    # a = 1
-    #
-    # table_1 = [['Country', 'Org/ISP', 'Incorrect Resolvers', 'Exit nodes', 'Correct Resolvers']]
-    # for i in range(30):
-    #     a = [ans_lst[i][3], ans_lst[i][2], ans_lst[i][0], ans_lst[i][1], ans_lst[i][4]]
-    #     table_1.append(a)
-    # print(tabulate(table_1, headers='firstrow', tablefmt='fancy_grid'))
-    #
-    # table_2 = [['Country', 'Org/ISP', 'Correct Resolvers', 'Exit nodes', 'Incorrect Resolvers']]
-    # for i in range(30):
-    #     a = [c_ans_lst[i][3], c_ans_lst[i][2], c_ans_lst[i][0], c_ans_lst[i][1], c_ans_lst[i][4]]
-    #     table_2.append(a)
-    # print(tabulate(table_2, headers='firstrow', tablefmt='fancy_grid'))
+def table_maker():
+    # k = {}
+    # k['ic_ans_lst'] = ans_lst
+    # k['c_ans_lst'] = c_ans_lst
+    # with open("table_data.json", "w") as ouf:
+    #     json.dump(k, fp=ouf)
+
+    f = open("../table_data.json")
+    d = json.load(f)
+    ans_lst = d['ic_ans_lst']
+    c_ans_lst = d['c_ans_lst']
+    ans_lst.sort(key=lambda x: x[0], reverse=True)
+    c_ans_lst.sort(key=lambda x: x[0], reverse=True)
+    a = 1
+
+    table_1 = [['Country', 'Org/ISP', 'Incorrect Resolvers', 'Exit nodes', 'Correct Resolvers']]
+    for i in range(20):
+        a = [ans_lst[i][3], ans_lst[i][2], ans_lst[i][0], ans_lst[i][1], ans_lst[i][4]]
+        table_1.append(a)
+    print(tabulate(table_1, headers='firstrow', tablefmt='fancy_grid'))
+
+    table_2 = [['Country', 'Org/ISP', 'Correct Resolvers', 'Exit nodes', 'Incorrect Resolvers']]
+    for i in range(20):
+        a = [c_ans_lst[i][3], c_ans_lst[i][2], c_ans_lst[i][0], c_ans_lst[i][1], c_ans_lst[i][4]]
+        table_2.append(a)
+    print(tabulate(table_2, headers='firstrow', tablefmt='fancy_grid'))
 
 
 def table_maker_preprocess():
@@ -73,13 +82,13 @@ def table_maker_preprocess():
         if total < 5:
             continue
         ratio = len(incorrect_set) / total
-        if ratio >= .8:
+        if ratio >= .95:
             asn = get_asn(key)
             org, cntry = get_org(asn)
             ans[org][0] += 1
             ans[org][1].update(total_set)
             cn[org] = cntry
-        elif ratio <= .2:
+        elif ratio <= .05:
             asn = get_asn(key)
             org, cntry = get_org(asn)
             c_ans[org][0] += 1
@@ -160,8 +169,31 @@ def local_public_analyzer():
 #table_maker()
 # test()
 
+
+def reolver_hits_weird_cases():
+    f = open("../req_id_to_bind_ips_phase_2.json")
+    d = json.load(f)
+
+    ip_to_count = defaultdict(lambda: 0)
+    for e in d:
+        if len(d[e]) > 100:
+            for element in d[e]:
+                ip_to_count[element] += 1
+
+    ans = []
+    for key in ip_to_count:
+        ans.append((key, ip_to_count[key]))
+    ans.sort(key=lambda x: -x[1])
+
+    with open("recurrent_phase_2_ips.json", "w") as ouf:
+        json.dump(ans, fp=ouf)
+
+# reolver_hits_weird_cases()
+
 def init():
     local_public_analyzer()
     table_maker_preprocess()
+
+# table_maker()
 
 

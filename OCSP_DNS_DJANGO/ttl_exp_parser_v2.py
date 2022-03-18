@@ -48,6 +48,7 @@ req_id_to_resolvers: both phases!
 req_id_to_resolvers = defaultdict(lambda: set())
 
 first_hit_resolvers = []
+all_resolvers_pool = []
 
 '''
 Global:
@@ -300,6 +301,9 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two):
             if len(bind_info['req'][k]) > 0:
                 first_item_resolver_ip = bind_info['req'][k][0]['resolver_ip']
                 first_hit_resolvers.append(first_item_resolver_ip)
+                for ele in bind_info['req'][k]:
+                    ip_resolver = ele['resolver_ip']
+                    all_resolvers_pool.append(ip_resolver)
 
     # apache_phase_1_start = apache_info_one["phase1-start"][0]['date']
     # apache_phase_1_divider = apache_info_one["phase1-end"][0]['date']
@@ -499,6 +503,18 @@ def master_calc(file_it):
 
     with open("first_hit_resolvers.json", "w") as ouf:
         json.dump(first_hit_resolvers, fp=ouf)
+
+    # all_resolvers_pool
+    ip_to_count = defaultdict(lambda: 0)
+    for e in all_resolvers_pool:
+        ip_to_count[e] += 1
+    ans_x = []
+    for key in ip_to_count:
+        ans_x.append((key, ip_to_count[key]))
+    ans_x.sort(key=lambda x: -x[1])
+
+    with open("all_resolvers_pool.json", "w") as ouf:
+        json.dump(ans_x, fp=ouf)
 
     print(pp)
 

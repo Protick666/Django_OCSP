@@ -116,28 +116,40 @@ def choose_hops_for_ttl_exp(file_date):
         return asns
 
 # TODO check
-def choose_hops_for_ttl_exp_v2(total_requests):
-    # return [(asn, req_id).....]
-    print(total_requests)
+
+
+def get_all_asn_list_with_prefix_count():
     tweets = []
+    asn_list = set()
+    asn_to_prefix_count = {}
     for line in open('asns_full_info.json', 'r'):
         tweets.append(json.loads(line))
 
-    curtailed_info = []
-
     total_prefixes = 0
     for a in tweets:
-        curtailed_info.append((a['asn'], a['announcing']['numberPrefixes']))
         total_prefixes += a['announcing']['numberPrefixes']
 
-    lst = []
     for a in tweets:
-        allotment = (a['announcing']['numberPrefixes'] / total_prefixes) * total_requests
-        allotment = min(max(int(allotment), 10), 200)
+        asn_list.add(a['asn'])
+        asn_to_prefix_count[a['asn']] = a['announcing']['numberPrefixes']
 
-        lst.append((a['asn'], allotment))
+    asn_to_prefix_count['all'] = total_prefixes
 
-    lst.sort(key=lambda x: -x[1])
+    return list(asn_list), asn_to_prefix_count
+
+
+def choose_hops_for_ttl_exp_v2(total_requests, asn_list, asn_to_prefix_count):
+    lst = []
+
+    for asn in asn_list:
+        if asn_to_prefix_count[asn] == 0:
+            continue
+        allotment = (asn_to_prefix_count[asn] / asn_to_prefix_count['all']) * total_requests
+        allotment = max(min(allotment, 10), 200)
+        lst.append((asn, allotment))
+
+    import random
+    random.shuffle(lst)
 
     flattened_list = []
     id = 1
@@ -146,10 +158,28 @@ def choose_hops_for_ttl_exp_v2(total_requests):
             flattened_list.append((e[0], id))
             id += 1
 
-    # flattened_list.reverse()
-    # import random
-    # random.shuffle(flattened_list)
     return flattened_list
+
+
+def create_lst_both(total_requests):
+    asn_list, asn_to_prefix_count = get_all_asn_list_with_prefix_count()
+
+    f = open("global_asn_list.json")
+    local_list = json.load(f)
+
+    global_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=asn_list,
+                                             asn_to_prefix_count=asn_to_prefix_count)
+
+    local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=local_list,
+                                             asn_to_prefix_count=asn_to_prefix_count)
+
+
+    print("Global ", len(global_list))
+    print("Local ", len(local_list))
+    with open("ttl_data_set-live-global-{}.json".format(LOCAL), "w") as ouf:
+        json.dump(global_list, fp=ouf)
+    with open("ttl_data_set-live-local-{}.json".format(LOCAL), "w") as ouf:
+        json.dump(local_list, fp=ouf)
 
 
 def create_lst(ll):
@@ -164,15 +194,3 @@ def create_lst(ll):
         json.dump(ans, fp=ouf)
 
 
-def create_lst_v2():
-    f = open("ttl_exp_asn_list.json")
-    d = json.load(f)
-    ans = []
-    id = 1
-    for e in d:
-        for i in range(10):
-            ans.append((e, id))
-            id += 1
-    a = 1
-    with open("targeted_ttl_data_set-live-{}.json".format(LOCAL), "w") as ouf:
-        json.dump(ans, fp=ouf)

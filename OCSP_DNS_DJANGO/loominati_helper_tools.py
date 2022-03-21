@@ -168,12 +168,14 @@ def create_lst_both(total_requests):
     asn_list, asn_to_prefix_count = get_all_asn_list_with_prefix_count()
 
     f = open("global_asn_list.json")
-    local_list = json.load(f)
+    local_asn_list = json.load(f)
+
+    print("Local ", len(local_asn_list))
 
     global_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=asn_list,
                                              asn_to_prefix_count=asn_to_prefix_count)
 
-    local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=local_list,
+    local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=local_asn_list,
                                              asn_to_prefix_count=asn_to_prefix_count)
 
 

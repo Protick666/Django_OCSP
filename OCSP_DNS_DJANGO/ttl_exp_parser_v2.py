@@ -234,7 +234,7 @@ def preprocess_live_data(data):
             req_id = str(req_url.split(".")[0])
             phase_1 = js['host-phase-1']
             phase_2 = js['host-phase-2']
-            asn = js['host-phase-2']
+            asn = js['asn']
             global_asn_set.add(asn)
             ans[req_id] = (phase_1, phase_2, js['asn'])
             req_id_to_ip_hash[req_id] = js['ip_hash']

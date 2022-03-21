@@ -13,8 +13,6 @@ else:
 
 
 
-
-
 def get_asn(ip):
     return asndb.lookup(ip)[0]
 
@@ -79,6 +77,9 @@ Global:
 Per request id
 '''
 jaccard_index = []
+
+
+global_asn_set = set()
 
 if LOCAL:
     BASE_URL = '/Users/protick.bhowmick/PriyoRepos/OCSP_DNS_DJANGO/logs_final/'
@@ -233,6 +234,8 @@ def preprocess_live_data(data):
             req_id = str(req_url.split(".")[0])
             phase_1 = js['host-phase-1']
             phase_2 = js['host-phase-2']
+            asn = js['host-phase-2']
+            global_asn_set.add(asn)
             ans[req_id] = (phase_1, phase_2, js['asn'])
             req_id_to_ip_hash[req_id] = js['ip_hash']
         except Exception as e:
@@ -515,6 +518,9 @@ def master_calc(file_it):
 
     with open("all_resolvers_pool.json", "w") as ouf:
         json.dump(ans_x, fp=ouf)
+
+    with open("global_asn_list.json", "w") as ouf:
+        json.dump(list(global_asn_set), fp=ouf)
 
     print(pp)
 

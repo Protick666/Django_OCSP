@@ -175,7 +175,7 @@ def create_lst_both(total_requests):
     global_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=asn_list,
                                              asn_to_prefix_count=asn_to_prefix_count)
 
-    local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=local_asn_list,
+    local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests * 5, asn_list=local_asn_list,
                                              asn_to_prefix_count=asn_to_prefix_count)
 
 

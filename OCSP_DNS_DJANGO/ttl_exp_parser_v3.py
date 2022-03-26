@@ -489,7 +489,7 @@ def master_calc(ttl):
             print('master_calc ' , e, exp_id)
 
     from pathlib import Path
-    parent_path = 'ttl_result/ttl/'
+    parent_path = 'ttl_result/{}/'.format(ttl)
     Path(parent_path).mkdir(parents=True, exist_ok=True)
     print("Total resolvers {}".format(len(list(final_dict.keys()))))
     # print("Total exit-nodes covered {}".format(len(list(req_id_to_resolvers.keys()))))
@@ -602,4 +602,4 @@ def send_telegram_msg(msg):
     import telegram_send
     telegram_send.send(messages=[msg])
 
-#master_calc(None)
+master_calc(15)

@@ -602,4 +602,3 @@ def send_telegram_msg(msg):
     import telegram_send
     telegram_send.send(messages=[msg])
 
-master_calc(15)

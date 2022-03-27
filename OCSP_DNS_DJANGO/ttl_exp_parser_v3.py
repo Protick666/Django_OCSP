@@ -5,10 +5,20 @@ from os.path import isfile, join
 from datetime import datetime
 import pyasn
 from OCSP_DNS_DJANGO.local import LOCAL
+from OCSP_DNS_DJANGO.tools import AS2ISP
 
 ttl_to_suffix_dict = {
     15: "",
 }
+
+as2isp = AS2ISP()
+
+def get_org(asn):
+    org = str(as2isp.getISP("20221212", asn)[0])
+    cntry = str(as2isp.getISP("20221212", asn)[1])
+    org.replace("\"", "")
+    cntry.replace("\"", "")
+    return org, cntry
 
 def get_live_file_name(ttl):
     if ttl in ttl_to_suffix_dict:
@@ -46,6 +56,7 @@ phase_wise_resolver_correlation = defaultdict(lambda: defaultdict(lambda: 0))
 
 ###### Global:
 http_response_dict = defaultdict(lambda: 0)
+http_response_to_asn_set = defaultdict(lambda: set())
 telemetry_count = {}
 
 '''
@@ -65,16 +76,20 @@ final_dict_elaborate = {}
 Global:
 req_id_to_resolvers: both phases!
 '''
-req_id_to_resolvers = defaultdict(lambda: set())
 
-first_hit_resolvers = []
-all_resolvers_pool = []
+req_id_to_resolvers = defaultdict(lambda: set())
 
 '''
 Global:
 req_id_to_client_ips: both phases!
 '''
+
 req_id_to_client_ips = defaultdict(lambda: set())
+
+first_hit_resolvers = []
+all_resolvers_pool = []
+
+
 
 
 '''
@@ -107,6 +122,45 @@ if LOCAL:
     BASE_URL = '/Users/protick.bhowmick/PriyoRepos/OCSP_DNS_DJANGO/logs_final/'
 else:
     BASE_URL = '/home/protick/ocsp_dns_django/ttldict/logs_final_v2/'
+
+
+# OUTER
+
+def initiate_per_ttl_global_sets():
+    global incorrect_asn_set
+    global http_response_dict
+    global telemetry_count
+    global final_dict
+    global final_dict_elaborate
+    global first_hit_resolvers
+
+    global all_resolvers_pool
+    global resolver_to_ips
+    global req_id_to_bind_ips
+    global req_id_to_bind_ips_phase_2
+    global jaccard_index
+    global global_asn_set
+    global req_id_to_resolvers
+    global req_id_to_client_ips
+    global phase_wise_resolver_correlation
+    global http_response_to_asn_set
+
+    http_response_to_asn_set = defaultdict(lambda: set())
+    phase_wise_resolver_correlation = defaultdict(lambda: defaultdict(lambda: 0))
+    req_id_to_resolvers = defaultdict(lambda: set())
+    req_id_to_client_ips = defaultdict(lambda: set())
+    incorrect_asn_set = set()
+    http_response_dict = defaultdict(lambda: 0)
+    telemetry_count = {}
+    final_dict = {}
+    final_dict_elaborate = {}
+    first_hit_resolvers = []
+    all_resolvers_pool = []
+    resolver_to_ips = defaultdict(lambda: set())
+    req_id_to_bind_ips = defaultdict(lambda: set())
+    req_id_to_bind_ips_phase_2 = defaultdict(lambda: set())
+    jaccard_index = []
+    global_asn_set = set()
 
 
 def is_event_log(log):
@@ -272,7 +326,13 @@ def preprocess_live_data(data):
             http_response_dict[js["1-response"]] += 1
             http_response_dict[js["2-response"]] += 1
 
+
+
             asn = js['asn']
+
+            http_response_to_asn_set[js["1-response"]].add(asn)
+            http_response_to_asn_set[js["2-response"]].add(asn)
+
             global_asn_set.add(asn)
             ans[req_id] = (phase_1, phase_2, js['asn'])
             req_id_to_ip_hash[req_id] = js['ip_hash']
@@ -448,7 +508,112 @@ def parc():
     get_leaf_files(BASE_URL + 'live/results')
 
 
-def master_calc(ttl):
+def table_maker_preprocess(d, parent_path):
+    ans = defaultdict(lambda: [0, set()])
+    c_ans = defaultdict(lambda: [0, set()])
+    final_dict = d["data_elaborate"]
+
+    cn = {}
+    # cnt, tot = 0, 0
+    for key in final_dict:
+        correct_set = set()
+        incorrect_set = set()
+        for e in final_dict[key]["ic"]:
+            incorrect_set.add(e[1])
+        for e in final_dict[key]["c"]:
+            correct_set.add(e[1])
+        total = len(correct_set) + len(incorrect_set)
+        total_set = correct_set.union(incorrect_set)
+        if total < 5:
+            continue
+        ratio = len(incorrect_set) / total
+        if ratio >= .95:
+            asn = get_asn(key)
+            org, cntry = get_org(asn)
+            ans[org][0] += 1
+            ans[org][1].update(total_set)
+            cn[org] = cntry
+        elif ratio <= .05:
+            asn = get_asn(key)
+            org, cntry = get_org(asn)
+            c_ans[org][0] += 1
+            c_ans[org][1].update(total_set)
+            cn[org] = cntry
+
+    ans_lst = []
+    c_ans_lst = []
+    l = 0
+    for key in ans:
+        l += ans[key][0]
+        correct_count = 0
+        if key in c_ans:
+            correct_count = c_ans[key][0]
+        ans_lst.append((ans[key][0], len(ans[key][1]), key, cn[key], correct_count))
+                        # resolver count, exit node count, isp, cntry, opposite
+
+    for key in c_ans:
+        l += c_ans[key][0]
+        in_correct_count = 0
+        if key in ans:
+            in_correct_count = ans[key][0]
+        c_ans_lst.append((c_ans[key][0],  len(c_ans[key][1]), key, cn[key], in_correct_count))
+
+    k = {}
+    k['ic_ans_lst'] = ans_lst
+    k['c_ans_lst'] = c_ans_lst
+    with open(parent_path + "table_data.json", "w") as ouf:
+        json.dump(k, fp=ouf)
+
+
+def local_public_analyzer(data, parent_path):
+
+    d = data
+    resolver_to_asns = d['resolver_to_asns']
+    resolver_to_asn_own = d['resolver_to_asn_own']
+    resolver_to_org_country = {}
+    is_resolver_public = {}
+    local_count, public_count = 0, 0
+    for resolver in resolver_to_asns:
+        ip_list = resolver_to_asns[resolver]
+        org_set = set()
+        cntry_set = set()
+
+        resolver_asn = resolver_to_asn_own[resolver]
+        res_org, cntry = get_org(resolver_asn)
+        resolver_to_org_country[resolver] = (res_org, cntry)
+
+        for ip_tuple in ip_list:
+            asn = ip_tuple[1]
+            org, cntry = get_org(asn)
+            org_set.add(org)
+            cntry_set.add(cntry)
+
+        if len(cntry_set) > 1:
+            is_resolver_public[resolver] = True
+            public_count += 1
+        elif len(org_set) == 1 and list(org_set)[0] == res_org:
+            local_count += 1
+            is_resolver_public[resolver] = False
+
+    # print("Total ", len(list(resolver_to_asns.keys())))
+    # print("Public ", public_count)
+    # print("Local ", local_count)
+
+    with open(parent_path + "resolver_public_local_dict.json", "w") as ouf:
+        json.dump(is_resolver_public, fp=ouf)
+
+    with open(parent_path + "resolver_to_org_country.json", "w") as ouf:
+        json.dump(resolver_to_org_country, fp=ouf)
+
+
+def is_allowed(element, lst):
+    for e in lst:
+        if element == e:
+            return True
+    return False
+
+
+def master_calc(ttl_list):
     live_jsons_dir = BASE_URL + 'live/results'
 
     leaf_files_unfiltered = get_leaf_files(BASE_URL + 'live/')
@@ -463,12 +628,15 @@ def master_calc(ttl):
     for element in leaf_files_filtered:
         exp_id_list.append(element[: - len("-out.json")])
 
+    ttl_to_exp_id_list = defaultdict(lambda: list())
+
     exp_id_list_temp = []
     for e in exp_id_list:
         segments = e.split("_")
         ttl_temp = int(segments[-3])
-        if ttl_temp != ttl:
+        if not is_allowed(ttl_temp, ttl_list):
             continue
+        ttl_to_exp_id_list[ttl_temp].append(e)
         exp_id_list_temp.append(e)
 
     exp_id_list = exp_id_list_temp
@@ -476,126 +644,147 @@ def master_calc(ttl):
     # 'live_zeus_15_1_10'
     bind_info_global, apache_info_one_global, apache_info_two_global = parse_logs_together(allowed_exp_ids=exp_id_list)
     send_telegram_msg("Done with parsing bind/apache logs")
-    for exp_id in exp_id_list:
+    for ttl in ttl_to_exp_id_list:
+        initiate_per_ttl_global_sets()
+        exp_id_nested = ttl_to_exp_id_list[ttl]
+        for exp_id in exp_id_nested:
+            try:
+                cs, ics = parse_logs_ttl(exp_id=exp_id,
+                                         bind_info=bind_info_global[exp_id],
+                                         apache_info_one=apache_info_one_global[exp_id],
+                                         apache_info_two=apache_info_two_global[exp_id],
+                                         ttl=ttl)
+            except Exception as e:
+                pp.append('master_calc {} {}'.format(e, exp_id))
+                print('master_calc ' , e, exp_id)
+
+        send_telegram_msg("Done with parsing TTL init {}".format(ttl))
+
+        from pathlib import Path
+        parent_path = 'ttl_result/{}/'.format(ttl)
+        Path(parent_path).mkdir(parents=True, exist_ok=True)
+        # print("Total resolvers {}".format(len(list(final_dict.keys()))))
+        # print("Total exit-nodes covered {}".format(len(list(req_id_to_resolvers.keys()))))
+
+        data_final = {}
+        data_final["Total_resolvers"] = len(list(final_dict.keys()))
+        # data_final["Total_ex_nodes"] = len(list(req_id_to_resolvers.keys()))
+        data_final["data"] = final_dict
+        data_final["data_elaborate"] = final_dict_elaborate
+
+        with open(parent_path + "final_data.json", "w") as ouf:
+            json.dump(data_final, fp=ouf)
+
         try:
-            cs, ics = parse_logs_ttl(exp_id=exp_id,
-                                     bind_info=bind_info_global[exp_id],
-                                     apache_info_one=apache_info_one_global[exp_id],
-                                     apache_info_two=apache_info_two_global[exp_id],
-                                     ttl=ttl)
-            send_telegram_msg("Done with parsing {}".format(exp_id))
-        except Exception as e:
-            pp.append('master_calc {} {}'.format(e, exp_id))
-            print('master_calc ' , e, exp_id)
+            table_maker_preprocess(d=data_final, parent_path=parent_path)
+        except:
+            pass
 
-    from pathlib import Path
-    parent_path = 'ttl_result/{}/'.format(ttl)
-    Path(parent_path).mkdir(parents=True, exist_ok=True)
-    print("Total resolvers {}".format(len(list(final_dict.keys()))))
-    # print("Total exit-nodes covered {}".format(len(list(req_id_to_resolvers.keys()))))
+        with open(parent_path + "incorrect_ans_set.json", "w") as ouf:
+            json.dump(list(incorrect_asn_set), fp=ouf)
 
-    data_final = {}
-    data_final["Total_resolvers"] = len(list(final_dict.keys()))
-    # data_final["Total_ex_nodes"] = len(list(req_id_to_resolvers.keys()))
-    data_final["data"] = final_dict
-    data_final["data_elaborate"] = final_dict_elaborate
+        distinct_ips = set()
 
-    with open(parent_path + "final_data.json", "w") as ouf:
-        json.dump(data_final, fp=ouf)
+        for req_id in req_id_to_resolvers:
+            resolvers = req_id_to_resolvers[req_id]
+            ips = req_id_to_client_ips[req_id]
+            distinct_ips.update(ips)
+            for resolver in resolvers:
+                resolver_to_ips[resolver].update(ips)
 
-    with open(parent_path + "incorrect_ans_set.json", "w") as ouf:
-        json.dump(list(incorrect_asn_set), fp=ouf)
+        ip_to_asn_dict = dict()
+        for ip in distinct_ips:
+            ip_to_asn_dict[ip] = get_asn(ip)
 
-    send_telegram_msg("Done with parsing phase 1")
-
-    distinct_ips = set()
-
-    for req_id in req_id_to_resolvers:
-        resolvers = req_id_to_resolvers[req_id]
-        ips = req_id_to_client_ips[req_id]
-        distinct_ips.update(ips)
-        for resolver in resolvers:
-            resolver_to_ips[resolver].update(ips)
-
-    ip_to_asn_dict = dict()
-    for ip in distinct_ips:
-        ip_to_asn_dict[ip] = get_asn(ip)
-
-    '''
-    Global
-    Considers every resolver to req id mapping, not only considered resolvers
-    '''
-    resolver_to_asn_own = {}
-    resolver_to_asns = defaultdict(lambda: list())
-    for resolver in resolver_to_ips:
-        resolver_to_asn_own[resolver] = get_asn(resolver)
-        for ip in resolver_to_ips[resolver]:
-            resolver_to_asns[resolver].append((ip, ip_to_asn_dict[ip]))
-
-    first_hit_set = set(first_hit_resolvers)
-    for resolver in first_hit_set:
-        if resolver not in resolver_to_asn_own:
+        '''
+        Global
+        Considers every resolver to req id mapping, not only considered resolvers
+        '''
+        resolver_to_asn_own = {}
+        resolver_to_asns = defaultdict(lambda: list())
+        for resolver in resolver_to_ips:
             resolver_to_asn_own[resolver] = get_asn(resolver)
+            for ip in resolver_to_ips[resolver]:
+                resolver_to_asns[resolver].append((ip, ip_to_asn_dict[ip]))
 
-    resolver_asn_bonanza = {
-        "resolver_to_asns": resolver_to_asns,
-        "resolver_to_asn_own": resolver_to_asn_own
-    }
+        first_hit_set = set(first_hit_resolvers)
+        for resolver in first_hit_set:
+            if resolver not in resolver_to_asn_own:
+                resolver_to_asn_own[resolver] = get_asn(resolver)
 
-    # TODO CHANGE of File name
-    with open(parent_path + "final_resolver_to_asn.json", "w") as ouf:
-        json.dump(resolver_asn_bonanza, fp=ouf)
+        resolver_asn_bonanza = {
+            "resolver_to_asns": resolver_to_asns,
+            "resolver_to_asn_own": resolver_to_asn_own
+        }
 
-    '''
-    Global:
-    First phase
-    '''
-    req_id_to_bind_ips_cp = {}
-    for key in req_id_to_bind_ips:
-        req_id_to_bind_ips_cp[key] = list(req_id_to_bind_ips[key])
+        # TODO CHANGE of File name
+        with open(parent_path + "final_resolver_to_asn.json", "w") as ouf:
+            json.dump(resolver_asn_bonanza, fp=ouf)
 
-    req_id_to_bind_ips_cp_2 = {}
-    for key in req_id_to_bind_ips_phase_2:
-        req_id_to_bind_ips_cp_2[key] = list(req_id_to_bind_ips_phase_2[key])
+        try:
+            local_public_analyzer(resolver_asn_bonanza, parent_path)
+        except Exception as e:
+            pass
 
-    with open(parent_path + "req_id_to_bind_ips.json", "w") as ouf:
-        json.dump(req_id_to_bind_ips_cp, fp=ouf)
+        '''
+        Global:
+        First phase
+        '''
+        req_id_to_bind_ips_cp = {}
+        for key in req_id_to_bind_ips:
+            req_id_to_bind_ips_cp[key] = list(req_id_to_bind_ips[key])
 
-    with open(parent_path + "req_id_to_bind_ips_phase_2.json", "w") as ouf:
-        json.dump(req_id_to_bind_ips_cp_2, fp=ouf)
+        req_id_to_bind_ips_cp_2 = {}
+        for key in req_id_to_bind_ips_phase_2:
+            req_id_to_bind_ips_cp_2[key] = list(req_id_to_bind_ips_phase_2[key])
 
-    with open(parent_path + "jaccard_index.json", "w") as ouf:
-        json.dump(jaccard_index, fp=ouf)
+        with open(parent_path + "req_id_to_bind_ips.json", "w") as ouf:
+            json.dump(req_id_to_bind_ips_cp, fp=ouf)
 
-    with open(parent_path + "correlation_resolvers.json", "w") as ouf:
-        json.dump(phase_wise_resolver_correlation, fp=ouf)
+        with open(parent_path + "req_id_to_bind_ips_phase_2.json", "w") as ouf:
+            json.dump(req_id_to_bind_ips_cp_2, fp=ouf)
 
-    with open(parent_path + "first_hit_resolvers.json", "w") as ouf:
-        json.dump(first_hit_resolvers, fp=ouf)
+        with open(parent_path + "jaccard_index.json", "w") as ouf:
+            json.dump(jaccard_index, fp=ouf)
 
-    # all_resolvers_pool
-    ip_to_count = defaultdict(lambda: 0)
-    for e in all_resolvers_pool:
-        ip_to_count[e] += 1
-    ans_x = []
-    for key in ip_to_count:
-        ans_x.append((key, ip_to_count[key]))
-    ans_x.sort(key=lambda x: -x[1])
+        with open(parent_path + "correlation_resolvers.json", "w") as ouf:
+            json.dump(phase_wise_resolver_correlation, fp=ouf)
 
-    with open(parent_path + "all_resolvers_pool.json", "w") as ouf:
-        json.dump(ans_x, fp=ouf)
+        with open(parent_path + "first_hit_resolvers.json", "w") as ouf:
+            json.dump(first_hit_resolvers, fp=ouf)
 
-    with open(parent_path + "global_asn_list.json", "w") as ouf:
-        json.dump(list(global_asn_set), fp=ouf)
+        # all_resolvers_pool
+        ip_to_count = defaultdict(lambda: 0)
+        for e in all_resolvers_pool:
+            ip_to_count[e] += 1
+        ans_x = []
+        for key in ip_to_count:
+            ans_x.append((key, ip_to_count[key]))
+        ans_x.sort(key=lambda x: -x[1])
 
-    with open(parent_path + "telemetry_count.json", "w") as ouf:
-        json.dump(telemetry_count, fp=ouf)
+        with open(parent_path + "all_resolvers_pool.json", "w") as ouf:
+            json.dump(ans_x, fp=ouf)
 
-    with open(parent_path + "http_response_dict.json", "w") as ouf:
-        json.dump(http_response_dict, fp=ouf)
+        with open(parent_path + "global_asn_list.json", "w") as ouf:
+            json.dump(list(global_asn_set), fp=ouf)
 
+        with open(parent_path + "telemetry_count.json", "w") as ouf:
+            json.dump(telemetry_count, fp=ouf)
 
-    send_telegram_msg("Done with parsing phase 2")
+        with open(parent_path + "http_response_dict.json", "w") as ouf:
+            json.dump(http_response_dict, fp=ouf)
+
+        try:
+            temp_dict = {}
+            for key in http_response_to_asn_set:
+                temp_dict[key] = list(http_response_to_asn_set[key])
+            with open(parent_path + "http_response_to_asn_list.json", "w") as ouf:
+                json.dump(temp_dict, fp=ouf)
+        except:
+            pass
+
+        print(pp)
+        send_telegram_msg("Done with parsing TTL final {}".format(ttl))
 
 
 def send_telegram_msg(msg):

@@ -11,6 +11,8 @@ ttl_to_suffix_dict = {
     15: "",
 }
 
+# banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
+
 as2isp = AS2ISP()
 
 def get_org(asn):
@@ -644,11 +646,27 @@ def master_calc(ttl_list):
     # 'live_zeus_15_1_10'
     bind_info_global, apache_info_one_global, apache_info_two_global = parse_logs_together(allowed_exp_ids=exp_id_list)
     send_telegram_msg("Done with parsing bind/apache logs")
+
+    # banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
+    banned_list = []
+    # live_zeus_5_403_1-out.json
+    for i in range(490, 526):
+        for j in range(1, 7):
+            banned_list.append("live_zeus_5_{}_{}".format(i, j))
+
+
+
+
+
+
+
     for ttl in ttl_to_exp_id_list:
         initiate_per_ttl_global_sets()
         exp_id_nested = ttl_to_exp_id_list[ttl]
         for exp_id in exp_id_nested:
             try:
+                if exp_id in banned_list:
+                    continue
                 cs, ics = parse_logs_ttl(exp_id=exp_id,
                                          bind_info=bind_info_global[exp_id],
                                          apache_info_one=apache_info_one_global[exp_id],
@@ -656,7 +674,7 @@ def master_calc(ttl_list):
                                          ttl=ttl)
             except Exception as e:
                 pp.append('master_calc {} {}'.format(e, exp_id))
-                print('master_calc ' , e, exp_id)
+                print('master_calc ', e, exp_id)
 
         send_telegram_msg("Done with parsing TTL init {}".format(ttl))
 
@@ -783,7 +801,6 @@ def master_calc(ttl_list):
         except:
             pass
 
-        print(pp)
         send_telegram_msg("Done with parsing TTL final {}".format(ttl))
 
 

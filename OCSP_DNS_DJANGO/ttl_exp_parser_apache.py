@@ -240,12 +240,9 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                 try:
 
                     if url_live not in line:
-                        print("live")
-                        print(line)
+
                         continue
-                    if ('live_zeus' not in line) or ('live_node' not in line):
-                        print("tive")
-                        print(line)
+                    if ('live_zeus' not in line) and ('live_node' not in line):
                         continue
                     # is_exp_id_present, exp_id = does_exp_id_match(line, exp_id_list)
                     # if not is_exp_id_present:
@@ -263,7 +260,6 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                     url = meta["url"]
                     is_event = is_event_log(url)
 
-                    print(line)
 
                     if is_event:
                         pass
@@ -274,7 +270,6 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                         asn = str(url.split(".")[2])
                         if not asn.isnumeric():
                             continue
-                        print(asn)
                         asn_to_client_count[asn] += 1
                         asn_to_client_list[asn].append(meta["client_ip"])
                         asn_set.add(asn)
@@ -631,6 +626,7 @@ def master_calc(ttl_list):
 
     parse_logs_together(allowed_exp_ids=[])
 
+    print(len(list(asn_set)))
     with open("global_asn_list_updated.json", "w") as ouf:
         json.dump(list(asn_set), fp=ouf)
 

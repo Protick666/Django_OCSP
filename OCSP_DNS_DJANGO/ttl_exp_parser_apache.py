@@ -238,7 +238,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
         with open(file) as FileObj:
             for line in FileObj:
                 try:
-                    print(line)
+
                     if url_live not in line:
                         continue
                     if ('live_zeus' not in line) or ('live_node' not in line):
@@ -252,17 +252,14 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
 
 
 
-                    if is_bind:
-                        if line.startswith("client"):
-                            continue
 
-                    if is_bind:
-                        meta = parse_bind_line_and_build_meta(line=line)
-                    else:
-                        meta = parse_apache_line_and_build_meta(line=line)
+
+                    meta = parse_apache_line_and_build_meta(line=line)
 
                     url = meta["url"]
                     is_event = is_event_log(url)
+
+                    print(line)
 
                     if is_event:
                         pass
@@ -273,6 +270,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                         asn = str(url.split(".")[2])
                         if not asn.isnumeric():
                             continue
+                        print(asn)
                         asn_to_client_count[asn] += 1
                         asn_to_client_list[asn].append(meta["client_ip"])
                         asn_set.add(asn)

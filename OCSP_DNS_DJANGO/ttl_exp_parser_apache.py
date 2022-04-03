@@ -240,8 +240,12 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                 try:
 
                     if url_live not in line:
+                        print("live")
+                        print(line)
                         continue
                     if ('live_zeus' not in line) or ('live_node' not in line):
+                        print("tive")
+                        print(line)
                         continue
                     # is_exp_id_present, exp_id = does_exp_id_match(line, exp_id_list)
                     # if not is_exp_id_present:

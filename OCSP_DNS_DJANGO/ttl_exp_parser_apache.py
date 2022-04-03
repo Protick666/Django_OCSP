@@ -233,7 +233,7 @@ def parse_apache_line_and_build_meta(line):
 
 def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
     ans_dict = defaultdict(lambda: dict())
-
+    print(files)
     for file in files:
         with open(file) as FileObj:
             for line in FileObj:

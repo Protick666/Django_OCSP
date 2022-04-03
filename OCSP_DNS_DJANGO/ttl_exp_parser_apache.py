@@ -238,6 +238,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
         with open(file) as FileObj:
             for line in FileObj:
                 try:
+                    print(line)
                     if url_live not in line:
                         continue
                     if ('live_zeus' not in line) or ('live_node' not in line):
@@ -248,6 +249,8 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                     # d = ans_dict[exp_id]
                     # if "req" not in d:
                     #     d["req"] = {}
+
+
 
                     if is_bind:
                         if line.startswith("client"):

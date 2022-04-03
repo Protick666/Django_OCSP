@@ -149,7 +149,7 @@ def choose_hops_for_ttl_exp_v2(total_requests, asn_list, asn_to_prefix_count):
         if asn_to_prefix_count[asn] == 0:
             continue
         allotment = (asn_to_prefix_count[asn] / asn_to_prefix_count['all']) * total_requests
-        allotment = max(min(allotment, 5), 200)
+        allotment = max(min(allotment, 5), 100)
         lst.append((asn, allotment))
 
     import random

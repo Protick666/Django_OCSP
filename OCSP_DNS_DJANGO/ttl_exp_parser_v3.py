@@ -809,6 +809,9 @@ def master_calc(ttl_list):
 
 
 def send_telegram_msg(msg):
-    import telegram_send
-    telegram_send.send(messages=[msg])
+    try:
+        import telegram_send
+        telegram_send.send(messages=[msg])
+    except Exception as e:
+        pass
 

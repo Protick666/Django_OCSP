@@ -253,7 +253,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
 
                     is_exp_id_present, exp_id = does_exp_id_match(line, exp_id_list)
                     print(line)
-                    print(exp_id_list)
+                    # print(exp_id_list)
                     print(exp_id)
                     if not is_exp_id_present:
                         continue

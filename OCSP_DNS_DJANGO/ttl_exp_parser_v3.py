@@ -7,9 +7,7 @@ import pyasn
 from OCSP_DNS_DJANGO.local import LOCAL
 from OCSP_DNS_DJANGO.tools import AS2ISP
 
-ttl_to_suffix_dict = {
-    15: "",
-}
+
 
 # banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
 
@@ -23,10 +21,7 @@ def get_org(asn):
     return org, cntry
 
 def get_live_file_name(ttl):
-    if ttl in ttl_to_suffix_dict:
-        return "results"
-    else:
-        return "results_{}".format(ttl)
+    return "results_{}".format(ttl)
 
 if LOCAL:
     asndb = pyasn.pyasn('../OCSP_DNS_DJANGO/ipsan_db.dat')
@@ -180,11 +175,15 @@ def calc_correlation_matrix(phase1_resolvers, phase2_resolvers):
 
 
 def does_exp_id_match(line, exp_id_list):
-    for exp_id in exp_id_list:
-        string_to_look_for = exp_id + "."
-        if string_to_look_for in line:
-            return True, exp_id
-    return False, None
+    try:
+        if ".live_zeus" not in line:
+            return False, None
+        st_index = line.find(".live_zeus")
+        sub = line[st_index + 1:]
+        sub = sub.split(".")[0]
+        return True, sub
+    except Exception:
+        return False, None
 
 
 def parse_bind_line_and_build_meta(line):
@@ -238,7 +237,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                     if url_live not in line:
                         continue
 
-                    is_exp_id_present, exp_id = does_exp_id_match(line, exp_id_list)
+                    is_exp_id_present, exp_id = does_exp_id_match(line, [])
                     if not is_exp_id_present:
                         continue
                     d = ans_dict[exp_id]
@@ -273,6 +272,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                 except Exception as e:
                     print('parse bind apache logs ', e)
 
+        send_telegram_msg("*** Done with parsing Bind file {}".format(file))
     return ans_dict
 
 
@@ -654,10 +654,14 @@ def master_calc(ttl_list):
         for j in range(1, 7):
             banned_list.append("live_zeus_5_{}_{}".format(i, j))
 
-
-
-
-
+    ini = 0
+    for i in [2000, 2500, 3000, 3500]:
+        for k in range(7, 10):
+            e = i + k
+            for j in range(1 + (ini * 16), 17 + (ini * 16)):
+                # live_zeus_15_4035_9
+                banned_list.append("live_zeus_15_{}_{}".format(e, j))
+        ini += 1
 
 
     for ttl in ttl_to_exp_id_list:
@@ -679,7 +683,7 @@ def master_calc(ttl_list):
         send_telegram_msg("Done with parsing TTL init {}".format(ttl))
 
         from pathlib import Path
-        parent_path = 'ttl_result/{}/'.format(ttl)
+        parent_path = 'ttl_result_v2/{}/'.format(ttl)
         Path(parent_path).mkdir(parents=True, exist_ok=True)
         # print("Total resolvers {}".format(len(list(final_dict.keys()))))
         # print("Total exit-nodes covered {}".format(len(list(req_id_to_resolvers.keys()))))

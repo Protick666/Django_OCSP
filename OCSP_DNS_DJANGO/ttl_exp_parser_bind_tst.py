@@ -188,11 +188,15 @@ def calc_correlation_matrix(phase1_resolvers, phase2_resolvers):
 
 
 def does_exp_id_match(line, exp_id_list):
-    for exp_id in exp_id_list:
-        string_to_look_for = exp_id + "."
-        if string_to_look_for in line:
-            return True, exp_id
-    return False, None
+    try:
+        if ".live_zeus" not in line:
+            return False, None
+        st_index = line.find(".live_zeus")
+        sub = line[st_index + 1:]
+        sub = sub.split(".")[0]
+        return True, sub
+    except Exception:
+        return False, None
 
 
 def parse_bind_line_and_build_meta(line):
@@ -251,7 +255,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                     if url_live not in line:
                         continue
 
-                    is_exp_id_present, exp_id = does_exp_id_match(line, exp_id_list)
+                    is_exp_id_present, exp_id = does_exp_id_match(line, [])
                     print(line)
                     # print(exp_id_list)
                     print(exp_id)

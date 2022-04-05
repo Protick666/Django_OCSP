@@ -137,15 +137,15 @@ def initiate_per_ttl_global_sets():
     global req_id_to_bind_ips_phase_2
     global jaccard_index
     global global_asn_set
-    global req_id_to_resolvers
-    global req_id_to_client_ips
+    # global req_id_to_resolvers
+    # global req_id_to_client_ips
     global phase_wise_resolver_correlation
     global http_response_to_asn_set
 
     http_response_to_asn_set = defaultdict(lambda: set())
     phase_wise_resolver_correlation = defaultdict(lambda: defaultdict(lambda: 0))
-    req_id_to_resolvers = defaultdict(lambda: set())
-    req_id_to_client_ips = defaultdict(lambda: set())
+    # req_id_to_resolvers = defaultdict(lambda: set())
+    # req_id_to_client_ips = defaultdict(lambda: set())
     incorrect_asn_set = set()
     http_response_dict = defaultdict(lambda: 0)
     telemetry_count = {}

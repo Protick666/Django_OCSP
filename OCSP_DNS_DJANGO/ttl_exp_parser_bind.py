@@ -376,6 +376,7 @@ def parse_logs_together(allowed_exp_ids):
     import os
 
     logs_for_me = log_dict[server_id]
+    send_msg("{}  have total {}".format(server_id, len(logs_for_me)))
     final_logs_to_parse = get_curtailed_logs(bind_files, logs_for_me)
     # TODO send telegram msg
     dump_dir = "bind_dumps"

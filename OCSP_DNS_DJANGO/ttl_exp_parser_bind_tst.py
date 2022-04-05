@@ -11,6 +11,7 @@ import requests
 import cProfile
 import pstats
 
+
 server_id = int(os.environ['log_server_id'])
 
 
@@ -383,7 +384,7 @@ def parse_logs_together(allowed_exp_ids):
     import os
 
     logs_for_me = ['query.log']
-    send_msg("{}  have total {}".format(server_id, len(logs_for_me)))
+    # send_msg("{}  have total {}".format(server_id, len(logs_for_me)))
 
     final_logs_to_parse = get_curtailed_logs(bind_files, logs_for_me)
 
@@ -394,7 +395,7 @@ def parse_logs_together(allowed_exp_ids):
         os.makedirs(dump_dir)
     for chid_log in final_logs_to_parse:
         file_name = chid_log.split("/")[-1]
-        send_msg("{}  solving {}".format(server_id, file_name))
+        # send_msg("{}  solving {}".format(server_id, file_name))
         file_name = "{}.json".format(file_name)
         req_id_to_resolvers = defaultdict(lambda: set())
         bind_info_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=[chid_log], is_bind=True)
@@ -409,7 +410,7 @@ def parse_logs_together(allowed_exp_ids):
 
         # with open("bind_dumps/{}".format(file_name), "w") as ouf:
         #     json.dump(master_dict, fp=ouf, default=str)
-        send_msg("{}  done with {}".format(server_id, file_name))
+        # send_msg("{}  done with {}".format(server_id, file_name))
         # send telegram app
 
     return {}
@@ -659,7 +660,7 @@ def is_allowed(element, lst):
 
 
 def master_calc(ttl_list):
-    send_msg("starting {}".format(server_id))
+    #send_msg("starting {}".format(server_id))
     leaf_files_unfiltered = get_leaf_files(BASE_URL + 'live/')
     leaf_files_filtered = [e.split("/")[-1] for e in leaf_files_unfiltered]
     leaf_files_filtered = [e for e in leaf_files_filtered if ".json" in e]
@@ -692,14 +693,5 @@ def send_telegram_msg(msg):
     import telegram_send
     telegram_send.send(messages=[msg])
 
-def send_msg(text):
 
-   try:
-       return
-       token = "5273555134:AAGBeMOV0LtFJEss9F2tWWSTH__UxQxz914"
-       chat_id = "1764697018"
-       url_req = "https://api.telegram.org/bot" + token + "/sendMessage" + "?chat_id=" + chat_id + "&text=" + text
-       results = requests.get(url_req)
-   except:
-       pass
 

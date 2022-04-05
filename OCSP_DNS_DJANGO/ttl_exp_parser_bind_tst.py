@@ -245,7 +245,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
         with open(file) as FileObj:
             for line in FileObj:
                 l = l + 1
-                if l == 1000:
+                if l == 10000:
                     break
                 try:
                     if url_live not in line:

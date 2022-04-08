@@ -7,11 +7,15 @@ import pyasn
 from OCSP_DNS_DJANGO.local import LOCAL
 from OCSP_DNS_DJANGO.tools import AS2ISP
 
+# {} -> resolver_ip -> req_id -> [5]
 
+resolver_to_middle_req = defaultdict(lambda: defaultdict(lambda: list()))
 
 # banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
 
+
 as2isp = AS2ISP()
+
 
 def get_org(asn):
     org = str(as2isp.getISP("20221212", asn)[0])
@@ -20,13 +24,16 @@ def get_org(asn):
     cntry.replace("\"", "")
     return org, cntry
 
+
 def get_live_file_name(ttl):
     return "results_{}".format(ttl)
+
 
 if LOCAL:
     asndb = pyasn.pyasn('../OCSP_DNS_DJANGO/ipsan_db.dat')
 else:
     asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
+
 
 def get_leaf_files(path):
     import os
@@ -41,12 +48,13 @@ def get_leaf_files(path):
 def get_asn(ip):
     try:
         return asndb.lookup(ip)[0]
-    except Exception as e:
+    except:
         return ""
+
 
 incorrect_asn_set = set()
 
-#file_iter = None
+# file_iter = None
 url_live = 'ttlexp.exp.net-measurement.net'
 event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
 banned_exp_ids = ['live_node_30_8', 'live_node_30_1', 'live_node_30_68']
@@ -89,9 +97,6 @@ req_id_to_client_ips = defaultdict(lambda: set())
 first_hit_resolvers = []
 all_resolvers_pool = []
 
-
-
-
 '''
 Global:
 resolver_to_ips: resolver -> ips from req ids that hit those resolvers
@@ -114,7 +119,6 @@ Global:
 Per request id
 '''
 jaccard_index = []
-
 
 global_asn_set = set()
 
@@ -233,10 +237,10 @@ def parse_apache_line_and_build_meta(line):
 def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
     ans_dict = defaultdict(lambda: dict())
 
-    file_count = 0
+    fl = 0
     for file in files:
-        file_count += 1
-        if file_count == 5:
+        fl += 1
+        if fl == 7:
             break
         with open(file) as FileObj:
             for line in FileObj:
@@ -306,6 +310,7 @@ def curate_time_segment(info, d1, d2):
         ans[req_id] = segment(lst, d1, d2)
     return ans
 
+
 def save_telemetry(data):
     try:
         keys = ["phase_1_nxdomain", "phase_2_server2", "phase_2_nxdomain", "phase_1_server1"]
@@ -335,8 +340,6 @@ def preprocess_live_data(data):
             http_response_dict[js["1-response"]] += 1
             http_response_dict[js["2-response"]] += 1
 
-
-
             asn = js['asn']
 
             http_response_to_asn_set[js["1-response"]].add(asn)
@@ -346,7 +349,7 @@ def preprocess_live_data(data):
             ans[req_id] = (phase_1, phase_2, js['asn'])
             req_id_to_ip_hash[req_id] = js['ip_hash']
         except Exception as e:
-            print('preprocess_live_data ' , e)
+            print('preprocess_live_data ', e)
     return ans, req_id_to_ip_hash
 
 
@@ -373,8 +376,10 @@ def parse_logs_together(allowed_exp_ids):
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 
     bind_info_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=bind_files, is_bind=True)
-    apache_info_one_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_1, is_bind=False)
-    apache_info_two_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_2, is_bind=False)
+    apache_info_one_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_1,
+                                                    is_bind=False)
+    apache_info_two_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_2,
+                                                    is_bind=False)
 
     return bind_info_global, apache_info_one_global, apache_info_two_global
 
@@ -395,7 +400,6 @@ def log_considered_resolvers(considered_resolvers, req_id, ip_hash, is_correct_s
 
 
 def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
-
     # TODO WATCH
     lists_in_hand = [apache_info_one, apache_info_two, bind_info]
 
@@ -427,6 +431,19 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
 
     bind_info_curated_first = curate_time_segment(bind_info, bind_phase_1_start, bind_phase_1_end)
     bind_info_curated_second = curate_time_segment(bind_info, bind_phase_2_start, bind_phase_2_end)
+    bind_info_curated_middle = curate_time_segment(bind_info, bind_phase_1_end, bind_phase_2_start)
+
+    try:
+        for re_id in bind_info_curated_middle:
+            for e in bind_info_curated_middle[re_id]:
+                resolver_ip = e['resolver_ip']
+                time = e['date']
+                resolver_to_middle_req[resolver_ip][re_id].append(int(datetime.timestamp(time)))
+    except:
+        pass
+
+    # {} -> resolver_ip -> exp_id -> [5]
+
     # apache_info_one_phase_1 = curate_time_segment(apache_info_one, apache_phase_1_start, apache_phase_1_divider)
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
     # apache_info_two_curated_phase_2 = curate_time_segment(apache_info_two, apache_phase_2_start, apache_phase_2_end)
@@ -508,6 +525,7 @@ def get_all_asns(file_iter):
     with open("ttl_exp_asn_list.json", "w") as ouf:
         json.dump(list(asn_set), fp=ouf)
 
+
 # TODO _.live_node_30_185.31313.ttlexp.exp.net-measurement.net
 # TODO query steps
 # global: resolver_ip_against -> ip1, ip2, ip3
@@ -558,14 +576,14 @@ def table_maker_preprocess(d, parent_path):
         if key in c_ans:
             correct_count = c_ans[key][0]
         ans_lst.append((ans[key][0], len(ans[key][1]), key, cn[key], correct_count))
-                        # resolver count, exit node count, isp, cntry, opposite
+        # resolver count, exit node count, isp, cntry, opposite
 
     for key in c_ans:
         l += c_ans[key][0]
         in_correct_count = 0
         if key in ans:
             in_correct_count = ans[key][0]
-        c_ans_lst.append((c_ans[key][0],  len(c_ans[key][1]), key, cn[key], in_correct_count))
+        c_ans_lst.append((c_ans[key][0], len(c_ans[key][1]), key, cn[key], in_correct_count))
 
     k = {}
     k['ic_ans_lst'] = ans_lst
@@ -575,7 +593,6 @@ def table_maker_preprocess(d, parent_path):
 
 
 def local_public_analyzer(data, parent_path):
-
     d = data
     resolver_to_asns = d['resolver_to_asns']
     resolver_to_asn_own = d['resolver_to_asn_own']
@@ -620,13 +637,6 @@ def is_allowed(element, lst):
         if element == e:
             return True
     return False
-
-
-def dict_set_manage(d):
-    e = {}
-    for k in d:
-        e[k] = list(d[k])
-    return e
 
 
 def master_calc(ttl_list):
@@ -677,13 +687,13 @@ def master_calc(ttl_list):
                 banned_list.append("live_zeus_15_{}_{}".format(e, j))
         ini += 1
 
-    ttt = 0
     for ttl in ttl_to_exp_id_list:
         initiate_per_ttl_global_sets()
         exp_id_nested = ttl_to_exp_id_list[ttl]
+        fl = 0
         for exp_id in exp_id_nested:
-            ttt += 1
-            if ttt == 20:
+            fl += 1
+            if fl == 20:
                 break
             try:
                 if exp_id in banned_list:
@@ -724,11 +734,6 @@ def master_calc(ttl_list):
 
         distinct_ips = set()
 
-        with open(parent_path + "req_id_to_resolvers.json", "w") as ouf:
-            json.dump(dict_set_manage(req_id_to_resolvers), fp=ouf)
-        with open(parent_path + "req_id_to_client_ips.json", "w") as ouf:
-            json.dump(dict_set_manage(req_id_to_client_ips), fp=ouf)
-
         for req_id in req_id_to_resolvers:
             resolvers = req_id_to_resolvers[req_id]
             ips = req_id_to_client_ips[req_id]
@@ -739,9 +744,6 @@ def master_calc(ttl_list):
         ip_to_asn_dict = dict()
         for ip in distinct_ips:
             ip_to_asn_dict[ip] = get_asn(ip)
-
-        with open(parent_path + "ip_to_asn_dict.json", "w") as ouf:
-            json.dump(ip_to_asn_dict, fp=ouf)
 
         '''
         Global
@@ -831,6 +833,13 @@ def master_calc(ttl_list):
             pass
 
         send_telegram_msg("Done with parsing TTL final {}".format(ttl))
+
+    parent_path = 'ttl_result_v2/'
+
+    with open(parent_path + "resolver_to_middle_req.json", "w") as ouf:
+        json.dump(resolver_to_middle_req, fp=ouf)
+
+    send_telegram_msg("Done with everything")
 
 
 def send_telegram_msg(msg):

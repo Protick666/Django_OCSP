@@ -7,11 +7,15 @@ import pyasn
 from OCSP_DNS_DJANGO.local import LOCAL
 from OCSP_DNS_DJANGO.tools import AS2ISP
 
+# {} -> resolver_ip -> req_id -> [5]
 
+resolver_to_middle_req = defaultdict(lambda: defaultdict(lambda: list()))
 
 # banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
 
+
 as2isp = AS2ISP()
+
 
 def get_org(asn):
     org = str(as2isp.getISP("20221212", asn)[0])
@@ -19,6 +23,7 @@ def get_org(asn):
     org.replace("\"", "")
     cntry.replace("\"", "")
     return org, cntry
+
 
 def get_live_file_name(ttl):
     return "results_{}".format(ttl)
@@ -423,6 +428,21 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
 
     bind_info_curated_first = curate_time_segment(bind_info, bind_phase_1_start, bind_phase_1_end)
     bind_info_curated_second = curate_time_segment(bind_info, bind_phase_2_start, bind_phase_2_end)
+    bind_info_curated_middle = curate_time_segment(bind_info, bind_phase_1_end, bind_phase_2_start)
+
+    try:
+        for re_id in bind_info_curated_middle:
+            for e in bind_info_curated_middle[re_id]:
+                resolver_ip = e['resolver_ip']
+                time = e['date']
+                resolver_to_middle_req[resolver_ip][re_id].append(int(datetime.timestamp(time)))
+    except:
+        pass
+
+
+    # {} -> resolver_ip -> exp_id -> [5]
+
+
     # apache_info_one_phase_1 = curate_time_segment(apache_info_one, apache_phase_1_start, apache_phase_1_divider)
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
     # apache_info_two_curated_phase_2 = curate_time_segment(apache_info_two, apache_phase_2_start, apache_phase_2_end)
@@ -809,6 +829,13 @@ def master_calc(ttl_list):
             pass
 
         send_telegram_msg("Done with parsing TTL final {}".format(ttl))
+
+    parent_path = 'ttl_result_v2/'
+
+    with open(parent_path + "resolver_to_middle_req.json", "w") as ouf:
+        json.dump(resolver_to_middle_req, fp=ouf)
+
+    send_telegram_msg("Done with everything")
 
 
 def send_telegram_msg(msg):

@@ -39,7 +39,10 @@ def get_leaf_files(path):
 
 
 def get_asn(ip):
-    return asndb.lookup(ip)[0]
+    try:
+        return asndb.lookup(ip)[0]
+    except Exception as e:
+        return ""
 
 incorrect_asn_set = set()
 

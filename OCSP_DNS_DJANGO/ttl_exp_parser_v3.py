@@ -230,7 +230,11 @@ def parse_apache_line_and_build_meta(line):
 def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
     ans_dict = defaultdict(lambda: dict())
 
+    file_count = 0
     for file in files:
+        file_count += 1
+        if file_count == 5:
+            break
         with open(file) as FileObj:
             for line in FileObj:
                 try:
@@ -615,6 +619,13 @@ def is_allowed(element, lst):
     return False
 
 
+def dict_set_manage(d):
+    e = {}
+    for k in d:
+        e[k] = list(d[k])
+    return e
+
+
 def master_calc(ttl_list):
     live_jsons_dir = BASE_URL + 'live/results'
 
@@ -663,11 +674,14 @@ def master_calc(ttl_list):
                 banned_list.append("live_zeus_15_{}_{}".format(e, j))
         ini += 1
 
-
+    ttt = 0
     for ttl in ttl_to_exp_id_list:
         initiate_per_ttl_global_sets()
         exp_id_nested = ttl_to_exp_id_list[ttl]
         for exp_id in exp_id_nested:
+            ttt += 1
+            if ttt == 20:
+                break
             try:
                 if exp_id in banned_list:
                     continue
@@ -707,6 +721,11 @@ def master_calc(ttl_list):
 
         distinct_ips = set()
 
+        with open(parent_path + "req_id_to_resolvers.json", "w") as ouf:
+            json.dump(dict_set_manage(req_id_to_resolvers), fp=ouf)
+        with open(parent_path + "req_id_to_client_ips.json", "w") as ouf:
+            json.dump(dict_set_manage(req_id_to_client_ips), fp=ouf)
+
         for req_id in req_id_to_resolvers:
             resolvers = req_id_to_resolvers[req_id]
             ips = req_id_to_client_ips[req_id]
@@ -717,6 +736,9 @@ def master_calc(ttl_list):
         ip_to_asn_dict = dict()
         for ip in distinct_ips:
             ip_to_asn_dict[ip] = get_asn(ip)
+
+        with open(parent_path + "ip_to_asn_dict.json", "w") as ouf:
+            json.dump(ip_to_asn_dict, fp=ouf)
 
         '''
         Global

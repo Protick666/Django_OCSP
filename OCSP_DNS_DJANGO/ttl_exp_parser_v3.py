@@ -430,14 +430,13 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
     bind_info_curated_second = curate_time_segment(bind_info, bind_phase_2_start, bind_phase_2_end)
     bind_info_curated_middle = curate_time_segment(bind_info, bind_phase_1_end, bind_phase_2_start)
 
-    try:
-        for re_id in bind_info_curated_middle:
-            for e in bind_info_curated_middle[re_id]:
-                resolver_ip = e['resolver_ip']
-                time = e['date']
-                resolver_to_middle_req[resolver_ip][re_id].append(int(datetime.timestamp(time)))
-    except:
-        pass
+
+    for re_id in bind_info_curated_middle:
+        for e in bind_info_curated_middle[re_id]:
+            resolver_ip = e['resolver_ip']
+            time = e['date']
+            resolver_to_middle_req[resolver_ip][re_id].append(int(datetime.timestamp(time)))
+
 
 
     # {} -> resolver_ip -> exp_id -> [5]

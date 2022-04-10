@@ -13,6 +13,11 @@ ttl_to_suffix_dict = {
 
 # banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
 
+ip_set = set()
+asn_set = set()
+date_to_ip = []
+
+
 as2isp = AS2ISP()
 
 def get_org(asn):
@@ -94,7 +99,7 @@ all_resolvers_pool = []
 
 asn_to_client_list = defaultdict(lambda : list())
 asn_to_client_count = defaultdict(lambda : 0)
-asn_set = set()
+
 
 
 '''
@@ -233,23 +238,28 @@ def parse_apache_line_and_build_meta(line):
 
 def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
     ans_dict = defaultdict(lambda: dict())
-    print(files)
+
+    ex_file = None
+    date_files = []
     for file in files:
+        if file.endswith("access.log"):
+            ex_file = file
+            continue
+        date_files.append(file)
+
+    date_files.sort(key=lambda x: int(((x.split("/")[-1]).split("-"))[-1]))
+    date_files = date_files + [ex_file]
+
+    for file in date_files:
         with open(file) as FileObj:
             for line in FileObj:
                 try:
 
                     if url_live not in line:
-
                         continue
                     if ('live_zeus' not in line) and ('live_node' not in line):
                         continue
-                    # is_exp_id_present, exp_id = does_exp_id_match(line, exp_id_list)
-                    # if not is_exp_id_present:
-                    #     continue
-                    # d = ans_dict[exp_id]
-                    # if "req" not in d:
-                    #     d["req"] = {}
+
 
 
 
@@ -273,8 +283,12 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                         asn_to_client_count[asn] += 1
                         asn_to_client_list[asn].append(meta["client_ip"])
                         asn_set.add(asn)
+                        ip_set.add(meta["client_ip"])
+
                 except Exception as e:
                     print('parse bind apache logs ', e)
+
+        date_to_ip.append(((file.split("/"))[-1], len(ip_set), len(asn_set)))
 
     return ans_dict
 
@@ -369,12 +383,12 @@ def parse_logs_together(allowed_exp_ids):
 
 
 
-    apache_logs_phase_1_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/' + 'apache_1/apache2/'
-    apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
-                           isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
+    # apache_logs_phase_1_dir = '/home/protick/ocsp_dns_django/ttldict/logs_final/' + 'apache_1/apache2/'
+    # apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
+    #                        isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
-    apache_info_one_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_1,
-                                                    is_bind=False)
+    # apache_info_one_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_1,
+    #                                                 is_bind=False)
 
 
 
@@ -635,6 +649,11 @@ def master_calc(ttl_list):
 
     with open("asn_to_client_count.json", "w") as ouf:
         json.dump(asn_to_client_count, fp=ouf)
+
+
+    with open("date_to_stat.json", "w") as ouf:
+        json.dump(date_to_ip, fp=ouf)
+
 
 
 

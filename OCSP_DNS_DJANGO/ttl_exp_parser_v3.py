@@ -11,6 +11,8 @@ from OCSP_DNS_DJANGO.tools import AS2ISP
 
 resolver_to_middle_req = defaultdict(lambda: defaultdict(lambda: list()))
 
+resolver_to_last_req = defaultdict(lambda: dict())
+
 # banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
 
 
@@ -80,6 +82,8 @@ final_dict_elaborate = {}
 '''
 Global:
 req_id_to_resolvers: both phases!
+
+done globally for all TTL
 '''
 
 req_id_to_resolvers = defaultdict(lambda: set())
@@ -120,7 +124,7 @@ Per request id
 '''
 jaccard_index = []
 
-
+# all asns that reached both phases**
 global_asn_set = set()
 
 if LOCAL:
@@ -149,6 +153,8 @@ def initiate_per_ttl_global_sets():
     # global req_id_to_client_ips
     global phase_wise_resolver_correlation
     global http_response_to_asn_set
+    global resolver_to_middle_req
+    global resolver_to_last_req
 
     http_response_to_asn_set = defaultdict(lambda: set())
     phase_wise_resolver_correlation = defaultdict(lambda: defaultdict(lambda: 0))
@@ -166,6 +172,8 @@ def initiate_per_ttl_global_sets():
     req_id_to_bind_ips_phase_2 = defaultdict(lambda: set())
     jaccard_index = []
     global_asn_set = set()
+    resolver_to_middle_req = defaultdict(lambda: defaultdict(lambda: list()))
+    resolver_to_last_req = defaultdict(lambda: dict())
 
 
 def is_event_log(log):
@@ -429,6 +437,14 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
     bind_info_curated_first = curate_time_segment(bind_info, bind_phase_1_start, bind_phase_1_end)
     bind_info_curated_second = curate_time_segment(bind_info, bind_phase_2_start, bind_phase_2_end)
     bind_info_curated_middle = curate_time_segment(bind_info, bind_phase_1_end, bind_phase_2_start)
+
+    for re_id in bind_info_curated_first:
+        if len(bind_info_curated_first[re_id]) == 0:
+            continue
+        last_element = bind_info_curated_first[re_id][-1]
+        resolver_ip = last_element['resolver_ip']
+        time = last_element['date']
+        resolver_to_last_req[resolver_ip][re_id] = int(datetime.timestamp(time))
 
 
     for re_id in bind_info_curated_middle:
@@ -729,6 +745,7 @@ def master_calc(ttl_list):
 
         distinct_ips = set()
 
+        # TODO check
         for req_id in req_id_to_resolvers:
             resolvers = req_id_to_resolvers[req_id]
             ips = req_id_to_client_ips[req_id]
@@ -818,6 +835,12 @@ def master_calc(ttl_list):
         with open(parent_path + "http_response_dict.json", "w") as ouf:
             json.dump(http_response_dict, fp=ouf)
 
+        with open(parent_path + "resolver_to_middle_req.json", "w") as ouf:
+            json.dump(resolver_to_middle_req, fp=ouf)
+
+        with open(parent_path + "resolver_to_last_req.json", "w") as ouf:
+            json.dump(resolver_to_last_req, fp=ouf)
+
         try:
             temp_dict = {}
             for key in http_response_to_asn_set:
@@ -829,12 +852,40 @@ def master_calc(ttl_list):
 
         send_telegram_msg("Done with parsing TTL final {}".format(ttl))
 
-    parent_path = 'ttl_result_v2/'
 
-    with open(parent_path + "resolver_to_middle_req.json", "w") as ouf:
-        json.dump(resolver_to_middle_req, fp=ouf)
+
 
     send_telegram_msg("Done with everything")
+
+
+def max_retries():
+    f = open("../max_retires_resolvers_5.json")
+    d = json.load(f)
+
+    org_set = set()
+    org_count = defaultdict(lambda : 0)
+
+    a = []
+    for k in d:
+        asn = get_asn(k)
+        org = get_org(asn)[0]
+        org_set.add(org)
+        org_count[org] = max(org_count[org], d[k]["num"])
+        #a.append([k, d[k]["num"], org])
+    #a.sort(key=lambda x: x[1])
+    for key in org_set:
+        a.append([key, org_count[key]])
+    a.sort(key=lambda x: x[1], reverse=True)
+
+    for e in a:
+        print(str(e[0]) + " ----->   " + str(e[1]))
+
+
+
+
+# max_retries()
+
+
 
 
 def send_telegram_msg(msg):

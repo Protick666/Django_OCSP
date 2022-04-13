@@ -3,7 +3,7 @@ import socket, ipaddress, threading
 port = 53
 from dns import resolver
 
-max_threads = 4000
+max_threads = 1000
 port_reachable = {}
 dns_answer = {}
 dns_error = {}

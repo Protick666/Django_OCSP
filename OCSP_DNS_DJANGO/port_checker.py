@@ -56,7 +56,7 @@ def check_port(ip, port, ind):
 
 
 import json
-from local import LOCAL
+from OCSP_DNS_DJANGO.local import LOCAL
 
 if LOCAL:
     f = open("../public_resolver_all.json")

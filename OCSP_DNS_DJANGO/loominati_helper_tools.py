@@ -175,7 +175,13 @@ def create_lst_both(total_requests):
     print("Local ", len(local_asn_list))
     print("Global ", len(asn_list))
 
-    global_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=asn_list,
+    asn_list_curated = []
+    for asn in asn_list:
+        if asn in local_asn_list:
+            continue
+        asn_list_curated.append(asn)
+
+    global_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=asn_list_curated,
                                              asn_to_prefix_count=asn_to_prefix_count)
 
     local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests * 2, asn_list=local_asn_list,

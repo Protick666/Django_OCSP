@@ -15,7 +15,7 @@ def print_public_len(data):
 
 
 for ttl in ttl_list:
-    file = "/home/protick/ocsp_dns_django/ttl_result_v2/" + str(ttl)
+    file = "/home/protick/ocsp_dns_django/ttl_result_v2/" + str(ttl) + "/resolver_public_local_dict.json"
     f = open(file)
     d = json.load(f)
     print("Total {}".format(ttl), len(d.keys()))

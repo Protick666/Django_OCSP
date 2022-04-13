@@ -3,7 +3,7 @@ import socket, ipaddress, threading
 port = 53
 from dns import resolver
 
-max_threads = 1000
+max_threads = 50
 port_reachable = {}
 dns_answer = {}
 dns_error = {}
@@ -93,5 +93,5 @@ p = {
     "ip_list": ip_list
 }
 
-with open("public_verdict.json", "w") as ouf:
+with open("public_verdict_2.json", "w") as ouf:
     json.dump(p, fp=ouf)

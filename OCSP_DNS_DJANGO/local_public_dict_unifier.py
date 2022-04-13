@@ -11,7 +11,7 @@ def print_public_len(data):
     for key in data:
         if data[key] is True:
             a .append(key)
-    print("Total ", len(a))
+    print("Total public ", len(a))
 
 
 for ttl in ttl_list:
@@ -21,9 +21,9 @@ for ttl in ttl_list:
     print("Total {}".format(ttl), len(d.keys()))
     print_public_len(d)
     for key in d:
-        if key in master_dict:
-            if master_dict[key] != d[key]:
-                print("** Contradict ** ", key)
+        # if key in master_dict:
+        #     if master_dict[key] != d[key]:
+        #         print("** Contradict ** ", key)
         master_dict[key] = d[key]
 
 print("Total ", len(master_dict.keys()))

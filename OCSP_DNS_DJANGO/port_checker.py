@@ -3,7 +3,7 @@ import socket, ipaddress, threading
 port = 53
 from dns import resolver
 
-max_threads = 2000
+max_threads = 4000
 port_reachable = {}
 dns_answer = {}
 dns_error = {}
@@ -42,7 +42,7 @@ def check_port(ip, port, ind):
     try:
         res = resolver.Resolver()
         res.nameservers = [ip]
-        answers = res.resolve('google.com', lifetime=2)
+        answers = res.resolve('google.com', lifetime=4)
         for rdata in answers:
             dns_answer[ip] = rdata.address
             return

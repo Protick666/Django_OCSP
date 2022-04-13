@@ -3,7 +3,7 @@ import socket, ipaddress, threading
 port = 53
 from dns import resolver
 
-max_threads = 50
+max_threads = 2000
 port_reachable = {}
 dns_answer = {}
 dns_error = {}
@@ -22,10 +22,10 @@ def check_port(ip, port, ind):
     global dns_error
     try:
 
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # TCP
-        #sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
+        #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # TCP
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         socket.setdefaulttimeout(3) # seconds (float)
-        result = sock.connect_ex((ip,port))
+        result = sock.connect_ex((ip, port))
         if result == 0:
             # print ("Port is open")
             port_reachable[ip] = "OPEN"
@@ -40,14 +40,12 @@ def check_port(ip, port, ind):
         pass
 
     try:
-
-
         res = resolver.Resolver()
         res.nameservers = [ip]
         answers = res.resolve('google.com', lifetime=2)
         for rdata in answers:
             dns_answer[ip] = rdata.address
-            break
+            return
 
     except Exception as e:
         dns_error[ip] = ((str(e.__class__.__name__), str(e)))
@@ -81,7 +79,7 @@ for ip in ip_list:
 # dns_answer = {}
 # dns_error = {}
 
-while len(port_reachable.keys()) < ip_size - 100:
+while len(dns_error.keys()) + len(dns_answer.keys()) < ip_size - 100:
     sleep(10)
 
 sleep(30)

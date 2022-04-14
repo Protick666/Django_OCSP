@@ -17,7 +17,6 @@ resolver_to_last_req = defaultdict(lambda: dict())
 
 # banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
 
-
 as2isp = AS2ISP()
 
 
@@ -275,7 +274,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
         things_to_store["req_id_to_client_ips"] = req_id_to_client_ips
 
         with open(dump_directory + "{}.json".format(file_name), "w") as ouf:
-            json.dump(things_to_store, fp=ouf)
+            json.dump(things_to_store, fp=ouf, default=str)
 
         send_telegram_msg("*** Done with parsing Bind file {}".format(file))
 
@@ -332,8 +331,6 @@ def preprocess_live_data(data):
 
             http_response_dict[js["1-response"]] += 1
             http_response_dict[js["2-response"]] += 1
-
-
 
             asn = js['asn']
 

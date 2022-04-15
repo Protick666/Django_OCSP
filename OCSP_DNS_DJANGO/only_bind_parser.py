@@ -318,9 +318,12 @@ def post_process_bind_logs():
     req_id_to_resolvers_mother = defaultdict(lambda: set())
 
     for file in bind_preprocessed_files:
-        f = open(file)
-        print(file)
-        d = ujson.load(f)
+        d = None
+        try:
+            f = open(file)
+            d = ujson.load(f)
+        except Exception:
+            continue
         ans_dict = d["ans_dict"]
         req_id_to_resolvers = d["req_id_to_resolvers"]
 

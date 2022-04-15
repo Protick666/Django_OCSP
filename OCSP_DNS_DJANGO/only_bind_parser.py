@@ -289,6 +289,24 @@ def get_ip_list_from_encoded_set(str):
     return ans
 
 
+def check_bind_logs():
+    import ujson
+
+    preprocessed_bind_dir = "/home/protick/ocsp_dns_django/preprocessed_ttl_log/bind/"
+    bind_dir = preprocessed_bind_dir
+    bind_preprocessed_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f and f.endswith(".json")]
+
+    ans_dict_mother = {}
+    req_id_to_resolvers_mother = defaultdict(lambda: set())
+
+    for file in bind_preprocessed_files:
+        try:
+            f = open(file)
+            d = ujson.load(f)
+        except Exception as e:
+            send_telegram_msg("*** Jhamela postprocessing Bind file {}".format(file))
+
+
 def post_process_bind_logs():
     import ujson
 
@@ -301,6 +319,7 @@ def post_process_bind_logs():
 
     for file in bind_preprocessed_files:
         f = open(file)
+        print(file)
         d = ujson.load(f)
         ans_dict = d["ans_dict"]
         req_id_to_resolvers = d["req_id_to_resolvers"]

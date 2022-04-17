@@ -8,6 +8,7 @@ from OCSP_DNS_DJANGO.local import LOCAL
 from OCSP_DNS_DJANGO.tools import AS2ISP
 from pathlib import Path
 import os
+import ujson
 
 # {} -> resolver_ip -> req_id -> [5]
 
@@ -307,18 +308,41 @@ def check_bind_logs():
             send_telegram_msg("*** Jhamela postprocessing Bind file {}".format(file))
 
 
-def post_process_bind_logs():
-    import ujson
+def get_set_exp_id_temp_file(exp_id, dir_extension, get=True, data={}):
+    full_dir = "temp_dump/{}".format(dir_extension)
+    full_file_path = "{}/{}.json".format(full_dir, exp_id)
+    Path(full_dir).mkdir(parents=True, exist_ok=True)
 
+    if get:
+        if os.path.isfile(full_file_path):
+            f = open(full_file_path)
+            d = ujson.load(f)
+            return d
+        else:
+            empty_dict = {}
+            with open(full_file_path, "w") as ouf:
+                json.dump(empty_dict, fp=ouf)
+            return empty_dict
+    else:
+        with open(full_file_path, "w") as ouf:
+            json.dump(data, fp=ouf)
+
+
+def post_process_bind_logs():
     preprocessed_bind_dir = "/home/protick/ocsp_dns_django/preprocessed_ttl_log/bind/"
     bind_dir = preprocessed_bind_dir
-    bind_preprocessed_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f and f.endswith(".json")]
-
-    ans_dict_mother = {}
+    bind_preprocessed_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f and f.endswith(".json") and "query" in f]
+    # TODO
+    bind_preprocessed_files = bind_preprocessed_files[10]
+    total_bind_files = len(bind_preprocessed_files)
+    import time
+    dir_extension = int(time.time())
     req_id_to_resolvers_mother = defaultdict(lambda: set())
 
+    file_index = 0
     for file in bind_preprocessed_files:
-        d = None
+        file_index += 1
+
         try:
             f = open(file)
             d = ujson.load(f)
@@ -328,23 +352,28 @@ def post_process_bind_logs():
         req_id_to_resolvers = d["req_id_to_resolvers"]
 
         for exp_id in ans_dict:
-            if exp_id not in ans_dict_mother:
-                ans_dict_mother[exp_id] = {}
-                ans_dict_mother[exp_id]["req"] = {}
+            ans_dict_prev = get_set_exp_id_temp_file(exp_id=exp_id, dir_extension=dir_extension, get=True)
+
+            if "req" not in ans_dict_prev:
+                ans_dict_prev["req"] = {}
+
             nested_dict = ans_dict[exp_id]
+
             if "req" in nested_dict:
                 for identifier in nested_dict["req"]:
-                    if identifier not in ans_dict_mother[exp_id]["req"]:
-                        ans_dict_mother[exp_id]["req"][identifier] = list()
+                    if identifier not in ans_dict_prev["req"]:
+                        ans_dict_prev["req"][identifier] = list()
                     for e in nested_dict["req"][identifier]:
-                        ans_dict_mother[exp_id]["req"][identifier].append(e)
+                        ans_dict_prev["req"][identifier].append(e)
+
             for key in nested_dict:
                 if key == "req":
                     continue
-                if key not in ans_dict_mother[exp_id]:
-                    ans_dict_mother[exp_id][key] = list()
+                if key not in ans_dict_prev:
+                    ans_dict_prev[key] = list()
                 for e in nested_dict[key]:
-                    ans_dict_mother[exp_id][key].append(e)
+                    ans_dict_prev[key].append(e)
+            get_set_exp_id_temp_file(exp_id=exp_id, dir_extension=dir_extension, get=False, data=ans_dict_prev)
 
         l = 0
         for identifier in req_id_to_resolvers:
@@ -353,23 +382,21 @@ def post_process_bind_logs():
             for element in ip_list:
                 req_id_to_resolvers_mother[identifier].add(element)
 
-        send_telegram_msg("*** Finised postprocessing Bind file {},  ip list: {}".format(file, l))
+        try:
+            f.close()
+        except:
+            pass
+        send_telegram_msg("*** Finised postprocessing Bind file {}, index {}/{},  ip list: {}".format(file, file_index, total_bind_files, l))
 
-    dump_directory = "post_processed_ttl_log/bind/"
+    dump_directory = "temp_dump/"
     Path(dump_directory).mkdir(parents=True, exist_ok=True)
-
-    for exp_id in ans_dict_mother:
-        with open(dump_directory + "{}.json".format(exp_id), "w") as ouf:
-            json.dump(ans_dict_mother[exp_id], fp=ouf)
-        send_telegram_msg("*** Finised dumping exp  id {}".format(exp_id))
-
 
     temp_dict = {}
     for identifier in req_id_to_resolvers_mother:
         temp_dict[identifier] = list(req_id_to_resolvers_mother[identifier])
-    with open("post_processed_ttl_log/" + "{}.json".format("req_id_to_resolvers_mother"), "w") as ouf:
+    with open(dump_directory + "{}.json".format("req_id_to_resolvers_mother"), "w") as ouf:
         json.dump(temp_dict, fp=ouf)
-    send_telegram_msg("*** Finished Everything")
+    send_telegram_msg("*** Finished Everything, directory {}".format(dir_extension))
 
 
 def segment(lst, d1, d2):

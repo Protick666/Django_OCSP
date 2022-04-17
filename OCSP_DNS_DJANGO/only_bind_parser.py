@@ -333,7 +333,7 @@ def post_process_bind_logs():
     bind_dir = preprocessed_bind_dir
     bind_preprocessed_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f and f.endswith(".json") and "query" in f]
     # TODO
-    bind_preprocessed_files = bind_preprocessed_files[10]
+    bind_preprocessed_files = bind_preprocessed_files[:10]
     total_bind_files = len(bind_preprocessed_files)
     import time
     dir_extension = int(time.time())

@@ -30,10 +30,12 @@ def get_org(asn):
 def get_live_file_name(ttl):
     return "results_{}".format(ttl)
 
+
 if LOCAL:
     asndb = pyasn.pyasn('../OCSP_DNS_DJANGO/ipsan_db.dat')
 else:
     asndb = pyasn.pyasn('OCSP_DNS_DJANGO/ipsan_db.dat')
+
 
 def get_leaf_files(path):
     import os
@@ -51,9 +53,10 @@ def get_asn(ip):
     except:
         return ""
 
+
 incorrect_asn_set = set()
 
-#file_iter = None
+# file_iter = None
 url_live = 'ttlexp.exp.net-measurement.net'
 event_strings = ["phase1-start", "phase1-end", "sleep-end", "phase2-end"]
 banned_exp_ids = ['live_node_30_8', 'live_node_30_1', 'live_node_30_68']
@@ -315,6 +318,7 @@ def curate_time_segment(info, d1, d2):
         ans[req_id] = segment(lst, d1, d2)
     return ans
 
+
 def save_telemetry(data):
     try:
         keys = ["phase_1_nxdomain", "phase_2_server2", "phase_2_nxdomain", "phase_1_server1"]
@@ -344,8 +348,6 @@ def preprocess_live_data(data):
             http_response_dict[js["1-response"]] += 1
             http_response_dict[js["2-response"]] += 1
 
-
-
             asn = js['asn']
 
             http_response_to_asn_set[js["1-response"]].add(asn)
@@ -355,7 +357,7 @@ def preprocess_live_data(data):
             ans[req_id] = (phase_1, phase_2, js['asn'])
             req_id_to_ip_hash[req_id] = js['ip_hash']
         except Exception as e:
-            print('preprocess_live_data ' , e)
+            print('preprocess_live_data ', e)
     return ans, req_id_to_ip_hash
 
 
@@ -382,8 +384,10 @@ def parse_logs_together(allowed_exp_ids):
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 
     # bind_info_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=bind_files, is_bind=True)
-    apache_info_one_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_1, is_bind=False)
-    apache_info_two_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_2, is_bind=False)
+    apache_info_one_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_1,
+                                                    is_bind=False)
+    apache_info_two_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_2,
+                                                    is_bind=False)
 
     return {}, apache_info_one_global, apache_info_two_global
 
@@ -417,13 +421,17 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
         if key == "req":
             for req_id in bind_info[key]:
                 for element in bind_info[key][req_id]:
-                    element["date"] = datetime.strptime(element["date"], '%Y-%m-%d %H:%M:%S.%f')
+                    if "." in element["date"]:
+                        element["date"] = datetime.strptime(element["date"], '%Y-%m-%d %H:%M:%S.%f')
+                    else:
+                        element["date"] = datetime.strptime(element["date"], '%Y-%m-%d %H:%M:%S')
+
         else:
             for element in bind_info[key]:
-                element["date"] = datetime.strptime(element["date"], '%Y-%m-%d %H:%M:%S.%f')
-
-
-
+                if "." in element["date"]:
+                    element["date"] = datetime.strptime(element["date"], '%Y-%m-%d %H:%M:%S.%f')
+                else:
+                    element["date"] = datetime.strptime(element["date"], '%Y-%m-%d %H:%M:%S')
 
     # TODO WATCH
     lists_in_hand = [apache_info_one, apache_info_two, bind_info]
@@ -472,9 +480,7 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
             time = e['date']
             resolver_to_middle_req[resolver_ip][re_id].append(int(datetime.timestamp(time)))
 
-
     # {} -> resolver_ip -> exp_id -> [5]
-
 
     # apache_info_one_phase_1 = curate_time_segment(apache_info_one, apache_phase_1_start, apache_phase_1_divider)
     # apache_info_one_phase_2 = curate_time_segment(apache_info_one, apache_phase_2_start, apache_phase_2_end)
@@ -543,7 +549,6 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
     return correct_set, incorrect_set
 
 
-
 def get_all_asns(file_iter):
     live_jsons_dir = BASE_URL + 'live/node_code/'.format(file_iter)
     run_jsons = [f for f in listdir(live_jsons_dir) if isfile(join(live_jsons_dir, f))
@@ -558,6 +563,7 @@ def get_all_asns(file_iter):
 
     with open("ttl_exp_asn_list.json", "w") as ouf:
         json.dump(list(asn_set), fp=ouf)
+
 
 # TODO _.live_node_30_185.31313.ttlexp.exp.net-measurement.net
 # TODO query steps
@@ -609,14 +615,14 @@ def table_maker_preprocess(d, parent_path):
         if key in c_ans:
             correct_count = c_ans[key][0]
         ans_lst.append((ans[key][0], len(ans[key][1]), key, cn[key], correct_count))
-                        # resolver count, exit node count, isp, cntry, opposite
+        # resolver count, exit node count, isp, cntry, opposite
 
     for key in c_ans:
         l += c_ans[key][0]
         in_correct_count = 0
         if key in ans:
             in_correct_count = ans[key][0]
-        c_ans_lst.append((c_ans[key][0],  len(c_ans[key][1]), key, cn[key], in_correct_count))
+        c_ans_lst.append((c_ans[key][0], len(c_ans[key][1]), key, cn[key], in_correct_count))
 
     k = {}
     k['ic_ans_lst'] = ans_lst
@@ -626,7 +632,6 @@ def table_maker_preprocess(d, parent_path):
 
 
 def local_public_analyzer(data, parent_path):
-
     d = data
     resolver_to_asns = d['resolver_to_asns']
     resolver_to_asn_own = d['resolver_to_asn_own']
@@ -725,10 +730,10 @@ def master_calc(ttl_list):
                 banned_list.append("live_zeus_15_{}_{}".format(e, j))
         ini += 1
 
-    total_exp_id = len(ttl_to_exp_id_list)
     for ttl in ttl_to_exp_id_list:
         initiate_per_ttl_global_sets()
         exp_id_nested = ttl_to_exp_id_list[ttl]
+        total_exp_id = len(exp_id_nested)
 
         exp_index = 0
         for exp_id in exp_id_nested:
@@ -743,6 +748,7 @@ def master_calc(ttl_list):
                                          ttl=ttl)
                 send_telegram_msg("Done with exp_id {}, {}/{}".format(exp_id, exp_index, total_exp_id))
             except Exception as e:
+                send_telegram_msg("Missed with exp_id {}, {}/{}".format(exp_id, exp_index, total_exp_id))
                 pp.append('master_calc {} {}'.format(e, exp_id))
                 print('master_calc ', e, exp_id)
 
@@ -882,7 +888,6 @@ def master_calc(ttl_list):
 
         send_telegram_msg("Done with parsing TTL final {}".format(ttl))
 
-
     send_telegram_msg("Done with everything")
 
 
@@ -891,7 +896,7 @@ def max_retries():
     d = json.load(f)
 
     org_set = set()
-    org_count = defaultdict(lambda : 0)
+    org_count = defaultdict(lambda: 0)
 
     a = []
     for k in d:
@@ -899,8 +904,8 @@ def max_retries():
         org = get_org(asn)[0]
         org_set.add(org)
         org_count[org] = max(org_count[org], d[k]["num"])
-        #a.append([k, d[k]["num"], org])
-    #a.sort(key=lambda x: x[1])
+        # a.append([k, d[k]["num"], org])
+    # a.sort(key=lambda x: x[1])
     for key in org_set:
         a.append([key, org_count[key]])
     a.sort(key=lambda x: x[1], reverse=True)
@@ -909,11 +914,7 @@ def max_retries():
         print(str(e[0]) + " ----->   " + str(e[1]))
 
 
-
-
 # max_retries()
-
-
 
 
 def send_telegram_msg(msg):

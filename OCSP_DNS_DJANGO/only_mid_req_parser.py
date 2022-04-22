@@ -515,7 +515,7 @@ def filter_data(data):
 
 
 def filter_out_multiple_resolvers():
-    allowed_ttls = ["30"]
+    allowed_ttls = ["60"]
     source_directory = "preprocessed_middle_req_log/bind/"
     f = open("{}{}".format(source_directory, "middle_req.json"))
     d = json.load(f)

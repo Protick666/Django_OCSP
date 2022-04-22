@@ -476,6 +476,69 @@ def get_non_lum_resolver_ips(bind_info, req_id, lum_resolvers):
     return resolvers
 
 
+def filter_time_series_hits(lst):
+    list_to_work_on = []
+    for e in lst:
+        list_to_work_on.append(int(e))
+    list_to_work_on.sort()
+
+    if len(list_to_work_on) == 1:
+        return []
+    final_list = []
+
+    final_list.append(list_to_work_on[0])
+    to_cmp = list_to_work_on[0]
+    init_delta = 20
+    for index in range(1, len(list_to_work_on)):
+        if list_to_work_on[index] - to_cmp <= init_delta:
+            continue
+        else:
+            final_list.append(list_to_work_on[index])
+            to_cmp = list_to_work_on[index]
+            init_delta = 5
+
+    final_list = final_list[1: ]
+    return final_list
+
+
+def filter_data(data):
+    data_cp = dict(data)
+    for identifier in list(data_cp.keys()):
+        curated_list = filter_time_series_hits(data_cp[identifier])
+        if len(curated_list) == 0:
+            data_cp.pop(identifier, None)
+        else:
+            data_cp[identifier] = curated_list
+    if len(list(data_cp.keys())) == 0:
+        return None
+    return data_cp
+
+
+def filter_out_multiple_resolvers():
+    allowed_ttls = ["30"]
+    source_directory = "preprocessed_middle_req_log/bind/"
+    f = open("{}{}".format(source_directory, "middle_req.json"))
+    d = json.load(f)
+    send_telegram_msg("loaded !!")
+
+    for ttl in d:
+        if not str(ttl) in allowed_ttls:
+            continue
+        data = d[ttl]
+        # data[ip]][identifier].append(timestamp)
+        for resolver in list(data.keys()):
+            nested_data = filter_data(data[resolver])
+            if nested_data is None:
+                data.pop(resolver, None)
+            else:
+                data[resolver] = nested_data
+        a = 1
+
+        with open(source_directory + "{}.json".format("middle_req_post_{}".format(ttl)), "w") as ouf:
+            json.dump(data, fp=ouf)
+    send_telegram_msg("Done")
+
+
 def parse_logs_together(allowed_exp_ids=None):
     bind_dir = BASE_URL + 'bind/bind/'
     bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]

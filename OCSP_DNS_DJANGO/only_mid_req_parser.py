@@ -486,14 +486,15 @@ def filter_time_series_hits(lst):
         return []
     final_list = []
 
-    final_list.append(list_to_work_on[0])
+    final_list.append(0)
+    init_stamp = list_to_work_on[0]
     to_cmp = list_to_work_on[0]
     init_delta = 20
     for index in range(1, len(list_to_work_on)):
         if list_to_work_on[index] - to_cmp <= init_delta:
             continue
         else:
-            final_list.append(list_to_work_on[index])
+            final_list.append(list_to_work_on[index] - init_stamp)
             to_cmp = list_to_work_on[index]
             init_delta = 5
 

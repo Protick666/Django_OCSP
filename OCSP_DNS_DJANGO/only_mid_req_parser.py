@@ -213,8 +213,9 @@ mid_req_master_dict = {}
 def file_allowed(file_name):
     try:
         comp_time = 1650149254
+        end_time =  1650435454
         time_Seg = int(file_name.split(".")[-1][:10])
-        return time_Seg >= comp_time
+        return end_time >= time_Seg >= comp_time
     except:
         return False
 
@@ -234,7 +235,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
         file_name = file.split("/")[-1]
 
         if not file_allowed(file_name):
-            send_telegram_msg("*** Skipping Bind file {}".format(file))
+            # send_telegram_msg("*** Skipping Bind file {}".format(file))
             continue
 
         with open(file) as FileObj:
@@ -250,7 +251,6 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
                     ttl_here = find_ttl(exp_id)
                     if ttl_here not in mid_req_master_dict:
                         mid_req_master_dict[ttl_here] = defaultdict(lambda: defaultdict(lambda: list()))
-
 
                     if is_bind:
                         if line.startswith("client"):

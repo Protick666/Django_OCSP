@@ -211,9 +211,12 @@ def parse_apache_line_and_build_meta(line):
 mid_req_master_dict = {}
 
 def file_allowed(file_name):
-    comp_time = 1650149254
-    time_Seg = int(file_name.split(".")[-1][:10])
-    return time_Seg >= comp_time
+    try:
+        comp_time = 1650149254
+        time_Seg = int(file_name.split(".")[-1][:10])
+        return time_Seg >= comp_time
+    except:
+        return False
 
 # b113dbd9-4a03-438b-9ea0-11a37ba31ed51650588713356.live_recur_15.52259.1.ttlexp.exp.net-measurement.net
 

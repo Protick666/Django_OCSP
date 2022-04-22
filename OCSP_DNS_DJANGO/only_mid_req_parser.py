@@ -227,7 +227,10 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
         dump_directory = "preprocessed_middle_req_log/apache_{}/".format(phase)
     Path(dump_directory).mkdir(parents=True, exist_ok=True)
 
+    tot_files = len(files)
+    index = 0
     for file in files:
+        index += 1
         file_name = file.split("/")[-1]
 
         if not file_allowed(file_name):
@@ -268,7 +271,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
                         mid_req_master_dict[ttl_here][meta["resolver_ip"]][identifier].append(int(datetime.timestamp(meta["date"])))
                 except Exception as e:
                     print('parse bind apache logs ', e)
-        send_telegram_msg("*** Done with parsing Bind file {}".format(file))
+        send_telegram_msg("*** Done with parsing Bind file {},  {}/{}".format(file, index, tot_files))
 
 
     with open(dump_directory + "{}.json".format("middle_req"), "w") as ouf:

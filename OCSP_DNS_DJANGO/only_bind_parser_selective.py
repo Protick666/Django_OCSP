@@ -308,8 +308,8 @@ def check_bind_logs():
             send_telegram_msg("*** Jhamela postprocessing Bind file {}".format(file))
 
 
-def get_set_exp_id_temp_file(exp_id, dir_extension, get=True, data={}):
-    full_dir = "temp_dump_2/{}".format(dir_extension)
+def get_set_exp_id_temp_file(exp_id, dir_extension, get=True, data={}, allowed_ttl=-1):
+    full_dir = "temp_dump_{}/{}".format(allowed_ttl, dir_extension)
     full_file_path = "{}/{}.json".format(full_dir, exp_id)
     Path(full_dir).mkdir(parents=True, exist_ok=True)
 
@@ -328,7 +328,21 @@ def get_set_exp_id_temp_file(exp_id, dir_extension, get=True, data={}):
             json.dump(data, fp=ouf)
 
 
-def post_process_bind_logs_v2():
+def file_allowed(file_name):
+    try:
+        comp_time = 1650689254
+        end_time = 1650909407
+        # query.log.1649733454937.json
+        time_Seg = int(file_name.split(".")[-2][:10])
+        return end_time >= time_Seg >= comp_time
+    except:
+        return False
+
+
+# TODO set TTL 60, preprocess v2
+
+
+def post_process_bind_logs_v2(allowed_ttl):
     preprocessed_bind_dir = "/home/protick/ocsp_dns_django/preprocessed_ttl_log/bind/"
     bind_dir = preprocessed_bind_dir
     bind_preprocessed_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f and f.endswith(".json") and "query" in f]
@@ -343,6 +357,11 @@ def post_process_bind_logs_v2():
     for file in bind_preprocessed_files:
         file_index += 1
 
+        file_name = file.split("/")[-1]
+        if not file_allowed(file_name):
+            # send_telegram_msg("*** Skipping Bind file {}".format(file))
+            continue
+
         try:
             f = open(file)
             d = ujson.load(f)
@@ -352,10 +371,10 @@ def post_process_bind_logs_v2():
         req_id_to_resolvers = d["req_id_to_resolvers"]
 
         for exp_id in ans_dict:
-            if "live_zeus_30_" not in exp_id:
+            if "live_zeus_{}_".format(allowed_ttl) not in exp_id:
                 continue
 
-            ans_dict_prev = get_set_exp_id_temp_file(exp_id=exp_id, dir_extension=dir_extension, get=True)
+            ans_dict_prev = get_set_exp_id_temp_file(exp_id=exp_id, dir_extension=dir_extension, get=True, allowed_ttl=allowed_ttl)
 
             if "req" not in ans_dict_prev:
                 ans_dict_prev["req"] = {}
@@ -376,7 +395,7 @@ def post_process_bind_logs_v2():
                     ans_dict_prev[key] = list()
                 for e in nested_dict[key]:
                     ans_dict_prev[key].append(e)
-            get_set_exp_id_temp_file(exp_id=exp_id, dir_extension=dir_extension, get=False, data=ans_dict_prev)
+            get_set_exp_id_temp_file(exp_id=exp_id, dir_extension=dir_extension, get=False, data=ans_dict_prev, allowed_ttl=allowed_ttl)
 
         l = 0
         for identifier in req_id_to_resolvers:
@@ -391,7 +410,7 @@ def post_process_bind_logs_v2():
             pass
         send_telegram_msg("*** Finised postprocessing Bind file {}, index {}/{},  ip list: {}".format(file, file_index, total_bind_files, l))
 
-    dump_directory = "temp_dump_2/"
+    dump_directory = "temp_dump_{}/".format(allowed_ttl)
     Path(dump_directory).mkdir(parents=True, exist_ok=True)
 
     temp_dict = {}

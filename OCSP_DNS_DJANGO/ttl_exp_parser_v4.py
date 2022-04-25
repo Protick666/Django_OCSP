@@ -410,7 +410,7 @@ def log_considered_resolvers(considered_resolvers, req_id, ip_hash, is_correct_s
 def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
     import os
 
-    full_file_path = "/home/protick/ocsp_dns_django/temp_dump_2/1650242491/{}.json".format(exp_id)
+    full_file_path = "/home/protick/ocsp_dns_django/temp_dump_{}/1650914540/{}.json".format(ttl, exp_id)
     if not os.path.isfile(full_file_path):
         send_telegram_msg("Not found {}".format(exp_id))
 

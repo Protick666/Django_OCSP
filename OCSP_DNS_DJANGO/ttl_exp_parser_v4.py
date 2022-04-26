@@ -705,7 +705,7 @@ def master_calc(ttl_list):
     # 'live_zeus_15_1_10'
     bind_info_global, apache_info_one_global, apache_info_two_global = parse_logs_together(allowed_exp_ids=exp_id_list)
     import os
-    full_file_path = "/home/protick/ocsp_dns_django/temp_dump_2/req_id_to_resolvers_mother.json"
+    full_file_path = "/home/protick/ocsp_dns_django/temp_dump_{}/req_id_to_resolvers_mother.json".format(ttl_list[0])
     if not os.path.isfile(full_file_path):
         send_telegram_msg("Not found {}".format("req_id_to_resolvers_mother"))
 

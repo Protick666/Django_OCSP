@@ -315,7 +315,7 @@ def parse_live_logs():
                 "t2": t2,
                 "diff": diff,
             }
-    send_telegram_msg("*** Done with live log {}".format(file))
+        send_telegram_msg("*** Done with live log {}".format(file))
 
     dump_directory = "preprocessed_proactive_req_log/bind/"
     with open(dump_directory + "{}.json".format("proactive_req_live_file"), "w") as ouf:

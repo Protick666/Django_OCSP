@@ -391,7 +391,6 @@ def filter_out_multiple_resolvers():
     d = json.load(f)
     send_telegram_msg("loaded !!")
 
-    source_directory = "preprocessed_proactive_req_log/bind/"
     f = open("{}{}".format(source_directory, "proactive_req_live_file.json"))
     live_data = json.load(f)
     # master_live_dict[identifier] = {
@@ -413,7 +412,7 @@ def filter_out_multiple_resolvers():
             else:
                 data[resolver] = nested_data
 
-        with open(source_directory + "{}.json".format("middle_req_post_{}".format(ttl)), "w") as ouf:
+        with open(source_directory + "{}.json".format("proactive_req_post_{}".format(ttl)), "w") as ouf:
             json.dump(data, fp=ouf)
     send_telegram_msg("Done")
 

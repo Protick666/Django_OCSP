@@ -430,9 +430,9 @@ def box_plot_info():
     for resolver in post_data:
         for req_id in post_data[resolver]:
             for e in post_data[resolver][req_id]:
-                if e >= 3600 - 10 or e <= 3240 or req_id not in live_data:
+                if e >= 3600 - 10 or e <= 3240 or ('http://' +req_id) not in live_data:
                     continue
-                diff = int(live_data[req_id])/1000
+                diff = int(live_data['http://' +req_id])/1000
                 delta.append(abs(diff - e))
 
     with open(source_directory + "{}.json".format("proactive_box_data".format(60)), "w") as ouf:

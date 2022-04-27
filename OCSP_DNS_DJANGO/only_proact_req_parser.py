@@ -416,6 +416,29 @@ def info():
     print(a)
 
 
+def box_plot_info():
+    source_directory = "preprocessed_proactive_req_log/bind/"
+    f = open("{}{}".format(source_directory, "proactive_req_post_60.json"))
+    post_data = json.load(f)
+
+    source_directory = "preprocessed_proactive_req_log/bind/"
+    f = open("{}{}".format(source_directory, "proactive_req_live_file.json "))
+    live_data = json.load(f)
+
+    delta = []
+
+    for resolver in post_data:
+        for req_id in post_data[resolver]:
+            for e in post_data[resolver][req_id]:
+                if e >= 3600 - 10 or e <= 3240 or req_id not in live_data:
+                    continue
+                diff = int(live_data[req_id])/1000
+                delta.append(abs(diff - e))
+
+    with open(source_directory + "{}.json".format("proactive_box_data".format(60)), "w") as ouf:
+        json.dump(delta, fp=ouf)
+
+
 
 def filter_out_multiple_resolvers():
     source_directory = "preprocessed_proactive_req_log/bind/"

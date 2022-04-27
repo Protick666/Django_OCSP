@@ -470,6 +470,9 @@ def proactive_requests_countifier():
 
     f = open("{}{}".format(source_directory, "candidate_ids.json"))
     candidate_list = json.load(f)
+    can_dict = {}
+    for e in candidate_list:
+        can_dict[e] = 1
 
     resolver_set = set()
     resolver_count = defaultdict(lambda : 0)
@@ -477,7 +480,7 @@ def proactive_requests_countifier():
     for resolver in d:
         is_res = False
         for req_id in d[resolver]:
-            is_req = req_id in candidate_list
+            is_req = req_id in can_dict
             if is_req:
                 is_res = True
                 tot_req += 1

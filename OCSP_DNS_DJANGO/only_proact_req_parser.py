@@ -402,9 +402,8 @@ def filter_data(data, live_data):
 
 
 def filter_out_multiple_resolvers():
-    allowed_ttls = ["60"]
     source_directory = "preprocessed_proactive_req_log/bind/"
-    f = open("{}{}".format(source_directory, "proactive_req.json"))
+    f = open("{}{}".format(source_directory, "corrected_proactive_req.json"))
     d = json.load(f)
     send_telegram_msg("loaded !!")
 
@@ -417,20 +416,17 @@ def filter_out_multiple_resolvers():
     #     "diff": diff,
     # }
 
-    for ttl in d:
-        if not str(ttl) in allowed_ttls:
-            continue
-        data = d[ttl]
-        # data[ip]][identifier].append(timestamp)
-        for resolver in list(data.keys()):
-            nested_data = filter_data(data[resolver], live_data)
-            if nested_data is None:
-                data.pop(resolver, None)
-            else:
-                data[resolver] = nested_data
 
-        with open(source_directory + "{}.json".format("proactive_req_post_{}".format(ttl)), "w") as ouf:
-            json.dump(data, fp=ouf)
+    data = d
+    for resolver in list(data.keys()):
+        nested_data = filter_data(data[resolver], live_data)
+        if nested_data is None:
+            data.pop(resolver, None)
+        else:
+            data[resolver] = nested_data
+
+    with open(source_directory + "{}.json".format("proactive_req_post_{}".format(60)), "w") as ouf:
+        json.dump(data, fp=ouf)
     send_telegram_msg("Done")
 
 

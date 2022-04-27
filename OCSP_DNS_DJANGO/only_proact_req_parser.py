@@ -306,17 +306,20 @@ def parse_live_logs():
         d = d["dict_of_phases"]
         for req_id in d:
             for num in d[req_id]:
-                url = d[req_id][num]["req_url"]
-                t1 = d[req_id][num]["1-time"]
-                t2 = d[req_id][num]["2-time"]
-                diff = t2 - t1
-                identifier = str(url.split(".")[0])
-                master_live_dict[identifier] = {
-                    "url": url,
-                    "t1": t1,
-                    "t2": t2,
-                    "diff": diff,
-                }
+                try:
+                    url = d[req_id][num]["req_url"]
+                    t1 = d[req_id][num]["1-time"]
+                    t2 = d[req_id][num]["2-time"]
+                    diff = t2 - t1
+                    identifier = str(url.split(".")[0])
+                    master_live_dict[identifier] = {
+                        "url": url,
+                        "t1": t1,
+                        "t2": t2,
+                        "diff": diff,
+                    }
+                except:
+                    pass
         send_telegram_msg("*** Done with live log {}".format(file))
 
     dump_directory = "preprocessed_proactive_req_log/bind/"

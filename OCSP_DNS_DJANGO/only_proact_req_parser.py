@@ -402,6 +402,21 @@ def filter_data(data, live_data):
     return data_cp
 
 
+def info():
+    source_directory = "preprocessed_proactive_req_log/bind/"
+    f = open("{}{}".format(source_directory, "proactive_req.json"))
+    d = json.load(f)
+    send_telegram_msg("loaded !!")
+
+    data = d
+    print(len(data.keys()))
+    a = 0
+    for resolver in data:
+        a += len(list(d[resolver].keys()))
+    print(a)
+
+
+
 def filter_out_multiple_resolvers():
     source_directory = "preprocessed_proactive_req_log/bind/"
     f = open("{}{}".format(source_directory, "proactive_req.json"))

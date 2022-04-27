@@ -422,7 +422,7 @@ def box_plot_info():
     post_data = json.load(f)
 
     source_directory = "preprocessed_proactive_req_log/bind/"
-    f = open("{}{}".format(source_directory, "proactive_req_live_file.json "))
+    f = open("{}{}".format(source_directory, "proactive_req_live_file.json"))
     live_data = json.load(f)
 
     delta = []

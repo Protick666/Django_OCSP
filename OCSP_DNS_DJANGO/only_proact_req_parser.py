@@ -281,6 +281,23 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
 
 
 
+def fix_it():
+    # mid_req_master_dict[ttl_here][meta["resolver_ip"]][identifier].append(int(datetime.timestamp(meta["date"])))
+    dump_directory = "preprocessed_proactive_req_log/bind/"
+    f = open(dump_directory + "{}.json".format("proactive_req"))
+    d = json.load(f)
+
+    mother_dict = defaultdict(lambda: defaultdict(lambda: list()))
+
+    for ttl in d:
+        for resolver in d[ttl]:
+            for identifier in d[ttl][resolver]:
+                for element in d[ttl][resolver][identifier]:
+                    mother_dict[resolver][identifier].append(element)
+
+    with open(dump_directory + "{}.json".format("corrected_proactive_req"), "w") as ouf:
+        json.dump(mother_dict, fp=ouf)
+
 
 
 def get_non_lum_resolver_ips(bind_info, req_id, lum_resolvers):

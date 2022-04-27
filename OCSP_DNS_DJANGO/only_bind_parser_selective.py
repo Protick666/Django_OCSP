@@ -330,8 +330,8 @@ def get_set_exp_id_temp_file(exp_id, dir_extension, get=True, data={}, allowed_t
 
 def file_allowed(file_name):
     try:
-        comp_time = 1650689254
-        end_time = 1650909407
+        comp_time = 1650909407
+        end_time = 1651035407
         # query.log.1649733454937.json
         time_Seg = int(file_name.split(".")[-2][:10])
         return end_time >= time_Seg >= comp_time

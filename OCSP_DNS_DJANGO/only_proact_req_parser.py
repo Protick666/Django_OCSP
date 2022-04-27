@@ -456,7 +456,7 @@ def candidate_requests():
                 if e >= 3600 - 10 or e <= 3240 or ('http://' +req_id) not in live_data:
                     continue
                 diff = int(live_data['http://' + req_id]["diff"]) / 1000
-                if abs(diff - e) < 3:
+                if abs(diff - e) < 2:
                     candidate_ids.add(req_id)
 
     with open(source_directory + "{}.json".format("candidate_ids".format(60)), "w") as ouf:
@@ -488,7 +488,7 @@ def proactive_requests_countifier():
         if is_res:
             tot_res += 1
             resolver_set.add(resolver)
-    print(tot_res, tot_res)
+    print(tot_res, tot_req)
 
     with open(source_directory + "{}.json".format("proactive_resolver_set_{}".format(60)), "w") as ouf:
         json.dump(list(resolver_set), fp=ouf)

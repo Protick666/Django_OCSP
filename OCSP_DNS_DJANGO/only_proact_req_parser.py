@@ -463,6 +463,37 @@ def candidate_requests():
         json.dump(list(candidate_ids), fp=ouf)
 
 
+def proactive_requests_countifier():
+    source_directory = "preprocessed_proactive_req_log/bind/"
+    f = open("{}{}".format(source_directory, "proactive_req_post_60.json"))
+    d = json.load(f)
+
+    f = open("{}{}".format(source_directory, "candidate_ids.json"))
+    candidate_list = json.load(f)
+
+    resolver_set = set()
+    resolver_count = defaultdict(lambda : 0)
+    tot_res, tot_req = 0, 0
+    for resolver in d:
+        is_res = False
+        for req_id in d[resolver]:
+            is_req = req_id in candidate_list
+            if is_req:
+                is_res = True
+                tot_req += 1
+                resolver_count[resolver] += 1
+        if is_res:
+            tot_res += 1
+            resolver_set.add(resolver)
+    print(tot_res, tot_res)
+
+    with open(source_directory + "{}.json".format("proactive_resolver_set_{}".format(60)), "w") as ouf:
+        json.dump(list(resolver_set), fp=ouf)
+    with open(source_directory + "{}.json".format("proactive_resolver_count_{}".format(60)), "w") as ouf:
+        json.dump(resolver_count, fp=ouf)
+    send_telegram_msg("Done")
+
+
 
 def filter_out_multiple_resolvers():
     source_directory = "preprocessed_proactive_req_log/bind/"

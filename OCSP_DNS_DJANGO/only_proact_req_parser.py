@@ -209,7 +209,7 @@ def parse_apache_line_and_build_meta(line):
     return meta
 
 
-mid_req_master_dict = {}
+mid_req_master_dict = defaultdict(lambda: defaultdict(lambda: list()))
 
 def file_allowed(file_name):
     try:
@@ -223,6 +223,7 @@ def file_allowed(file_name):
 # 5c77f2fa-5e57-4e55-baaa-45198f56ac7f1650875806358.live_recpro_60_1014_55.134128.245.ttlexp.exp.net-measurement.net
 
 def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
+    p = 0
     if is_bind:
         dump_directory = "preprocessed_proactive_req_log/bind/"
     else:
@@ -248,9 +249,9 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
                     if not is_exp_id_present:
                         continue
 
-                    ttl_here = find_ttl(exp_id)
-                    if ttl_here not in mid_req_master_dict:
-                        mid_req_master_dict[ttl_here] = defaultdict(lambda: defaultdict(lambda: list()))
+                    # ttl_here = find_ttl(exp_id)
+                    # if ttl_here not in mid_req_master_dict:
+                    #     mid_req_master_dict[ttl_here] = defaultdict(lambda: defaultdict(lambda: list()))
 
                     if is_bind:
                         if line.startswith("client"):
@@ -268,12 +269,14 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
                         pass
                     else:
                         identifier = str(url.split(".")[0])
-                        mid_req_master_dict[ttl_here][meta["resolver_ip"]][identifier].append(int(datetime.timestamp(meta["date"])))
+                        mid_req_master_dict[meta["resolver_ip"]][identifier].append(int(datetime.timestamp(meta["date"])))
+                        p = max(p, len(mid_req_master_dict[meta["resolver_ip"]][identifier]))
+
                 except Exception as e:
                     print('parse bind apache logs ', e)
         send_telegram_msg("*** Done with parsing Bind file {},  {}/{}".format(file, index, tot_files))
 
-
+    print("PPP {}".format(p))
     with open(dump_directory + "{}.json".format("proactive_req"), "w") as ouf:
         json.dump(mid_req_master_dict, fp=ouf)
 
@@ -354,9 +357,7 @@ def parse_logs_together(allowed_exp_ids=None):
     # parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_2, is_bind=False, phase=2)
 
 
-def inito():
-    # parse_logs_together()
-    parse_live_logs()
+
 
 
 def filter_time_series_hits(lst):
@@ -388,9 +389,9 @@ def filter_time_series_hits(lst):
 def filter_data(data, live_data):
     data_cp = dict(data)
     for identifier in list(data_cp.keys()):
-        if identifier not in live_data:
-            data_cp.pop(identifier, None)
-            continue
+        # if identifier not in live_data:
+        #     data_cp.pop(identifier, None)
+        #     continue
         curated_list = filter_time_series_hits(data_cp[identifier])
         if len(curated_list) == 0:
             data_cp.pop(identifier, None)
@@ -403,7 +404,7 @@ def filter_data(data, live_data):
 
 def filter_out_multiple_resolvers():
     source_directory = "preprocessed_proactive_req_log/bind/"
-    f = open("{}{}".format(source_directory, "corrected_proactive_req.json"))
+    f = open("{}{}".format(source_directory, "proactive_req.json"))
     d = json.load(f)
     send_telegram_msg("loaded !!")
 
@@ -416,8 +417,8 @@ def filter_out_multiple_resolvers():
     #     "diff": diff,
     # }
 
-
     data = d
+    print(len(data.keys()))
     for resolver in list(data.keys()):
         nested_data = filter_data(data[resolver], live_data)
         if nested_data is None:
@@ -428,11 +429,6 @@ def filter_out_multiple_resolvers():
     with open(source_directory + "{}.json".format("proactive_req_post_{}".format(60)), "w") as ouf:
         json.dump(data, fp=ouf)
     send_telegram_msg("Done")
-
-
-
-
-
 
 
 def is_allowed(element, lst):
@@ -450,4 +446,10 @@ def send_telegram_msg(msg):
         telegram_send.send(messages=[msg])
     except Exception as e:
         pass
+
+
+def inito():
+    parse_logs_together()
+    parse_live_logs()
+    filter_out_multiple_resolvers()
 

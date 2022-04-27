@@ -303,18 +303,19 @@ def parse_live_logs():
     for file in data_files:
         f = open(file)
         d = ujson.load(f)
-        for key in d:
-            url = d[key]["req_url"]
-            t1 = d[key]["1-time"]
-            t2 = d[key]["2-time"]
-            diff = t2 - t1
-            identifier = str(url.split(".")[0])
-            master_live_dict[identifier] = {
-                "url": url,
-                "t1": t1,
-                "t2": t2,
-                "diff": diff,
-            }
+        for req_id in d:
+            for num in d[req_id]:
+                url = d[req_id][num]["req_url"]
+                t1 = d[req_id][num]["1-time"]
+                t2 = d[req_id][num]["2-time"]
+                diff = t2 - t1
+                identifier = str(url.split(".")[0])
+                master_live_dict[identifier] = {
+                    "url": url,
+                    "t1": t1,
+                    "t2": t2,
+                    "diff": diff,
+                }
         send_telegram_msg("*** Done with live log {}".format(file))
 
     dump_directory = "preprocessed_proactive_req_log/bind/"
@@ -335,6 +336,9 @@ def parse_logs_together(allowed_exp_ids=None):
 def inito():
     parse_logs_together()
     parse_live_logs()
+
+
+
 
 
 

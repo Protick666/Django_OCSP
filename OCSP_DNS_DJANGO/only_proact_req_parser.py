@@ -455,8 +455,8 @@ def candidate_requests():
             for e in post_data[resolver][req_id]:
                 if e >= 3600 - 10 or e <= 3240 or ('http://' +req_id) not in live_data:
                     continue
-                diff = int(live_data['http://' +req_id]["diff"])/1000
-                if diff <= 3:
+                diff = int(live_data['http://' + req_id]["diff"]) / 1000
+                if abs(diff - e) < 3:
                     candidate_ids.add(req_id)
 
     with open(source_directory + "{}.json".format("candidate_ids".format(60)), "w") as ouf:

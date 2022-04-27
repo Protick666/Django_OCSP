@@ -19,11 +19,18 @@ resolver_to_last_req = defaultdict(lambda: dict())
 as2isp = AS2ISP()
 
 
+org_dict_2 = {}
+
 def get_org(asn):
+
+    if asn in org_dict_2:
+        return org_dict_2[asn]
+
     org = str(as2isp.getISP("20221212", asn)[0])
     cntry = str(as2isp.getISP("20221212", asn)[1])
     org.replace("\"", "")
     cntry.replace("\"", "")
+    org_dict_2[asn] = org, cntry
     return org, cntry
 
 
@@ -410,7 +417,7 @@ def log_considered_resolvers(considered_resolvers, req_id, ip_hash, is_correct_s
 def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
     import os
 
-    full_file_path = "/home/protick/ocsp_dns_django/temp_dump_{}/1650914540/{}.json".format(ttl, exp_id)
+    full_file_path = "/home/protick/ocsp_dns_django/temp_dump_{}/1651037118/{}.json".format(ttl, exp_id)
     if not os.path.isfile(full_file_path):
         send_telegram_msg("Not found {}".format(exp_id))
 

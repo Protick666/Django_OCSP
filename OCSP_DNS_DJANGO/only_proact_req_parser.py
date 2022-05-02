@@ -453,7 +453,7 @@ def box_plot_info_v2():
     for resolver in post_data:
         for req_id in post_data[resolver]:
             for e in post_data[resolver][req_id]:
-                if e <= 3240 or ('http://' +req_id) not in live_data:
+                if e >= 3600 - 10 or e <= 3240 or ('http://' +req_id) not in live_data:
                     continue
                 diff = int(live_data['http://' +req_id]["diff"])/1000
                 delta.append(abs(diff - e))

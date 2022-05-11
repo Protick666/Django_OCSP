@@ -280,15 +280,20 @@ def preprocess_live_data(data):
 
 
 def get_ip_hit_time_tuple(req_id, apache_info_one, apache_info_two):
-    phase_1_list = apache_info_one[req_id]
-    phase_2_list = apache_info_two[req_id]
     phase_1_timestamp, phase_2_timestamp = "N/A", "N/A"
+
     try:
-        phase_1_timestamp = datetime.timestamp(phase_1_list[0]['date'])
-    except:
-        pass
-    try:
-        phase_2_timestamp = datetime.timestamp(phase_2_list[0]['date'])
+        phase_1_list = apache_info_one[req_id]
+        phase_2_list = apache_info_two[req_id]
+
+        try:
+            phase_1_timestamp = datetime.timestamp(phase_1_list[0]['date'])
+        except:
+            pass
+        try:
+            phase_2_timestamp = datetime.timestamp(phase_2_list[0]['date'])
+        except:
+            pass
     except:
         pass
 
@@ -352,115 +357,124 @@ def log_considered_resolvers(considered_resolvers, req_id, ip_hash, type_key,
 
 
 def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_threshold):
-    lists_in_hand = [apache_info_one, apache_info_two, bind_info]
+    try:
+        lists_in_hand = [apache_info_one, apache_info_two, bind_info]
 
-    for l in lists_in_hand:
-        for k in event_strings:
-            if k in l:
-                l[k].sort(key=lambda x: x['date'])
-        if 'req' in l:
-            for k in l['req']:
-                l['req'][k].sort(key=lambda x: x['date'])
+        for l in lists_in_hand:
+            for k in event_strings:
+                if k in l:
+                    l[k].sort(key=lambda x: x['date'])
+            if 'req' in l:
+                for k in l['req']:
+                    l['req'][k].sort(key=lambda x: x['date'])
 
+        bind_phase_1_start = bind_info["phase1-start"][0]['date']
+        bind_phase_1_end = bind_info["phase1-end"][0]['date']
+        bind_phase_2_start = bind_info["sleep-end"][0]['date']
+        bind_phase_2_end = bind_info["phase2-end"][0]['date']
 
-    bind_phase_1_start = bind_info["phase1-start"][0]['date']
-    bind_phase_1_end = bind_info["phase1-end"][0]['date']
-    bind_phase_2_start = bind_info["sleep-end"][0]['date']
-    bind_phase_2_end = bind_info["phase2-end"][0]['date']
+        bind_info_curated_first = curate_time_segment(bind_info, bind_phase_1_start, bind_phase_1_end)
+        bind_info_curated_second = curate_time_segment(bind_info, bind_phase_2_start, bind_phase_2_end)
 
-    bind_info_curated_first = curate_time_segment(bind_info, bind_phase_1_start, bind_phase_1_end)
-    bind_info_curated_second = curate_time_segment(bind_info, bind_phase_2_start, bind_phase_2_end)
+        apache_info_curated_first = curate_time_segment(apache_info_one, bind_phase_1_start, bind_phase_1_end)
+        apache_info_curated_second = curate_time_segment(apache_info_two, bind_phase_2_start, bind_phase_2_end)
 
-    apache_info_curated_first = curate_time_segment(apache_info_one, bind_phase_1_start, bind_phase_1_end)
-    apache_info_curated_second = curate_time_segment(apache_info_two, bind_phase_2_start, bind_phase_2_end)
+        # live_recpronew_thresh_iteration_bucket
+        # live_recpronew_43_1038_10
 
-    # live_recpronew_thresh_iteration_bucket
-    # live_recpronew_43_1038_10
+        segments = exp_id.split("_")
+        exp_iteration = int(segments[-2])
 
-    segments = exp_id.split("_")
-    exp_iteration = int(segments[-2])
+        # /home/protick/node_code/rec_duo_complex_60/43/1000/live_recpronew_43_1000_22-out.json
+        live_log = open(BASE_URL + "{}/{}/{}-out.json".format(exp_threshold, exp_iteration, exp_id))
 
-    # /home/protick/node_code/rec_duo_complex_60/43/1000/live_recpronew_43_1000_22-out.json
-    live_log = open(BASE_URL + "{}/{}/{}-out.json".format(exp_threshold, exp_iteration, exp_id))
+        live_data, req_id_to_ip_hash = preprocess_live_data(json.load(live_log))
 
-    live_data, req_id_to_ip_hash = preprocess_live_data(json.load(live_log))
+        case_1_set = set()
+        case_2_set = set()
 
-    case_1_set = set()
-    case_2_set = set()
+        # case 1 -> exitnode connects to new (potential less cache)
+        # case 2 -> exitnode connects to old (potential proactive caching)
+        # (phase_1, phase_2, js['asn'], server_time_1, server_time_2)
+        for req_id in live_data:
+            # case 2
+            if live_data[req_id][0] == 1 and live_data[req_id][1] == 1:
+                case_2_set.add(req_id)
+            # case 1
+            elif live_data[req_id][0] == 1 and live_data[req_id][1] == 2:
+                case_1_set.add(req_id)
 
-    # case 1 -> exitnode connects to new (potential less cache)
-    # case 2 -> exitnode connects to old (potential proactive caching)
-    # (phase_1, phase_2, js['asn'], server_time_1, server_time_2)
-    for req_id in live_data:
-        # case 2
-        if live_data[req_id][0] == 1 and live_data[req_id][1] == 1:
-            case_2_set.add(req_id)
-        # case 1
-        elif live_data[req_id][0] == 1 and live_data[req_id][1] == 2:
-            case_1_set.add(req_id)
-
-    msg_to_send = "case 1 set, case 2 set".format(len(case_1_set), len(case_2_set))
-    send_telegram_msg(msg_to_send)
-
-    # TODO resume from here
-    for req_id in case_1_set:
-        phase1_resolvers, phase1_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_first, req_id, [])
-        phase2_resolvers, phase2_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_second, req_id, [])
-
-        considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
-        server_time_1, server_time_2 = live_data[req_id][3], live_data[req_id][4]
-        phase_1_apache_hit_timestamp, phase_2_apache_hit_timestamp = get_ip_hit_time_tuple(req_id, apache_info_curated_first,
-                                                                                           apache_info_curated_second)
-
-        log_considered_resolvers(considered_resolvers=considered_resolvers,
-                                 req_id=req_id,
-                                 ip_hash=req_id_to_ip_hash[req_id],
-                                 type_key="reduce",
-                                 server_time_1=server_time_1,
-                                 server_time_2=server_time_2,
-                                 phase1_resolver_to_timestamp=phase1_resolver_to_timestamp,
-                                 phase2_resolver_to_timestamp=phase2_resolver_to_timestamp,
-                                 phase_1_apache_hit_timestamp=phase_1_apache_hit_timestamp,
-                                 phase_2_apache_hit_timestamp=phase_2_apache_hit_timestamp
-                                 )
-
-    for req_id in case_2_set:
-        phase1_resolvers, phase1_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_first, req_id, [])
-        phase2_resolvers, phase2_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_second, req_id, [])
-        considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
-        normal_resolvers = phase1_resolvers.difference(phase2_resolvers)
-        server_time_1, server_time_2 = live_data[req_id][3], live_data[req_id][4]
-        phase_1_apache_hit_timestamp, phase_2_apache_hit_timestamp = get_ip_hit_time_tuple(req_id, apache_info_curated_first,
-                                                                                           apache_info_curated_second)
-        msg_to_send = "Got case 2, considered resolvers, normal resolvers {} {}".format(len(considered_resolvers),
-                                                                                        len(normal_resolvers))
+        msg_to_send = "case 1 set {}, case 2 set {}".format(len(case_1_set), len(case_2_set))
         send_telegram_msg(msg_to_send)
 
-        log_considered_resolvers(considered_resolvers=considered_resolvers,
-                                 req_id=req_id,
-                                 ip_hash=req_id_to_ip_hash[req_id],
-                                 type_key="pro",
-                                 server_time_1=server_time_1,
-                                 server_time_2=server_time_2,
-                                 phase1_resolver_to_timestamp=phase1_resolver_to_timestamp,
-                                 phase2_resolver_to_timestamp=phase2_resolver_to_timestamp,
-                                 phase_1_apache_hit_timestamp=phase_1_apache_hit_timestamp,
-                                 phase_2_apache_hit_timestamp=phase_2_apache_hit_timestamp
-                                 )
+        # TODO resume from here
+        for req_id in case_1_set:
+            phase1_resolvers, phase1_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_first, req_id,
+                                                                                      [])
+            phase2_resolvers, phase2_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_second, req_id,
+                                                                                      [])
 
-        log_considered_resolvers(considered_resolvers=normal_resolvers,
-                                 req_id=req_id,
-                                 ip_hash=req_id_to_ip_hash[req_id],
-                                 type_key="normal",
-                                 server_time_1=server_time_1,
-                                 server_time_2=server_time_2,
-                                 phase1_resolver_to_timestamp=phase1_resolver_to_timestamp,
-                                 phase2_resolver_to_timestamp=phase2_resolver_to_timestamp,
-                                 phase_1_apache_hit_timestamp=phase_1_apache_hit_timestamp,
-                                 phase_2_apache_hit_timestamp=phase_2_apache_hit_timestamp
-                                 )
+            considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
+            server_time_1, server_time_2 = live_data[req_id][3], live_data[req_id][4]
+            phase_1_apache_hit_timestamp, phase_2_apache_hit_timestamp = get_ip_hit_time_tuple(req_id,
+                                                                                               apache_info_curated_first,
+                                                                                               apache_info_curated_second)
 
-    return case_1_set, case_2_set
+            log_considered_resolvers(considered_resolvers=considered_resolvers,
+                                     req_id=req_id,
+                                     ip_hash=req_id_to_ip_hash[req_id],
+                                     type_key="reduce",
+                                     server_time_1=server_time_1,
+                                     server_time_2=server_time_2,
+                                     phase1_resolver_to_timestamp=phase1_resolver_to_timestamp,
+                                     phase2_resolver_to_timestamp=phase2_resolver_to_timestamp,
+                                     phase_1_apache_hit_timestamp=phase_1_apache_hit_timestamp,
+                                     phase_2_apache_hit_timestamp=phase_2_apache_hit_timestamp
+                                     )
+
+        for req_id in case_2_set:
+            phase1_resolvers, phase1_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_first, req_id,
+                                                                                      [])
+            phase2_resolvers, phase2_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_second, req_id,
+                                                                                      [])
+            considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
+            normal_resolvers = phase1_resolvers.difference(phase2_resolvers)
+            server_time_1, server_time_2 = live_data[req_id][3], live_data[req_id][4]
+            phase_1_apache_hit_timestamp, phase_2_apache_hit_timestamp = get_ip_hit_time_tuple(req_id,
+                                                                                               apache_info_curated_first,
+                                                                                               apache_info_curated_second)
+            msg_to_send = "Got case 2, considered resolvers {}, normal resolvers {}".format(len(considered_resolvers),
+                                                                                            len(normal_resolvers))
+            send_telegram_msg(msg_to_send)
+
+            log_considered_resolvers(considered_resolvers=considered_resolvers,
+                                     req_id=req_id,
+                                     ip_hash=req_id_to_ip_hash[req_id],
+                                     type_key="pro",
+                                     server_time_1=server_time_1,
+                                     server_time_2=server_time_2,
+                                     phase1_resolver_to_timestamp=phase1_resolver_to_timestamp,
+                                     phase2_resolver_to_timestamp=phase2_resolver_to_timestamp,
+                                     phase_1_apache_hit_timestamp=phase_1_apache_hit_timestamp,
+                                     phase_2_apache_hit_timestamp=phase_2_apache_hit_timestamp
+                                     )
+
+            log_considered_resolvers(considered_resolvers=normal_resolvers,
+                                     req_id=req_id,
+                                     ip_hash=req_id_to_ip_hash[req_id],
+                                     type_key="normal",
+                                     server_time_1=server_time_1,
+                                     server_time_2=server_time_2,
+                                     phase1_resolver_to_timestamp=phase1_resolver_to_timestamp,
+                                     phase2_resolver_to_timestamp=phase2_resolver_to_timestamp,
+                                     phase_1_apache_hit_timestamp=phase_1_apache_hit_timestamp,
+                                     phase_2_apache_hit_timestamp=phase_2_apache_hit_timestamp
+                                     )
+
+        return case_1_set, case_2_set
+    except Exception as e:
+        msg = "bari re mama {}".format(e)
+        send_telegram_msg(msg)
 
 
 def get_all_asns(file_iter):

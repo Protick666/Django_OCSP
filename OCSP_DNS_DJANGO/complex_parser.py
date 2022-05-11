@@ -358,8 +358,9 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
         for k in event_strings:
             if k in l:
                 l[k].sort(key=lambda x: x['date'])
-        for k in l['req']:
-            l['req'][k].sort(key=lambda x: x['date'])
+        if 'req' in l:
+            for k in l['req']:
+                l['req'][k].sort(key=lambda x: x['date'])
 
 
     bind_phase_1_start = bind_info["phase1-start"][0]['date']
@@ -398,6 +399,9 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
         elif live_data[req_id][0] == 1 and live_data[req_id][1] == 2:
             case_1_set.add(req_id)
 
+    msg_to_send = "case 1 set, case 2 set".format(len(case_1_set), len(case_2_set))
+    send_telegram_msg(msg_to_send)
+
     # TODO resume from here
     for req_id in case_1_set:
         phase1_resolvers, phase1_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_first, req_id, [])
@@ -428,6 +432,10 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
         server_time_1, server_time_2 = live_data[req_id][3], live_data[req_id][4]
         phase_1_apache_hit_timestamp, phase_2_apache_hit_timestamp = get_ip_hit_time_tuple(req_id, apache_info_curated_first,
                                                                                            apache_info_curated_second)
+        msg_to_send = "Got case 2, considered resolvers, normal resolvers {} {}".format(len(considered_resolvers),
+                                                                                        len(normal_resolvers))
+        send_telegram_msg(msg_to_send)
+
         log_considered_resolvers(considered_resolvers=considered_resolvers,
                                  req_id=req_id,
                                  ip_hash=req_id_to_ip_hash[req_id],
@@ -524,7 +532,7 @@ def master_calc(ttl_list):
     bind_info_global, apache_info_one_global, apache_info_two_global = parse_logs_together(allowed_exp_ids=[])
     send_telegram_msg("Done with parsing bind/apache logs")
 
-    exp_to_file_list = defaultdict(lambda : list())
+    exp_to_file_list = defaultdict(lambda: list())
     for exp_threshold in exp_threshold_list:
         leaf_files_unfiltered = get_leaf_files(BASE_URL + '{}/'.format(exp_threshold))
         leaf_files_filtered = [e.split("/")[-1] for e in leaf_files_unfiltered]
@@ -554,7 +562,7 @@ def master_calc(ttl_list):
         send_telegram_msg("Done with parsing Threshold live files")
 
         from pathlib import Path
-        parent_path = 'results_proactive_complex/{}/'.format(exp_threshold)
+        parent_path = 'results_proactive_complex_v2/{}/'.format(exp_threshold)
         Path(parent_path).mkdir(parents=True, exist_ok=True)
 
         data_final = {}
@@ -608,6 +616,9 @@ def master_calc(ttl_list):
 
         with open(parent_path + "telemetry_count.json", "w") as ouf:
             json.dump(telemetry_count, fp=ouf)
+
+        with open(parent_path + "error_desc.json", "w") as ouf:
+            json.dump(pp, fp=ouf)
 
         send_telegram_msg("Done with parsing Threshold final {}".format(exp_threshold))
 

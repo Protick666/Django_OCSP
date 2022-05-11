@@ -404,8 +404,8 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
             elif live_data[req_id][0] == 1 and live_data[req_id][1] == 2:
                 case_1_set.add(req_id)
 
-        msg_to_send = "case 1 set {}, case 2 set {}".format(len(case_1_set), len(case_2_set))
-        send_telegram_msg(msg_to_send)
+        # msg_to_send = "case 1 set {}, case 2 set {}".format(len(case_1_set), len(case_2_set))
+        # send_telegram_msg(msg_to_send)
 
         # TODO resume from here
         for req_id in case_1_set:
@@ -443,9 +443,9 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
             phase_1_apache_hit_timestamp, phase_2_apache_hit_timestamp = get_ip_hit_time_tuple(req_id,
                                                                                                apache_info_curated_first,
                                                                                                apache_info_curated_second)
-            msg_to_send = "Got case 2, considered resolvers {}, normal resolvers {}".format(len(considered_resolvers),
-                                                                                            len(normal_resolvers))
-            send_telegram_msg(msg_to_send)
+            # msg_to_send = "Got case 2, considered resolvers {}, normal resolvers {}".format(len(considered_resolvers),
+            #                                                                                 len(normal_resolvers))
+            # send_telegram_msg(msg_to_send)
 
             log_considered_resolvers(considered_resolvers=considered_resolvers,
                                      req_id=req_id,

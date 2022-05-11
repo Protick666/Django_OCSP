@@ -173,7 +173,10 @@ def parse_apache_line_and_build_meta(line):
 def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
     ans_dict = defaultdict(lambda: dict())
 
+    tot_files = len(files)
+    index = 0
     for file in files:
+        index += 1
         with open(file) as FileObj:
             for line in FileObj:
                 try:
@@ -215,6 +218,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True):
                     print('parse bind apache logs ', e)
 
         send_telegram_msg("*** Done with parsing Bind file {}".format(file))
+        send_telegram_msg("Done with isbind {}, {}/{}".format(is_bind, index, tot_files))
     return ans_dict
 
 

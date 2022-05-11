@@ -358,6 +358,7 @@ def log_considered_resolvers(considered_resolvers, req_id, ip_hash, type_key,
 
 def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_threshold):
     try:
+        mama = 1
         lists_in_hand = [apache_info_one, apache_info_two, bind_info]
 
         for l in lists_in_hand:

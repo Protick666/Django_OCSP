@@ -474,8 +474,7 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
 
         return case_1_set, case_2_set
     except Exception as e:
-        msg = "bari re mama {}".format(e)
-        send_telegram_msg(msg)
+        pass
 
 
 def get_all_asns(file_iter):

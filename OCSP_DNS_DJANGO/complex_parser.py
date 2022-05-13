@@ -554,6 +554,7 @@ def master_calc(ttl_list):
     bind_info_global, apache_info_one_global, apache_info_two_global = parse_logs_together(allowed_exp_ids=[])
     send_telegram_msg("Done with parsing bind/apache logs")
 
+
     exp_to_file_list = defaultdict(lambda: list())
     for exp_threshold in exp_threshold_list:
         leaf_files_unfiltered = get_leaf_files(BASE_URL + '{}/'.format(exp_threshold))

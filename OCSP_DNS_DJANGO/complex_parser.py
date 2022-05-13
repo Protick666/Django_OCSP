@@ -378,11 +378,15 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
         bind_info_curated_second = curate_time_segment(bind_info, bind_phase_2_start, bind_phase_2_end)
 
         apache_info_curated_first = curate_time_segment(apache_info_one,
-                                                        bind_phase_1_start - timedelta(minutes=2),
-                                                        bind_phase_1_end + timedelta(minutes=2))
+                                                        bind_phase_1_start - timedelta(minutes=.5),
+                                                        bind_phase_1_end + timedelta(minutes=.5))
         apache_info_curated_second = curate_time_segment(apache_info_two,
-                                                         bind_phase_2_start - timedelta(minutes=2),
-                                                         bind_phase_2_end + timedelta(minutes=2))
+                                                         bind_phase_2_start - timedelta(minutes=.5),
+                                                         bind_phase_2_end + timedelta(minutes=.5))
+
+        apache_info_curated_second_connecting_to_one = curate_time_segment(apache_info_one,
+                                                         bind_phase_2_start - timedelta(minutes=.5),
+                                                         bind_phase_2_end + timedelta(minutes=.5))
 
         # live_recpronew_thresh_iteration_bucket
         # live_recpronew_43_1038_10
@@ -447,7 +451,7 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
             server_time_1, server_time_2 = live_data[req_id][3], live_data[req_id][4]
             phase_1_apache_hit_timestamp, phase_2_apache_hit_timestamp = get_ip_hit_time_tuple(req_id,
                                                                                                apache_info_curated_first,
-                                                                                               apache_info_curated_second)
+                                                                                               apache_info_curated_second_connecting_to_one)
             # msg_to_send = "Got case 2, considered resolvers {}, normal resolvers {}".format(len(considered_resolvers),
             #                                                                                 len(normal_resolvers))
             # send_telegram_msg(msg_to_send)
@@ -580,7 +584,7 @@ def master_calc(ttl_list):
         send_telegram_msg("Done with parsing Threshold live files")
 
         from pathlib import Path
-        parent_path = 'results_proactive_complex_v4/{}/'.format(exp_threshold)
+        parent_path = 'results_proactive_complex_v5/{}/'.format(exp_threshold)
         Path(parent_path).mkdir(parents=True, exist_ok=True)
 
         data_final = {}

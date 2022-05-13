@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 from os import listdir
 from os.path import isfile, join
-from datetime import datetime
+from datetime import datetime, timedelta
 import pyasn
 from OCSP_DNS_DJANGO.local import LOCAL
 from OCSP_DNS_DJANGO.tools import AS2ISP
@@ -377,8 +377,12 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
         bind_info_curated_first = curate_time_segment(bind_info, bind_phase_1_start, bind_phase_1_end)
         bind_info_curated_second = curate_time_segment(bind_info, bind_phase_2_start, bind_phase_2_end)
 
-        apache_info_curated_first = curate_time_segment(apache_info_one, bind_phase_1_start, bind_phase_1_end)
-        apache_info_curated_second = curate_time_segment(apache_info_two, bind_phase_2_start, bind_phase_2_end)
+        apache_info_curated_first = curate_time_segment(apache_info_one,
+                                                        bind_phase_1_start - timedelta(minutes=2),
+                                                        bind_phase_1_end + timedelta(minutes=2))
+        apache_info_curated_second = curate_time_segment(apache_info_two,
+                                                         bind_phase_2_start - timedelta(minutes=2),
+                                                         bind_phase_2_end + timedelta(minutes=2))
 
         # live_recpronew_thresh_iteration_bucket
         # live_recpronew_43_1038_10
@@ -576,7 +580,7 @@ def master_calc(ttl_list):
         send_telegram_msg("Done with parsing Threshold live files")
 
         from pathlib import Path
-        parent_path = 'results_proactive_complex_v2/{}/'.format(exp_threshold)
+        parent_path = 'results_proactive_complex_v4/{}/'.format(exp_threshold)
         Path(parent_path).mkdir(parents=True, exist_ok=True)
 
         data_final = {}

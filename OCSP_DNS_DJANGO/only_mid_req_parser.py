@@ -217,7 +217,7 @@ def file_allowed(file_name):
         # end_time =  1650435454
         # 1651641612206 1651981545491
         comp_time = 1651555212
-        end_time = 1651928401
+        end_time = 1651669201
         time_Seg = int(file_name.split(".")[-1][:10])
         return end_time >= time_Seg >= comp_time
     except:

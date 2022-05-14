@@ -242,12 +242,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
     index = 0
     for file in files:
         index += 1
-        file_name = file.split("/")[-1]
-        #
-        # if not file_allowed(file_name):
-        #     # send_telegram_msg("*** Skipping Bind file {}".format(file))
-        #     continue
-
+        print("doing file {}".format(file))
         with open(file) as FileObj:
             for line in FileObj:
                 try:
@@ -255,8 +250,11 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
                         continue
                     is_exp_id_present, exp_id, asn = does_exp_id_match(line, [])
 
+
                     if not is_exp_id_present:
+                        print("goint empty {}".format(line))
                         continue
+                    print("goint mama {}".format(line))
 
                     ttl_here = "60"
 
@@ -276,7 +274,9 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
                         pass
                     else:
                         identifier = str(url.split(".")[0])
-                        req_id_to_meta[identifier] = (meta["client_ip"], datetime.timestamp(meta["date"]), asn)
+                        if identifier not in req_id_to_meta:
+                            print("putting")
+                            req_id_to_meta[identifier] = (meta["client_ip"], datetime.timestamp(meta["date"]), asn)
                 except Exception as e:
                     print('parse bind apache logs ', e)
         send_telegram_msg("*** Done with parsing Bind file {},  {}/{}".format(file, index, tot_files))

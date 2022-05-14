@@ -163,8 +163,9 @@ def does_exp_id_match(line, exp_id_list):
             if str in line:
                 st_index = line.find(str)
                 sub = line[st_index + 1:]
+                temp = sub
                 sub = sub.split(".")[0]
-                asn = sub.split(".")[1]
+                asn = temp.split(".")[1]
                 return True, sub, asn
         return False, None, None
     except Exception:

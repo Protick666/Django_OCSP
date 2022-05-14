@@ -132,7 +132,7 @@ global_asn_set = set()
 if LOCAL:
     BASE_URL = '/Users/protick.bhowmick/PriyoRepos/OCSP_DNS_DJANGO/logs_final/'
 else:
-    BASE_URL = '/home/protick/ocsp_dns_django/ttldict/logs_final_v2/'
+    BASE_URL = '/net/data/dns-ttl/prev_log/logs_final_v2'
 
 
 # OUTER
@@ -154,6 +154,7 @@ def calc_correlation_matrix(phase1_resolvers, phase2_resolvers):
 def find_ttl(str):
     segments = str.split("_")
     return int(segments[-1])
+
 
 def does_exp_id_match(line, exp_id_list):
     try:
@@ -212,8 +213,11 @@ mid_req_master_dict = {}
 
 def file_allowed(file_name):
     try:
-        comp_time = 1650149254
-        end_time =  1650435454
+        # comp_time = 1650149254
+        # end_time =  1650435454
+        # 1651641612206 1651981545491
+        comp_time = 1651555212
+        end_time = 1652067945
         time_Seg = int(file_name.split(".")[-1][:10])
         return end_time >= time_Seg >= comp_time
     except:
@@ -223,10 +227,12 @@ def file_allowed(file_name):
 
 def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
     if is_bind:
-        dump_directory = "preprocessed_middle_req_log/bind/"
+        dump_directory = "preprocessed_middle_req_log_second_phase/bind/"
     else:
-        dump_directory = "preprocessed_middle_req_log/apache_{}/".format(phase)
+        dump_directory = "preprocessed_middle_req_log_second_phase/apache_{}/".format(phase)
     Path(dump_directory).mkdir(parents=True, exist_ok=True)
+
+    mid_req_master_dict["60"] = defaultdict(lambda: defaultdict(lambda: list()))
 
     tot_files = len(files)
     index = 0
@@ -248,9 +254,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
                     if not is_exp_id_present:
                         continue
 
-                    ttl_here = find_ttl(exp_id)
-                    if ttl_here not in mid_req_master_dict:
-                        mid_req_master_dict[ttl_here] = defaultdict(lambda: defaultdict(lambda: list()))
+                    ttl_here = "60"
 
                     if is_bind:
                         if line.startswith("client"):

@@ -132,7 +132,7 @@ global_asn_set = set()
 if LOCAL:
     BASE_URL = '/Users/protick.bhowmick/PriyoRepos/OCSP_DNS_DJANGO/logs_final/'
 else:
-    BASE_URL = '/net/data/dns-ttl/prev_log/logs_final_v2'
+    BASE_URL = '/net/data/dns-ttl/prev_log/logs_final_v2/'
 
 
 # OUTER

@@ -243,7 +243,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
     index = 0
     for file in files:
         index += 1
-        print("doing file {}".format(file))
+        #print("doing file {}".format(file))
         with open(file) as FileObj:
             for line in FileObj:
                 try:
@@ -253,9 +253,9 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
 
 
                     if not is_exp_id_present:
-                        print("goint empty {}".format(line))
+                        #print("goint empty {}".format(line))
                         continue
-                    print("goint mama {}".format(line))
+                    #print("goint mama {}".format(line))
 
                     ttl_here = "60"
 
@@ -276,7 +276,7 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
                     else:
                         identifier = str(url.split(".")[0])
                         if identifier not in req_id_to_meta:
-                            print("putting")
+                            #print("putting")
                             req_id_to_meta[identifier] = (meta["client_ip"], datetime.timestamp(meta["date"]), asn)
                 except Exception as e:
                     print('parse bind apache logs ', e)

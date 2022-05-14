@@ -217,7 +217,7 @@ def file_allowed(file_name):
         # end_time =  1650435454
         # 1651641612206 1651981545491
         comp_time = 1651555212
-        end_time = 1652067945
+        end_time = 1651928401
         time_Seg = int(file_name.split(".")[-1][:10])
         return end_time >= time_Seg >= comp_time
     except:
@@ -282,8 +282,6 @@ def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
         json.dump(mid_req_master_dict, fp=ouf)
 
     send_telegram_msg("*** Done with parsing Everything {}")
-
-
 
 
 def get_ip_list_from_encoded_set(str):

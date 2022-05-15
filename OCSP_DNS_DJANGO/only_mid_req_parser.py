@@ -519,25 +519,51 @@ def filter_data(data):
 
 def filter_out_multiple_resolvers():
     allowed_ttls = ["60"]
-    f = open("/home/protick/ocsp_dns_django/preprocessed_middle_req_log_second_phase/bind/middle_req.json")
+    f = open("/net/data/dns-ttl/node_code_dump/preprocessed_middle_req_log/bind/middle_req.json")
     d = json.load(f)
-    send_telegram_msg("loaded !!")
+
+    f = open("/home/protick/ocsp_dns_django/apache_master/apache_1/apache_all.json")
+    req_id_to_meta = json.load(f)
+
+    tot_resolvers = 0
+    final_dict = {}
 
     for ttl in d:
         if not str(ttl) in allowed_ttls:
             continue
         data = d[ttl]
         # data[ip]][identifier].append(timestamp)
+
         for resolver in list(data.keys()):
+
+            if resolver not in final_dict:
+                final_dict[resolver] = {"t": 0, "recur": 0}
+
+            global_ips = set()
+            all_req_ids = list(data[resolver].keys())
+            req_id_to_ip = {}
+            final_dict[resolver]['t'] = len(all_req_ids)
+            for req_id in all_req_ids:
+                if req_id in req_id_to_meta:
+                    global_ips.add(req_id_to_meta[req_id][0])
+                    req_id_to_ip[req_id] = req_id_to_meta[req_id][0]
+
             nested_data = filter_data(data[resolver])
             if nested_data is None:
+                final_dict[resolver]['recur'] = 0
                 data.pop(resolver, None)
             else:
                 data[resolver] = nested_data
-        a = 1
+                recurring_req_ids = list(nested_data.keys())
+                recurring_ips = set()
+                for req_id in recurring_req_ids:
+                    if req_id in req_id_to_ip:
+                        recurring_ips.add(req_id_to_ip[req_id])
 
-        with open("{}_second.json".format("middle_req_post_{}".format(ttl)), "w") as ouf:
-            json.dump(data, fp=ouf)
+                final_dict[resolver]['recur'] = len(recurring_ips)
+
+        with open("recur_summary.json", "w") as ouf:
+            json.dump(final_dict, fp=ouf)
     send_telegram_msg("Done")
 
 

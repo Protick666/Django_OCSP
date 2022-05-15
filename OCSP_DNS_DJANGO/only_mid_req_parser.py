@@ -519,7 +519,7 @@ def filter_data(data):
 
 def filter_out_multiple_resolvers():
     allowed_ttls = ["60"]
-    f = open("/home/protick/ocsp_dns_django/preprocessed_middle_req_log_second_phase/bindmiddle_req.json")
+    f = open("/home/protick/ocsp_dns_django/preprocessed_middle_req_log_second_phase/bind/middle_req.json")
     d = json.load(f)
     send_telegram_msg("loaded !!")
 

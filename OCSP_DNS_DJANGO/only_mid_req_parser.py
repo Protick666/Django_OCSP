@@ -519,8 +519,7 @@ def filter_data(data):
 
 def filter_out_multiple_resolvers():
     allowed_ttls = ["60"]
-    source_directory = "preprocessed_middle_req_log/bind/"
-    f = open("{}{}".format(source_directory, "middle_req.json"))
+    f = open("/home/protick/ocsp_dns_django/preprocessed_middle_req_log_second_phase/bindmiddle_req.json")
     d = json.load(f)
     send_telegram_msg("loaded !!")
 
@@ -537,7 +536,7 @@ def filter_out_multiple_resolvers():
                 data[resolver] = nested_data
         a = 1
 
-        with open(source_directory + "{}.json".format("middle_req_post_{}".format(ttl)), "w") as ouf:
+        with open("{}_second.json".format("middle_req_post_{}".format(ttl)), "w") as ouf:
             json.dump(data, fp=ouf)
     send_telegram_msg("Done")
 

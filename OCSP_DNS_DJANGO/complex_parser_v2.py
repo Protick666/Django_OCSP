@@ -8,6 +8,12 @@ from OCSP_DNS_DJANGO.local import LOCAL
 from OCSP_DNS_DJANGO.tools import AS2ISP
 import os
 
+lum_resolver_dict = {}
+f = open("/home/protick/ocsp_dns_tools/stat/graph_data_pre_v_27/lum_ips.json")
+d = json.load(f)
+for resolver in d:
+    lum_resolver_dict[resolver] = 1
+
 exp_threshold_list = [43, 49, 55, 58]
 instance_id = int(os.environ['instance_id'])
 exp_threshold_for_this_server = exp_threshold_list[instance_id - 1]
@@ -300,6 +306,13 @@ def get_ip_hit_time_tuple(req_id, apache_info_one, apache_info_two):
     return phase_1_timestamp, phase_2_timestamp
 
 
+def curate_lum_resolvers(resolvers):
+    temp_ = set()
+    for resolver in resolvers:
+        if resolver not in lum_resolver_dict:
+            temp_.add(resolver)
+    return temp_
+
 def get_non_lum_resolver_ips(bind_info, req_id, lum_resolvers):
     lst = bind_info[req_id]  # ['resolver_ip']
     resolvers = set()
@@ -322,20 +335,48 @@ def get_non_lum_resolver_ips(bind_info, req_id, lum_resolvers):
             resolver_to_timestamp[ip] = timestamp
         if ip not in lum_resolvers:
             resolvers.add(ip)
+
+    resolvers = curate_lum_resolvers(resolvers)
     return resolvers, resolver_to_timestamp
 
 
+def get_allowed_files(file_list, N):
+
+    temp_list = []
+    for file in file_list:
+        file_name = file.split("/")[-1]
+
+        temp_list.append((int(file_name.split(".")[-1][:10]), file))
+
+    temp_list.sort(key=lambda x: x[0])
+    temp_list = temp_list[: N]
+
+    ans = []
+    for element in temp_list:
+        ans.append(element[1])
+    return ans
+
+
 def parse_logs_together(allowed_exp_ids):
+    # bind 568
+    # apache 1 -> 63
+    # apache 2 -> 64
+
     bind_dir = BASE_URL_BIND_APACHE + 'bind/'
     bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
+    bind_files = get_allowed_files(bind_files, 568)
 
     apache_logs_phase_1_dir = BASE_URL_BIND_APACHE + 'apache1/'
     apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
                            isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
+    apache_logs_phase_1 = get_allowed_files(apache_logs_phase_1, 63)
+
     apache_logs_phase_2_dir = BASE_URL_BIND_APACHE + 'apache2/'
     apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
+
+    apache_logs_phase_2 = get_allowed_files(apache_logs_phase_2, 64)
 
     bind_info_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=bind_files, is_bind=True)
     apache_info_one_global = parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_1, is_bind=False)
@@ -433,6 +474,9 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
             phase2_resolvers, phase2_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_second, req_id,
                                                                                       [])
 
+            if len(phase1_resolvers) > 2 or len(phase2_resolvers) > 2:
+                continue
+
             considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
             server_time_1, server_time_2 = live_data[req_id][3], live_data[req_id][4]
             phase_1_apache_hit_timestamp, phase_2_apache_hit_timestamp = get_ip_hit_time_tuple(req_id,
@@ -456,6 +500,10 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, exp_thre
                                                                                       [])
             phase2_resolvers, phase2_resolver_to_timestamp = get_non_lum_resolver_ips(bind_info_curated_second, req_id,
                                                                                       [])
+
+            if len(phase1_resolvers) > 2 or len(phase2_resolvers) > 2:
+                continue
+
             considered_resolvers = phase1_resolvers.intersection(phase2_resolvers)
             normal_resolvers = phase1_resolvers.difference(phase2_resolvers)
             server_time_1, server_time_2 = live_data[req_id][3], live_data[req_id][4]
@@ -557,6 +605,9 @@ def is_allowed(element, lst):
             return True
     return False
 
+# bind 568
+# apache 1 -> 63
+# apache 2 -> 64
 
 def master_calc(ttl_list):
 
@@ -595,7 +646,7 @@ def master_calc(ttl_list):
         send_telegram_msg("Done with parsing Threshold live files")
 
         from pathlib import Path
-        parent_path = 'results_proactive_complex_v6/{}/'.format(exp_threshold)
+        parent_path = 'results_proactive_complex_v8/{}/'.format(exp_threshold)
         Path(parent_path).mkdir(parents=True, exist_ok=True)
 
         data_final = {}
@@ -630,7 +681,6 @@ def master_calc(ttl_list):
             resolver_to_asn_own[resolver] = get_asn(resolver)
             for ip in resolver_to_ips[resolver]:
                 resolver_to_asns[resolver].append((ip, ip_to_asn_dict[ip]))
-
 
         resolver_asn_bonanza = {
             "resolver_to_asns": resolver_to_asns,

@@ -132,7 +132,7 @@ global_asn_set = set()
 if LOCAL:
     BASE_URL = '/Users/protick.bhowmick/PriyoRepos/OCSP_DNS_DJANGO/logs_final/'
 else:
-    BASE_URL = '/home/protick/ocsp_dns_django/ttldict/logs_final_v2/'
+    BASE_URL = '/net/data/dns-ttl/new_run/'
 
 
 # OUTER
@@ -207,13 +207,16 @@ def parse_apache_line_and_build_meta(line):
 def parse_bind_apache_logs(exp_id_list, files, is_bind=True, phase=None):
 
     for file in files:
-
         if is_bind:
             dump_directory = "preprocessed_ttl_log/bind/"
         else:
             dump_directory = "preprocessed_ttl_log/apache_{}/".format(phase)
 
         file_name = file.split("/")[-1]
+
+        if not file_allowed(file_name):
+            continue
+
         full_file_name = dump_directory + "{}.json".format(file_name)
 
         if os.path.isfile(full_file_name):
@@ -330,10 +333,10 @@ def get_set_exp_id_temp_file(exp_id, dir_extension, get=True, data={}, allowed_t
 
 def file_allowed(file_name):
     try:
-        comp_time = 1650909407
-        end_time = 1651035407
+        comp_time = 1655352765
+        end_time = 1655545407
         # query.log.1649733454937.json
-        time_Seg = int(file_name.split(".")[-2][:10])
+        time_Seg = int(file_name.split(".")[-1][:10])
         return end_time >= time_Seg >= comp_time
     except:
         return False
@@ -358,9 +361,9 @@ def post_process_bind_logs_v2(allowed_ttl):
         file_index += 1
 
         file_name = file.split("/")[-1]
-        if not file_allowed(file_name):
-            # send_telegram_msg("*** Skipping Bind file {}".format(file))
-            continue
+        # if not file_allowed(file_name):
+        #     # send_telegram_msg("*** Skipping Bind file {}".format(file))
+        #     continue
 
         try:
             f = open(file)
@@ -444,6 +447,7 @@ def curate_time_segment(info, d1, d2):
         ans[req_id] = segment(lst, d1, d2)
     return ans
 
+
 def save_telemetry(data):
     try:
         keys = ["phase_1_nxdomain", "phase_2_server2", "phase_2_nxdomain", "phase_1_server1"]
@@ -497,20 +501,10 @@ def get_non_lum_resolver_ips(bind_info, req_id, lum_resolvers):
 
 
 def parse_logs_together(allowed_exp_ids=None):
-    bind_dir = BASE_URL + 'bind/bind/'
+    bind_dir = BASE_URL + 'bind/'
     bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
 
-    apache_logs_phase_1_dir = BASE_URL + 'apache_1/apache2/'
-    apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
-                           isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
-
-    apache_logs_phase_2_dir = BASE_URL + 'apache_2/apache2/'
-    apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
-                           isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
-
     parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=bind_files, is_bind=True)
-    parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_1, is_bind=False, phase=1)
-    parse_bind_apache_logs(exp_id_list=allowed_exp_ids, files=apache_logs_phase_2, is_bind=False, phase=2)
 
 
 def is_allowed(element, lst):

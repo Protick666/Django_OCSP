@@ -381,11 +381,11 @@ def parse_logs_together(allowed_exp_ids):
     # bind_dir = BASE_URL + 'bind/bind/'
     # bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
 
-    apache_logs_phase_1_dir = "/net/data/dns-ttl/new_run/apache1"
+    apache_logs_phase_1_dir = "/net/data/dns-ttl/new_run/apache1/"
     apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
                            isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
-    apache_logs_phase_2_dir = "/net/data/dns-ttl/new_run/apache2"
+    apache_logs_phase_2_dir = "/net/data/dns-ttl/new_run/apache2/"
     apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 

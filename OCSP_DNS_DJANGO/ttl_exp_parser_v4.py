@@ -15,7 +15,6 @@ resolver_to_last_req = defaultdict(lambda: dict())
 
 # banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
 
-
 as2isp = AS2ISP()
 
 
@@ -382,11 +381,11 @@ def parse_logs_together(allowed_exp_ids):
     # bind_dir = BASE_URL + 'bind/bind/'
     # bind_files = [bind_dir + f for f in listdir(bind_dir) if isfile(join(bind_dir, f)) and '.gz' not in f]
 
-    apache_logs_phase_1_dir = BASE_URL + 'apache_1/apache2/'
+    apache_logs_phase_1_dir = "/net/data/dns-ttl/new_run/apache1"
     apache_logs_phase_1 = [apache_logs_phase_1_dir + f for f in listdir(apache_logs_phase_1_dir) if
                            isfile(join(apache_logs_phase_1_dir, f)) and '.gz' not in f and 'access.log' in f]
 
-    apache_logs_phase_2_dir = BASE_URL + 'apache_2/apache2/'
+    apache_logs_phase_2_dir = "/net/data/dns-ttl/new_run/apache2"
     apache_logs_phase_2 = [apache_logs_phase_2_dir + f for f in listdir(apache_logs_phase_2_dir) if
                            isfile(join(apache_logs_phase_2_dir, f)) and '.gz' not in f and 'access.log' in f]
 
@@ -417,7 +416,7 @@ def log_considered_resolvers(considered_resolvers, req_id, ip_hash, is_correct_s
 def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
     import os
 
-    full_file_path = "/home/protick/ocsp_dns_django/temp_dump_{}/1651037118/{}.json".format(ttl, exp_id)
+    full_file_path = "/home/protick/ocsp_dns_django/temp_dump_{}/1655689166/{}.json".format(ttl, exp_id)
     if not os.path.isfile(full_file_path):
         send_telegram_msg("Not found {}".format(exp_id))
 
@@ -500,8 +499,7 @@ def parse_logs_ttl(exp_id, bind_info, apache_info_one, apache_info_two, ttl):
     segments = exp_id.split("_")
     exp_iteration = int(segments[-2])
 
-    live_file_seg = get_live_file_name(ttl)
-    live_log = open(BASE_URL + "live/{}/{}/{}-out.json".format(live_file_seg, exp_iteration, exp_id))
+    live_log = open("/home/protick/node_code/results_new_1/{}/{}-out.json".format(exp_iteration, exp_id))
 
     # live_data: req_id -> (phase_1_webserver, phase_2_webserver, asn)
     # req_id_to_ip_hash: req_id -> ip_hash'
@@ -682,9 +680,8 @@ def is_allowed(element, lst):
 
 
 def master_calc(ttl_list):
-    live_jsons_dir = BASE_URL + 'live/results'
 
-    leaf_files_unfiltered = get_leaf_files(BASE_URL + 'live/')
+    leaf_files_unfiltered = get_leaf_files("/home/protick/node_code/results_new_1")
     leaf_files_filtered = [e.split("/")[-1] for e in leaf_files_unfiltered]
     leaf_files_filtered = [e for e in leaf_files_filtered if ".json" in e]
 
@@ -723,19 +720,19 @@ def master_calc(ttl_list):
 
     # banned live_zeus_5_404 -> live_zeus_5_525 # live_zeus_5_499 porjonto allowed
     banned_list = []
-    # live_zeus_5_403_1-out.json
-    for i in range(490, 526):
-        for j in range(1, 7):
-            banned_list.append("live_zeus_5_{}_{}".format(i, j))
+    # # live_zeus_5_403_1-out.json
+    # for i in range(490, 526):
+    #     for j in range(1, 7):
+    #         banned_list.append("live_zeus_5_{}_{}".format(i, j))
 
-    ini = 0
-    for i in [2000, 2500, 3000, 3500]:
-        for k in range(7, 10):
-            e = i + k
-            for j in range(1 + (ini * 16), 17 + (ini * 16)):
-                # live_zeus_15_4035_9
-                banned_list.append("live_zeus_15_{}_{}".format(e, j))
-        ini += 1
+    # ini = 0
+    # for i in [2000, 2500, 3000, 3500]:
+    #     for k in range(7, 10):
+    #         e = i + k
+    #         for j in range(1 + (ini * 16), 17 + (ini * 16)):
+    #             # live_zeus_15_4035_9
+    #             banned_list.append("live_zeus_15_{}_{}".format(e, j))
+    #     ini += 1
 
     for ttl in ttl_to_exp_id_list:
         initiate_per_ttl_global_sets()
@@ -762,7 +759,7 @@ def master_calc(ttl_list):
         send_telegram_msg("Done with parsing TTL init {}".format(ttl))
 
         from pathlib import Path
-        parent_path = 'ttl_result_v2/{}/'.format(ttl)
+        parent_path = 'ttl_result_new/{}/'.format(ttl)
         Path(parent_path).mkdir(parents=True, exist_ok=True)
         # print("Total resolvers {}".format(len(list(final_dict.keys()))))
         # print("Total exit-nodes covered {}".format(len(list(req_id_to_resolvers.keys()))))

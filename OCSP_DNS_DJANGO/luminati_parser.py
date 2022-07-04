@@ -272,7 +272,9 @@ def get_compact_info():
 
     is_host_visited = {}
 
+    index = 0
     for responder in all_responders:
+
         try:
             host = get_ocsp_host(responder.url)
             if host in is_host_visited:
@@ -280,6 +282,9 @@ def get_compact_info():
             is_host_visited[host] = 1
             relevant_data = luminati_model_manager.one_cert_info(responder=responder)
             mother_dict[responder.url] = relevant_data
+            index += 1
+            if index == 10:
+                break
 
         except Exception as e:
             print("Exception when processing {}, {}".format(responder.url, e))

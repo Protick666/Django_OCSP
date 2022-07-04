@@ -117,12 +117,14 @@ class LuminatiModelManager:
         local_lst = []
         ocsp_responses = OcspResponsesWrtAsn.objects.filter(ocsp_url=responder,
                                                             ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
-                                                            ).order_by('-id')[:5]
+                                                            )
 
         index = 0
         for response in ocsp_responses:
             print(index)
             index += 1
+            if index == 6:
+                break
             nested_dict = {}
             nested_dict["serial"] = response.serial
             nested_dict["akid"] = response.akid

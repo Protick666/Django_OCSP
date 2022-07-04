@@ -4,6 +4,7 @@ from collections import defaultdict
 
 import django
 
+from OCSP_DNS_DJANGO.management.commands.scheduler import get_ocsp_host
 from OCSP_DNS_DJANGO.models import *
 
 django.setup()
@@ -116,7 +117,7 @@ class LuminatiModelManager:
         local_lst = []
         ocsp_responses = OcspResponsesWrtAsn.objects.filter(ocsp_url=responder,
                                                             ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
-                                                            ).order_by('-id')[:10]
+                                                            ).order_by('-id')[:5]
 
         for response in ocsp_responses:
             nested_dict = {}
@@ -268,8 +269,15 @@ def get_compact_info():
     # responders_count_stat = luminati_model_manager.get_responder_count_stat()
     all_responders = LuminatiModelManager.get_responders()
     mother_dict = {}
+
+    is_host_visited = {}
+
     for responder in all_responders:
         try:
+            host = get_ocsp_host(responder.url)
+            if host in is_host_visited:
+                continue
+            is_host_visited[host] = 1
             relevant_data = luminati_model_manager.one_cert_info(responder=responder)
             mother_dict[responder.url] = relevant_data
 

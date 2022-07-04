@@ -10,6 +10,7 @@ django.setup()
 
 logger = logging.getLogger(__name__)
 
+
 class LuminatiModelManager:
     def __init__(self):
         self.response_enum = ["OCSPResponseStatus.SUCCESSFUL",
@@ -110,6 +111,24 @@ class LuminatiModelManager:
                 asn_to_error[response.hop]['count'] = asn_to_error[response.hop]['count'] + 1
 
         return asn_to_error
+
+    def one_cert_info(self, responder):
+        local_lst = []
+        ocsp_responses = OcspResponsesWrtAsn.objects.filter(ocsp_url=responder,
+                                                            ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
+                                                            ).order_by('-id')[:10]
+
+        for response in ocsp_responses:
+            nested_dict = {}
+            nested_dict["serial"] = response.serial
+            nested_dict["akid"] = response.akid
+            nested_dict["fingerprint"] = response.fingerprint
+            local_lst.append(nested_dict)
+
+        return local_lst
+
+
+
 
 
 def get_url_file_name(url):
@@ -242,6 +261,23 @@ def get_latency_dist():
     print("High variance")
     for e in list(m_dict.items())[-5: ]:
         print(e[0], e[1])
+
+
+def get_compact_info():
+    luminati_model_manager = LuminatiModelManager()
+    # responders_count_stat = luminati_model_manager.get_responder_count_stat()
+    all_responders = LuminatiModelManager.get_responders()
+    mother_dict = {}
+    for responder in all_responders:
+        try:
+            relevant_data = luminati_model_manager.one_cert_info(responder=responder)
+            mother_dict[responder.url] = relevant_data
+
+        except Exception as e:
+            print("Exception when processing {}, {}".format(responder.url, e))
+
+    with open("compact_info.json", "w") as ouf:
+        json.dump(mother_dict, fp=ouf)
 
 
 

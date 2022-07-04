@@ -119,7 +119,10 @@ class LuminatiModelManager:
                                                             ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
                                                             ).order_by('-id')[:5]
 
+        index = 0
         for response in ocsp_responses:
+            print(index)
+            index += 1
             nested_dict = {}
             nested_dict["serial"] = response.serial
             nested_dict["akid"] = response.akid
@@ -280,6 +283,7 @@ def get_compact_info():
             if host in is_host_visited:
                 continue
             is_host_visited[host] = 1
+            print(responder.url)
             relevant_data = luminati_model_manager.one_cert_info(responder=responder)
             mother_dict[responder.url] = relevant_data
             index += 1

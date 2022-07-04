@@ -280,9 +280,9 @@ def get_compact_info():
 
         try:
             host = get_ocsp_host(responder.url)
-            if host in is_host_visited:
-                continue
-            is_host_visited[host] = 1
+            # if host in is_host_visited:
+            #     continue
+            # is_host_visited[host] = 1
             print(responder.url)
             relevant_data = luminati_model_manager.one_cert_info(responder=responder)
             mother_dict[responder.url] = relevant_data

@@ -27,11 +27,13 @@ if LOCAL:
 else:
     redis_host = REMOTE_REDIS_HOST
 
+# synced_data = {}
+
 r = redis.Redis(host=redis_host, port=6379, db=0,
                 password="certificatesarealwaysmisissued")
 
 
-def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, data, dns_server, is_nonce):
+def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_server, is_nonce):
     import requests
     import time
 
@@ -39,12 +41,14 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, data, dns_serve
     dns_response_time = []
     iterations = 100
     # TODO
-    target_iter = 1
+    target_iter = 50
 
-    element = data[1]
+
+    # synced_data[ocsp_url] = element
+
     serial_number, akid, fingerprint = element["serial"], element["akid"], element["fingerprint"]
     akk = r.get("ocsp:akid:" + akid)
-    print(akid)
+
     ca_cert = fix_cert_indentation(akk.decode())
 
     ca_cert = pem.readPemFromString(ca_cert)
@@ -114,26 +118,28 @@ def http_vs_dns():
     d = ['http://ocsp.trust-provider.cn', 'http://ocsp.netsolssl.com', 'http://ocsp.quovadisglobal.com',
          'http://oneocsp.microsoft.com/ocsp', 'http://status.rapidssl.com']
 
-    f = open("compact_info.json")
-    dd = json.load(f)
+    f = open("ocsp_dns_http/sync_elements.json")
+    element_dict = json.load(f)
 
-    ocsp_urls_lst = list(dd.keys())
-    ocsp_urls_lst = [e for e in ocsp_urls_lst if e in d]
+    # ocsp_urls_lst = list(dd.keys())
+    # ocsp_urls_lst = [e for e in ocsp_urls_lst if e in d]
 
     # TODO change it
     dns_servers = ["1.1.1.1", "8.8.8.8", "198.82.247.98"]
 
     url_index = 0
-    for ocsp_url in ocsp_urls_lst:
+    for ocsp_url in d:
         for dns_server in dns_servers:
             for is_nonce in [True, False]:
                 url_index += 1
                 process_ocsp_urls_sync(ocsp_url=ocsp_url,
                                        chosen_hop_list=None, url_index=url_index,
-                                       data=dd[ocsp_url],
+                                       element=element_dict[ocsp_url],
                                        dns_server=dns_server, is_nonce=is_nonce)
 
     parent_path = 'ocsp_dns_http/'
     Path(parent_path).mkdir(parents=True, exist_ok=True)
     with open(parent_path + "allover.json", "w") as ouf:
         json.dump(mother_dict, fp=ouf)
+    # with open(parent_path + "sync_elements.json", "w") as ouf:
+    #     json.dump(synced_data, fp=ouf)

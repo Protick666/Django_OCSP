@@ -41,7 +41,7 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
     dns_response_time = []
     iterations = 100
     # TODO
-    target_iter = 50
+    target_iter = 1
 
 
     # synced_data[ocsp_url] = element

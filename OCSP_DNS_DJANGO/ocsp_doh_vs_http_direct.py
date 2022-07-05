@@ -118,7 +118,7 @@ def http_vs_dns():
     d = ['http://ocsp.trust-provider.cn', 'http://ocsp.netsolssl.com', 'http://ocsp.quovadisglobal.com',
          'http://oneocsp.microsoft.com/ocsp', 'http://status.rapidssl.com']
 
-    f = open("ocsp_dns_http/sync_elements.json")
+    f = open("sync_elements.json")
     element_dict = json.load(f)
 
     # ocsp_urls_lst = list(dd.keys())

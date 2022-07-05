@@ -48,7 +48,7 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
 
     serial_number, akid, fingerprint = element["serial"], element["akid"], element["fingerprint"]
     akk = r.get("ocsp:akid:" + akid)
-
+    print(akid)
     ca_cert = fix_cert_indentation(akk.decode())
 
     ca_cert = pem.readPemFromString(ca_cert)

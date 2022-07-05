@@ -39,11 +39,14 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, data, dns_serve
     dns_response_time = []
     iterations = 100
     # TODO
-    target_iter = 30
+    target_iter = 1
 
     element = data[1]
     serial_number, akid, fingerprint = element["serial"], element["akid"], element["fingerprint"]
-    ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
+    akk = r.get("ocsp:akid:" + akid)
+    print(akid)
+    ca_cert = fix_cert_indentation(akk.decode())
+
     ca_cert = pem.readPemFromString(ca_cert)
     issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
     ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)
@@ -70,8 +73,6 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, data, dns_serve
             index += 1
         except Exception as e:
             a = 1
-
-
 
     index = 1
     import random

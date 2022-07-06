@@ -37,18 +37,20 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
     import requests
     import time
 
+
+
     ocsp_response_time = []
     dns_response_time = []
     iterations = 100
     # TODO
-    target_iter = 50
+    target_iter = 1
 
 
     # synced_data[ocsp_url] = element
 
     serial_number, akid, fingerprint = element["serial"], element["akid"], element["fingerprint"]
     akk = r.get("ocsp:akid:" + akid)
-    print(akid)
+    # print(akid)
     ca_cert = fix_cert_indentation(akk.decode())
 
     ca_cert = pem.readPemFromString(ca_cert)
@@ -78,26 +80,49 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
         except Exception as e:
             a = 1
 
-    index = 1
-    import random
-    specifier = random.randint(1, 10000)
-    dns_query = "{}.ttlexp.exp.net-measurement.net".format(specifier)
-    for i in range(iterations):
-        try:
-            my_resolver = dns.resolver.Resolver()
-            # 8.8.8.8 is Google's public DNS server
-            my_resolver.nameservers = [dns_server]
-            t_start = time.perf_counter()
-            answer = my_resolver.resolve(dns_query, rdtype=dns.rdatatype.TXT)
-            t_total = answer.response.time
-            ttl = answer.response.answer[0].ttl
-            dns_response_time.append(t_total)
+    if dns_server != "doh":
+        index = 1
+        import random
+        specifier = random.randint(1, 10000)
+        dns_query = "{}.ttlexp.exp.net-measurement.net".format(specifier)
+        for i in range(iterations):
+            try:
+                my_resolver = dns.resolver.Resolver()
+                # 8.8.8.8 is Google's public DNS server
+                my_resolver.nameservers = [dns_server]
+                t_start = time.perf_counter()
+                answer = my_resolver.resolve(dns_query, rdtype=dns.rdatatype.TXT)
+                t_total = answer.response.time
+                ttl = answer.response.answer[0].ttl
+                dns_response_time.append((t_total, ttl))
 
-            if index == target_iter:
-                break
-            index += 1
-        except Exception as e:
-            a = 1
+                if index == target_iter:
+                    break
+                index += 1
+            except Exception as e:
+                a = 1
+    else:
+        index = 1
+        import random
+        specifier = random.randint(1, 10000)
+        dns_query = "{}.ttlexp.exp.net-measurement.net".format(specifier)
+        for i in range(iterations):
+            try:
+                t_start = time.perf_counter()
+                res = requests.get(
+                    "https://cloudflare-dns.com/dns-query?name={}&type=txt".format(dns_query),
+                    headers={"accept": "application/dns-json"})
+                t_total = time.perf_counter() - t_start
+                answer = json.loads(res.text)['Answer'][0]
+                ttl = answer['TTL']
+                dns_response_time.append((t_total, ttl))
+
+                if index == target_iter:
+                    break
+                index += 1
+            except Exception as e:
+                a = 1
+
 
 
     to_Save = {
@@ -125,7 +150,7 @@ def http_vs_dns():
     # ocsp_urls_lst = [e for e in ocsp_urls_lst if e in d]
 
     # TODO change it
-    dns_servers = ["1.1.1.1", "8.8.8.8", "198.82.247.98"]
+    dns_servers = ["1.1.1.1", "8.8.8.8", "198.82.247.98", "doh"]
 
     url_index = 0
     for ocsp_url in d:

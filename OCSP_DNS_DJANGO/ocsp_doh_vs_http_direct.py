@@ -1,7 +1,6 @@
 import json
 import logging
 from pathlib import Path
-from local import LOCAL
 
 import django
 import dns.resolver

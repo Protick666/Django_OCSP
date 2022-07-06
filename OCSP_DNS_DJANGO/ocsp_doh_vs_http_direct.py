@@ -1,6 +1,7 @@
 import json
 import logging
 from pathlib import Path
+from local import LOCAL
 
 import django
 import dns.resolver
@@ -150,7 +151,11 @@ def http_vs_dns():
     # ocsp_urls_lst = [e for e in ocsp_urls_lst if e in d]
 
     # TODO change it
-    dns_servers = ["1.1.1.1", "8.8.8.8", "198.82.247.98", "doh"]
+    if LOCAL:
+        local_ip = "75.75.75.75"
+    else:
+        local_ip = "198.82.247.98"
+    dns_servers = ["1.1.1.1", "8.8.8.8", local_ip, "doh"]
 
     url_index = 0
     for ocsp_url in d:

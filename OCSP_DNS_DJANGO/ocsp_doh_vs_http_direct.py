@@ -37,14 +37,11 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
     import requests
     import time
 
-
-
     ocsp_response_time = []
     dns_response_time = []
     iterations = 100
     # TODO
-    target_iter = 50
-
+    target_iter = 20
 
     # synced_data[ocsp_url] = element
 
@@ -77,6 +74,7 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
             if index == target_iter:
                 break
             index += 1
+            time.sleep(1)
         except Exception as e:
             a = 1
 
@@ -99,6 +97,7 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
                 if index == target_iter:
                     break
                 index += 1
+                time.sleep(1)
             except Exception as e:
                 a = 1
     else:
@@ -120,6 +119,7 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
                 if index == target_iter:
                     break
                 index += 1
+                time.sleep(1)
             except Exception as e:
                 a = 1
 

@@ -41,7 +41,7 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
     dns_response_time = []
     iterations = 100
     # TODO
-    target_iter = 20
+    target_iter = 50
 
     # synced_data[ocsp_url] = element
 
@@ -74,7 +74,7 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
             if index == target_iter:
                 break
             index += 1
-            time.sleep(1)
+            #time.sleep(1)
         except Exception as e:
             a = 1
 
@@ -97,7 +97,7 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
                 if index == target_iter:
                     break
                 index += 1
-                time.sleep(1)
+                #time.sleep(1)
             except Exception as e:
                 a = 1
     else:
@@ -119,7 +119,7 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
                 if index == target_iter:
                     break
                 index += 1
-                time.sleep(1)
+                #time.sleep(1)
             except Exception as e:
                 a = 1
 
@@ -135,8 +135,6 @@ def process_ocsp_urls_sync(ocsp_url, chosen_hop_list, url_index, element, dns_se
     if dns_server not in mother_dict[ocsp_url]:
         mother_dict[ocsp_url][dns_server] = {}
     mother_dict[ocsp_url][dns_server][is_nonce] = to_Save
-
-
 
 
 def http_vs_dns():

@@ -186,7 +186,7 @@ def luminati_asn_ttl_crawler_req(exp_id, TTL_IN_SEC, TOTAL_REQUESTS, chunk_size)
 
 
 def zeus_mami111():
-    for i in range(4, 7):
+    for i in range(4, 7000000):
         luminati_asn_ttl_crawler_req(exp_id="live{}".format(i), TTL_IN_SEC=3600, TOTAL_REQUESTS=300000, chunk_size=2000)
         time.sleep(60*10)
 

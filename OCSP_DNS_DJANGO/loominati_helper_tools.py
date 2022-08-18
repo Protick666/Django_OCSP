@@ -166,11 +166,21 @@ def choose_hops_for_ttl_exp_v2(total_requests, asn_list, asn_to_prefix_count):
     return flattened_list
 
 
+def get_local_asn_list():
+    f = open("ttl_data_set-live-local-False.json")
+    d = json.load(f)
+    asn_set = set()
+    for e in d:
+        asn_set.add(e[0])
+
+    asn_list = list(asn_set)
+    return asn_list
+
 def create_lst_both(total_requests):
     asn_list, asn_to_prefix_count = get_all_asn_list_with_prefix_count()
 
-    f = open("global_asn_list_updated.json")
-    local_asn_list = json.load(f)
+    # f = open("global_asn_list_updated.json")
+    local_asn_list = get_local_asn_list()
 
     print("Local ", len(local_asn_list))
     print("Global ", len(asn_list))

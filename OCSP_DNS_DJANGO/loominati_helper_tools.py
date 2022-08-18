@@ -149,7 +149,7 @@ def choose_hops_for_ttl_exp_v2(total_requests, asn_list, asn_to_prefix_count):
         if asn_to_prefix_count[asn] == 0:
             continue
         allotment = (asn_to_prefix_count[asn] / asn_to_prefix_count['all']) * total_requests
-        allotment = max(min(allotment, 5), 100)
+        allotment = max(min(allotment, 2), 30)
         lst.append((asn, allotment))
 
     import random
@@ -181,18 +181,18 @@ def create_lst_both(total_requests):
             continue
         asn_list_curated.append(asn)
 
-    global_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=asn_list_curated,
+    # global_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=asn_list_curated,
+    #                                          asn_to_prefix_count=asn_to_prefix_count)
+
+    local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=local_asn_list,
                                              asn_to_prefix_count=asn_to_prefix_count)
 
-    local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests * 2, asn_list=local_asn_list,
-                                             asn_to_prefix_count=asn_to_prefix_count)
 
-
-    print("Global ", len(global_list))
+    # print("Global ", len(global_list))
     print("Local ", len(local_list))
-    with open("ttl_data_set-live-global-{}.json".format(LOCAL), "w") as ouf:
-        json.dump(global_list, fp=ouf)
-    with open("ttl_data_set-live-local-{}.json".format(LOCAL), "w") as ouf:
+    # with open("ttl_data_set-live-global-{}.json".format(LOCAL), "w") as ouf:
+    #     json.dump(global_list, fp=ouf)
+    with open("ttl_data_set-live-v2-local-{}.json".format(LOCAL), "w") as ouf:
         json.dump(local_list, fp=ouf)
 
 

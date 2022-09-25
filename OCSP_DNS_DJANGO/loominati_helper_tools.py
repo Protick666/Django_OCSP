@@ -182,7 +182,7 @@ def choose_hops_for_ttl_exp_v3(total_requests, asn_to_cnt_tup, asn_to_address_co
     for e in minor_list:
         minor_tot += e[0]
 
-    for asn in minor_list:
+    for cnt, asn in minor_list:
         if asn not in asn_to_address_count:
             continue
         if asn_to_address_count[asn] == 0:
@@ -191,7 +191,7 @@ def choose_hops_for_ttl_exp_v3(total_requests, asn_to_cnt_tup, asn_to_address_co
         allotment = max(min(allotment, 1), 15)
         lst.append((asn, allotment))
 
-    for asn in major_list:
+    for cnt, asn in major_list:
         if asn not in asn_to_address_count:
             continue
         if asn_to_address_count[asn] == 0:

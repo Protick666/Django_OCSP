@@ -123,20 +123,25 @@ def get_all_asn_list_with_prefix_count():
     tweets = []
     asn_list = set()
     asn_to_prefix_count = {}
+    asn_to_address_count = {}
     for line in open('asns_full_info.json', 'r'):
         tweets.append(json.loads(line))
 
     total_prefixes = 0
+    total_addresses = 0
     for a in tweets:
         total_prefixes += a['announcing']['numberPrefixes']
+        total_addresses += a['announcing']['numberAddresses']
 
     for a in tweets:
         asn_list.add(a['asn'])
         asn_to_prefix_count[a['asn']] = a['announcing']['numberPrefixes']
+        asn_to_address_count[a['asn']] = a['announcing']['numberAddresses']
 
     asn_to_prefix_count['all'] = total_prefixes
+    asn_to_address_count['all'] = total_addresses
 
-    return list(asn_list), asn_to_prefix_count
+    return list(asn_list), asn_to_prefix_count, asn_to_address_count
 
 
 def choose_hops_for_ttl_exp_v2(total_requests, asn_list, asn_to_prefix_count):
@@ -177,9 +182,8 @@ def get_local_asn_list():
     return asn_list
 
 def create_lst_both(total_requests):
-    asn_list, asn_to_prefix_count = get_all_asn_list_with_prefix_count()
+    asn_list, asn_to_prefix_count, asn_to_address_count = get_all_asn_list_with_prefix_count()
 
-    # f = open("global_asn_list_updated.json")
     local_asn_list = get_local_asn_list()
 
     print("Local ", len(local_asn_list))

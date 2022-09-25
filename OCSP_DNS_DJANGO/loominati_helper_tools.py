@@ -170,6 +170,49 @@ def choose_hops_for_ttl_exp_v2(total_requests, asn_list, asn_to_prefix_count):
     random.shuffle(flattened_list)
     return flattened_list
 
+def choose_hops_for_ttl_exp_v3(total_requests, asn_to_cnt_tup, asn_to_address_count):
+    lst = []
+    asn_to_cnt_tup.sort()
+    n = len(asn_to_cnt_tup)
+    minor_list = asn_to_cnt_tup[: int(n * .8)]
+    major_list = asn_to_cnt_tup[int(n * .8): ]
+    minor_tot, major_tot = 0, 0
+    for e in major_list:
+        major_tot += e[0]
+    for e in minor_list:
+        minor_tot += e[0]
+
+    for asn in minor_list:
+        if asn not in asn_to_address_count:
+            continue
+        if asn_to_address_count[asn] == 0:
+            continue
+        allotment = (asn_to_address_count[asn] / minor_tot) * total_requests
+        allotment = max(min(allotment, 1), 15)
+        lst.append((asn, allotment))
+
+    for asn in major_list:
+        if asn not in asn_to_address_count:
+            continue
+        if asn_to_address_count[asn] == 0:
+            continue
+        allotment = (asn_to_address_count[asn] / major_tot) * int(total_requests/4)
+        allotment = max(min(allotment, 18), 40)
+        lst.append((asn, allotment))
+
+    import random
+    random.shuffle(lst)
+
+    flattened_list = []
+    id = 1
+    for e in lst:
+        for i in range(e[1]):
+            flattened_list.append((e[0], id))
+            id += 1
+
+    random.shuffle(flattened_list)
+    return flattened_list
+
 
 def get_local_asn_list():
     f = open("ttl_data_set-live-local-False.json")
@@ -189,24 +232,26 @@ def create_lst_both(total_requests):
     print("Local ", len(local_asn_list))
     print("Global ", len(asn_list))
 
-    asn_list_curated = []
+    asn_to_cnt_tup = []
     for asn in asn_list:
-        if asn in local_asn_list:
+        if asn_to_address_count[asn] == 0:
             continue
-        asn_list_curated.append(asn)
+        asn_to_cnt_tup.append((asn_to_address_count[asn], asn))
+    asn_to_cnt_tup.sort()
 
-    # global_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=asn_list_curated,
+    # asn_list_curated = []
+    # for asn in asn_list:
+    #     if asn in local_asn_list:
+    #         continue
+    #     asn_list_curated.append(asn)
+
+    # local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=local_asn_list,
     #                                          asn_to_prefix_count=asn_to_prefix_count)
 
-    local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=local_asn_list,
-                                             asn_to_prefix_count=asn_to_prefix_count)
-
-
-    # print("Global ", len(global_list))
-    print("Local ", len(local_list))
-    # with open("ttl_data_set-live-global-{}.json".format(LOCAL), "w") as ouf:
-    #     json.dump(global_list, fp=ouf)
-    with open("ttl_data_set-live-v2-local-{}.json".format(LOCAL), "w") as ouf:
+    local_list = choose_hops_for_ttl_exp_v3(total_requests=total_requests, asn_to_cnt_tup=asn_to_cnt_tup,
+                                            asn_to_address_count=asn_to_address_count)
+    print("yo {}".format(len(local_list)))
+    with open("ttl_data_set-live-v3-local-{}.json".format(LOCAL), "w") as ouf:
         json.dump(local_list, fp=ouf)
 
 

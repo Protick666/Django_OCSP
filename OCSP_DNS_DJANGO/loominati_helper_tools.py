@@ -244,15 +244,26 @@ def create_lst_both(total_requests):
     #     if asn in local_asn_list:
     #         continue
     #     asn_list_curated.append(asn)
+    id = 1
+    ans = []
+    for e in asn_list:
+        if asn_to_address_count[e] == 0:
+            continue
+        ans.append((e, id))
+        id = id + 1
+
+    with open("ttl_data_set-live-v4-local-{}.json".format(LOCAL), "w") as ouf:
+        json.dump(ans, fp=ouf)
+
 
     # local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=local_asn_list,
     #                                          asn_to_prefix_count=asn_to_prefix_count)
 
     local_list = choose_hops_for_ttl_exp_v3(total_requests=total_requests, asn_to_cnt_tup=asn_to_cnt_tup,
                                             asn_to_address_count=asn_to_address_count)
-    print("yo {}".format(len(local_list)))
-    with open("ttl_data_set-live-v3-local-{}.json".format(LOCAL), "w") as ouf:
-        json.dump(local_list, fp=ouf)
+    # print("yo {}".format(len(local_list)))
+    # with open("ttl_data_set-live-v3-local-{}.json".format(LOCAL), "w") as ouf:
+    #     json.dump(local_list, fp=ouf)
 
 
 def create_lst(ll):

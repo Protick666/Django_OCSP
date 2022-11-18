@@ -111,7 +111,7 @@ def ocsp_url_analizer():
         ans[base_url] = d[key]
         ans[base_url]["full_url"] = key
     # a = 1
-    with open('ocsp_url_info_v2.json', "w") as ouf:
+    with open('data/ocsp_url_info_v2.json', "w") as ouf:
         json.dump(ans, fp=ouf)
 
 

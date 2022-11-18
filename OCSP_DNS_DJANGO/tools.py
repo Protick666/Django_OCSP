@@ -2,18 +2,31 @@ from dns import resolver, rdata
 from dns.rdatatype import CNAME, A, NS
 import time
 from intervaltree import *
-# import ujson as json
 import json
-from datetime import datetime
 import os
-import pathlib
 import asyncio
+from OCSP_DNS_DJANGO.local import LOCAL
+
+
+def exp():
+    import sys
+    import urllib.request
+    opener = urllib.request.build_opener(
+        urllib.request.ProxyHandler(
+            {'http': 'http://lum-customer-c_9c799542-zone-protick:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225',
+             'https': 'http://lum-customer-c_9c799542-zone-protick:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'}))
+    print(opener.open('http://lumtest.com/myip.json').read())
+
 
 
 class AS2ISP:
     def __init__(self):
-        self.raw_path = "OCSP_DNS_DJANGO/" + "/data"
-        self.export_path = "OCSP_DNS_DJANGO/" + "/data/as2isp.json"
+        if LOCAL:
+            self.raw_path = "../OCSP_DNS_DJANGO/" + "/data"
+            self.export_path = "../OCSP_DNS_DJANGO/" + "/data/as2isp.json"
+        else:
+            self.raw_path = "OCSP_DNS_DJANGO/" + "/data"
+            self.export_path = "OCSP_DNS_DJANGO/" + "/data/as2isp.json"
 
         self.date = []
         self.intervalTree = IntervalTree()
@@ -44,13 +57,11 @@ class AS2ISP:
         for prev, next in zip(d[:-1], d[1:]):
             self.intervalTree[prev:next] = prev
 
-
     def loadDB(self):
         t = time.time()
         f = open(self.export_path)
         self.as2isp = json.load(f)
         print('as2ISP DB loaded done: it took %s secs' % (time.time() - t))
-
 
     def getISP(self, date, asnum):
         """
@@ -135,9 +146,6 @@ class AS2ISP:
             l += 1
             print("Processed {} files".format(l))
 
-
-
-
     def saveDB(self):
         ORG_NAME = "format:org_id|changed|org_name|country|source"
         AS_ORG = "format:aut|changed|aut_name|org_id|source"
@@ -192,9 +200,6 @@ class AS2ISP:
             json.dump(asnumDB, fp=ouf)
 
 
-
-
-
 def fix_cert_indentation(der_encoded_cert):
     l = len(der_encoded_cert)
     index = 0
@@ -206,19 +211,31 @@ def fix_cert_indentation(der_encoded_cert):
     return ultimate
 
 
+def get_base_url(url):
+    ocsp_url_base = url
+    if url.startswith("http://"):
+        ocsp_url_base = url[7:]
+    if "/" in ocsp_url_base:
+        ocsp_url_base = ocsp_url_base[0: ocsp_url_base.find("/")]
+    return ocsp_url_base
+
+
+base_to_records = {}
 def get_dns_records(ocsp_url):
     try:
         dns_records = []
-        if ocsp_url.startswith("http://"):
-            ocsp_url_base = ocsp_url[7:]
-        if "/" in ocsp_url_base:
-            ocsp_url_base = ocsp_url_base[0: ocsp_url_base.find("/")]
+        ocsp_url_base = get_base_url(ocsp_url)
+
+        if ocsp_url_base in base_to_records:
+            return base_to_records[ocsp_url_base]
+
         for rdata in resolver.resolve(ocsp_url_base, CNAME, raise_on_no_answer=False):
             dns_records.append(('CNAME', str(rdata)))
         for rdata in resolver.resolve(ocsp_url_base, A, raise_on_no_answer=False):
             dns_records.append(('A_RECORD', str(rdata)))
         for rdata in resolver.resolve(ocsp_url_base, NS, raise_on_no_answer=False):
             dns_records.append(('NS_RECORD', str(rdata)))
+        base_to_records[ocsp_url_base] = dns_records
         return dns_records
     except Exception as e:
         return []
@@ -237,6 +254,7 @@ def get_ns_records(ocsp_url):
     except Exception as e:
         return []
 
+
 def chunks(lst, n):
     ans = []
     """Yield successive n-sized chunks from lst."""
@@ -245,21 +263,23 @@ def chunks(lst, n):
     return ans
 
 
-
 # TODO telegram check!!
 import aiohttp
 import logging
+
 logger = logging.getLogger(__name__)
 
 available_asns = []
+
 
 async def query_through_luminati(hop, session):
     try:
         import random, string, time
 
-        #session_key = ''.join(random.choice(letters) for i in range(5)) + str(int(time.time()))
+        # session_key = ''.join(random.choice(letters) for i in range(5)) + str(int(time.time()))
 
-        proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(hop)
+        proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(
+            hop)
 
         async with session.get(url='http://lumtest.com/myip.json', proxy=proxy_url) as response:
             try:
@@ -277,6 +297,7 @@ async def query_through_luminati(hop, session):
 
     except Exception as e:
         pass
+
 
 async def process_asn_chunks(chosen_hop_list):
     timeout = aiohttp.ClientTimeout(total=30)
@@ -338,7 +359,7 @@ def get_all_active_asns():
     d1 = d1.replace("/", "-")
     out_file = open("available_asns-{}.json".format(d1), "w")
     json.dump(available_asns, out_file)
-    #print(len(available_asns))
+    # print(len(available_asns))
     send_telegram_msg("Dumped the file!")
 
 

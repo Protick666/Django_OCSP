@@ -95,11 +95,14 @@ def ocsp_url_analizer():
     base_url_vis = {}
     ans = {}
 
+    count = 1
     for key in d:
         base_url = get_base_url(key)
         if base_url in base_url_vis:
             continue
         base_url_vis[base_url] = 1
+        print(base_url, count)
+        count += 1
         # a_record, cname
         d[key]['asn'] = get_asn(d[key]['a_record'])
         d[key]['org'] = get_org(d[key]['asn'])

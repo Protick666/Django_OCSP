@@ -55,7 +55,8 @@ CDNS = ['Akamai',
 
 def get_dns_records_of_ocsp_hosts():
     d = defaultdict(lambda : dict())
-    ocsp_hosts = get_ocsp_hosts()
+    ocsp_hosts, host_to_id = get_ocsp_hosts()
+
     for host in ocsp_hosts:
          try:
              dns_records = get_dns_records(ocsp_url=host)
@@ -69,7 +70,7 @@ def get_dns_records_of_ocsp_hosts():
          except Exception as e:
             pass
 
-    return d
+    return d, host_to_id
 
 
 def get_asn(ip):
@@ -89,19 +90,29 @@ def get_root_domain(url):
         url = url[0: url.find("/")]
     return url
 
+
+# in future, do all !!
 def ocsp_url_analizer():
-    d = get_dns_records_of_ocsp_hosts()
+    d, host_to_id = get_dns_records_of_ocsp_hosts()
 
     base_url_vis = {}
     ans = {}
 
     count = 1
+
+    tot_keys = len(list(d.keys()))
+
     for key in d:
         base_url = get_base_url(key)
         if base_url in base_url_vis:
+            if len(ans[base_url]['host_list']) < 10:
+                ans[base_url]['host_list'].append((key, host_to_id[key]))
+            tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
+            ans[base_url]['count'] += tot_count
+            #print("Done with {")
             continue
         base_url_vis[base_url] = 1
-        print(base_url, count)
+        print(base_url, "{}/{}".format(count, tot_keys))
         count += 1
         # a_record, cname
         d[key]['asn'] = get_asn(d[key]['a_record'])
@@ -110,11 +121,16 @@ def ocsp_url_analizer():
         is_delegated = OcspResponsesWrtAsn.objects.filter(ocsp_url__url=key,
                                                           ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
                                                           ocsp_cert_status='OCSPCertStatus.GOOD').values('delegated_response').distinct()
+
+        tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
+
         d[key]['is_delegated'] = list(is_delegated)
         ans[base_url] = d[key]
+        ans[base_url]['host_list'] = [(key, host_to_id[key])]
+        ans[base_url]['count'] = int(tot_count)
         ans[base_url]["full_url"] = key
     # a = 1
-    with open('data/ocsp_url_info_v2.json', "w") as ouf:
+    with open('data/ocsp_url_info_v3.json', "w") as ouf:
         json.dump(ans, fp=ouf)
 
 

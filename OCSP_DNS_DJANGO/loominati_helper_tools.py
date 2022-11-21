@@ -7,7 +7,13 @@ from OCSP_DNS_DJANGO.models import *
 def get_ocsp_hosts():
     # TODO test
     ocsp_hosts = ocsp_url_db.objects.all()
-    return [e.url for e in ocsp_hosts]
+
+    host_to_id = {}
+
+    for e in ocsp_hosts:
+        host_to_id[e.url] = e.id
+
+    return [e.url for e in ocsp_hosts], host_to_id
 
 
 def choose_asn_number_per_country(number):

@@ -153,9 +153,9 @@ def exp_init(base_url):
 
         candidate_urls = mother_dict[base_url]['host_list']
         print("Chosen {} from {}".format(candidate_urls[0], base_url))
-        print(candidate_urls[0] in url_to_a_record)
-        print(url_to_a_record)
-        ans = luminati_master_crawler_cache(ocsp_url=candidate_urls[0], ip_host=url_to_a_record[candidate_urls[0]])
+        # print(candidate_urls[0] in url_to_a_record)
+        # print(url_to_a_record)
+        ans = luminati_master_crawler_cache(ocsp_url=candidate_urls[0], ip_host=mother_dict[candidate_urls[0]]['a_record'])
 
         # ans[base_url]['host_list'] = [(key, host_to_id[key])]
         # ans[base_url]['count'] = int(tot_count)

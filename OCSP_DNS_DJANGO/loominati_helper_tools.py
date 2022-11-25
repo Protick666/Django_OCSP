@@ -2,6 +2,7 @@ from OCSP_DNS_DJANGO.local import LOCAL
 import json
 import random
 from OCSP_DNS_DJANGO.models import *
+import redis
 
 
 def get_ocsp_hosts():
@@ -15,6 +16,11 @@ def get_ocsp_hosts():
 
     return [e.url for e in ocsp_hosts], host_to_id
 
+
+def get_ocsp_hosts_v2(redis_host):
+    r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
+    ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
+    return [item.decode() for item in ocsp_urls_set]
 
 def choose_asn_number_per_country(number):
     if LOCAL:

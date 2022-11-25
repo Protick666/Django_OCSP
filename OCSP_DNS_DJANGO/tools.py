@@ -221,6 +221,7 @@ def get_base_url(url):
 
 
 base_to_records = {}
+base_to_A_record = {}
 def get_dns_records(ocsp_url):
     try:
         dns_records = []
@@ -233,10 +234,11 @@ def get_dns_records(ocsp_url):
             dns_records.append(('CNAME', str(rdata)))
         for rdata in resolver.resolve(ocsp_url_base, A, raise_on_no_answer=False):
             dns_records.append(('A_RECORD', str(rdata)))
+            base_to_A_record[ocsp_url_base] = str(rdata)
         for rdata in resolver.resolve(ocsp_url_base, NS, raise_on_no_answer=False):
             dns_records.append(('NS_RECORD', str(rdata)))
         base_to_records[ocsp_url_base] = dns_records
-        return dns_records
+        return dns_records, base_to_A_record
     except Exception as e:
         return []
 

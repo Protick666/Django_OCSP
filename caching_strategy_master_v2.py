@@ -1,9 +1,13 @@
-from OCSP_DNS_DJANGO.loominati_helper_tools import get_ocsp_hosts
+from OCSP_DNS_DJANGO.loominati_helper_tools import get_ocsp_hosts_v2
 from OCSP_DNS_DJANGO.models import *
 from collections import defaultdict
 import pyasn, json
+from multiprocessing.dummy import Pool as ThreadPool
+from OCSP_DNS_DJANGO.practise_ground.cache_exp_prac import *
 
 # TODO check pyasn, intervaltree
+
+# from caching_strategy_master_v2 import *
 
 from OCSP_DNS_DJANGO.tools import get_dns_records, AS2ISP, get_base_url
 
@@ -53,9 +57,12 @@ CDNS = ['Akamai',
         'WebMobi',
         'CDNvideo']
 
+url_to_a_record = {}
+
 def get_dns_records_of_ocsp_hosts():
     d = defaultdict(lambda : dict())
-    ocsp_hosts, host_to_id = get_ocsp_hosts()
+    ocsp_hosts = get_ocsp_hosts_v2(redis_host=redis_host)
+    print("Total urls from redis {}".format(len(ocsp_hosts)))
 
     for host in ocsp_hosts:
          try:
@@ -65,12 +72,13 @@ def get_dns_records_of_ocsp_hosts():
              if not a_records:
                  continue
              d[host]['a_record'] = a_records[0]
+             url_to_a_record[host] = a_records[0]
              if c_names:
                  d[host]['cname'] = c_names[0]
          except Exception as e:
             pass
 
-    return d, host_to_id
+    return d
 
 
 def get_asn(ip):
@@ -93,8 +101,7 @@ def get_root_domain(url):
 
 # in future, do all !!
 def ocsp_url_analizer():
-    d, host_to_id = get_dns_records_of_ocsp_hosts()
-
+    d = get_dns_records_of_ocsp_hosts()
     base_url_vis = {}
     ans = {}
 
@@ -105,14 +112,14 @@ def ocsp_url_analizer():
     for key in d:
         base_url = get_base_url(key)
         if base_url in base_url_vis:
-            if len(ans[base_url]['host_list']) < 10:
-                ans[base_url]['host_list'].append((key, host_to_id[key]))
-            tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
-            ans[base_url]['count'] += tot_count
+            if len(ans[base_url]['host_list']) < 20:
+                ans[base_url]['host_list'].append(key)
+            # tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
+            # ans[base_url]['count'] += tot_count
             #print("Done with {")
             continue
         base_url_vis[base_url] = 1
-        print(base_url, "{}/{}".format(count, tot_keys))
+        #print(base_url, "{}/{}".format(count, tot_keys))
         count += 1
         # a_record, cname
         d[key]['asn'] = get_asn(d[key]['a_record'])
@@ -122,16 +129,59 @@ def ocsp_url_analizer():
                                                           ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
                                                           ocsp_cert_status='OCSPCertStatus.GOOD').values('delegated_response').distinct()
 
-        tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
+        #tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
 
         d[key]['is_delegated'] = list(is_delegated)
         ans[base_url] = d[key]
-        ans[base_url]['host_list'] = [(key, host_to_id[key])]
-        ans[base_url]['count'] = int(tot_count)
+        ans[base_url]['host_list'] = [key]
+        #ans[base_url]['count'] = int(tot_count)
         ans[base_url]["full_url"] = key
     # a = 1
     with open('data/ocsp_url_info_v3.json', "w") as ouf:
         json.dump(ans, fp=ouf)
+
+    return ans
+
+mother_dict = {}
+ans_dict = {}
+
+
+def exp_init(base_url):
+    global mother_dict
+    global ans_dict
+    candidate_urls = mother_dict[base_url]['host_list']
+    ans = luminati_master_crawler_cache(ocsp_url=candidate_urls[0], ip_host=url_to_a_record[candidate_urls[0]])
+    # ans[base_url]['host_list'] = [(key, host_to_id[key])]
+    # ans[base_url]['count'] = int(tot_count)
+    # ans[base_url]["full_url"] = key
+
+    ans_dict[base_url] = ans
+
+
+def caching_exp():
+    global mother_dict
+    d = ocsp_url_analizer()
+    # f = open('data/ocsp_url_info_v3.json')
+    # d = json.load(f)
+    mother_dict = d
+
+    base_urls = list(d.keys())[: 10]
+    print("10", base_urls)
+    pool = ThreadPool(40)
+    results = pool.map(exp_init, base_urls)
+    pool.close()
+    pool.join()
+
+    with open('data/ult_mother.json', "w") as ouf:
+        json.dump(mother_dict, fp=ouf)
+
+    # # # # # # #
+    ###base url###
+
+
+
+
+
 
 
 

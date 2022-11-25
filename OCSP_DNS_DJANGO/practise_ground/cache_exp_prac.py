@@ -84,7 +84,7 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
     except Exception as e:
         # print(e)
         #d = {}
-        d['error'] = str(e)
+        d['error'] = str(e) + " " + str(decoded_response)
         if response:
             d['elapsed_time'] = response.elapsed.total_seconds()
         return d

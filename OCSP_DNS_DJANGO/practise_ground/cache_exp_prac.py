@@ -115,8 +115,8 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
 
     #TODO change
-    certs_per_bucket = 1
-    query_number = 2
+    certs_per_bucket = 2
+    query_number = 40
 
     random_list = []
     random_list_dynamic = []

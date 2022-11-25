@@ -176,8 +176,8 @@ def caching_exp():
     d = json.load(f)
     mother_dict = d
 
-    base_urls = list(d.keys())[-4: ]
-    print("10", base_urls)
+    base_urls = list(d.keys())
+    #print("10", base_urls)
     pool = ThreadPool(40)
     results = pool.map(exp_init, base_urls)
     pool.close()
@@ -188,14 +188,6 @@ def caching_exp():
 
     # # # # # # #
     ###base url###
-
-
-
-
-
-
-
-
 
 
 caching_exp()

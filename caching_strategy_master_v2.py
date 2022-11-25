@@ -161,15 +161,16 @@ def exp_init(base_url):
 
         ans_dict[base_url] = ans
         print("Done with {}".format(base_url))
-    except:
+    except Exception as e:
+        print(base_url, e)
         ans_dict[base_url] = {}
 
 
 def caching_exp():
     global mother_dict
-    d = ocsp_url_analizer()
-    # f = open('data/ocsp_url_info_v3.json')
-    # d = json.load(f)
+    #d = ocsp_url_analizer()
+    f = open('data/ocsp_url_info_v3.json')
+    d = json.load(f)
     mother_dict = d
 
     base_urls = list(d.keys())[: 4]

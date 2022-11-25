@@ -151,6 +151,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
         d_d = {"with_nonce": {}, "without_nonce": {}}
         serial_number, akid, fingerprint = element.split(":")
         akid_c = akid
+        print(ocsp_url, serial_number, akid)
 
         pre = [-1]
         for c in range(query_number):

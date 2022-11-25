@@ -149,13 +149,17 @@ ans_dict = {}
 def exp_init(base_url):
     global mother_dict
     global ans_dict
+
     candidate_urls = mother_dict[base_url]['host_list']
+    print("Chosen {} from {}".format(candidate_urls[0], base_url))
     ans = luminati_master_crawler_cache(ocsp_url=candidate_urls[0], ip_host=url_to_a_record[candidate_urls[0]])
+
     # ans[base_url]['host_list'] = [(key, host_to_id[key])]
     # ans[base_url]['count'] = int(tot_count)
     # ans[base_url]["full_url"] = key
 
     ans_dict[base_url] = ans
+    print("Done with {}".format(base_url))
 
 
 def caching_exp():

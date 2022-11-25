@@ -109,7 +109,7 @@ def get_ips_of_urls():
 
 
 def luminati_master_crawler_cache(ocsp_url, ip_host):
-
+    print("Doing {} {}".format(ocsp_url, ip_host))
     ip_host = 'http://' + ip_host
 
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
@@ -131,6 +131,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
     q_key = "ocsp:serial:" + ocsp_url
     elements = r.lrange(q_key, 0, -1)
     elements = [e.decode() for e in elements]
+    print("Len of elements {}".format(len(elements)))
     #print(ocsp_url)
     elements = list(set(elements))
     elements = random.sample(elements, certs_per_bucket)

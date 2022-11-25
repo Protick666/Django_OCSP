@@ -54,10 +54,10 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
         d = {}
         d['serial_number'] = serial_number
 
-        starting_time = time.monotonic()
-        response_temp = requests.get(ip_host)
-        connection_time = time.monotonic() - starting_time - response_temp.elapsed.total_seconds()
-        d['connection_time'] = connection_time
+        # starting_time = time.monotonic()
+        # response_temp = requests.get(ip_host)
+        # connection_time = time.monotonic() - starting_time - response_temp.elapsed.total_seconds()
+        # d['connection_time'] = connection_time
 
         starting_time = time.monotonic()
         response = requests.post(ip_host, data=encoder.encode(ocspReq), headers=headers)
@@ -82,7 +82,7 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
         return d
 
     except Exception as e:
-        print(e)
+        # print(e)
         #d = {}
         d['error'] = str(e)
         if response:
@@ -108,19 +108,14 @@ def get_ips_of_urls():
         json.dump(d, fp=ouf, indent=2)
 
 
-def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, cdn, key, meta):
-    cdn = cdn.replace(" ", "-")
-    cdn = cdn.replace(",", "")
-    cdn = cdn.replace(".", "")
-    cdn = cdn.replace("/", "-")
+def luminati_master_crawler_cache(ocsp_url, ip_host):
 
     ip_host = 'http://' + ip_host
-
 
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
 
     #TODO change
-    certs_per_bucket = 3
+    certs_per_bucket = 2
     query_number = 50
 
     random_list = []
@@ -149,8 +144,8 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
     ans = defaultdict(lambda: dict())
     import time
 
-
     d = {}
+
     for element in new_list:
         d_d = {"with_nonce": {}, "without_nonce": {}}
         serial_number, akid, fingerprint = element.split(":")
@@ -219,14 +214,14 @@ def luminati_master_crawler_cache(ocsp_url, ip_host, master_akid, OCSP_URL_ID, c
         d[e] = d_d
     ans['random_dynamic'] = d
 
-    ans['url'] = key
+    ans['url'] = ocsp_url
 
-    try:
-        with open("jsons_v11/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
-            json.dump(ans, fp=ouf, indent=2)
-    except Exception as e:
-        print(e)
-        pass
+    # try:
+    #     with open("jsons_v11/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
+    #         json.dump(ans, fp=ouf, indent=2)
+    # except Exception as e:
+    #     print(e)
+    #     pass
 
 
 

@@ -180,7 +180,7 @@ def caching_exp():
     pool.join()
 
     with open('data/ult_mother.json', "w") as ouf:
-        json.dump(mother_dict, fp=ouf)
+        json.dump(ans_dict, fp=ouf)
 
     # # # # # # #
     ###base url###

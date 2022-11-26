@@ -76,6 +76,7 @@ def get_dns_records_of_ocsp_hosts():
              if c_names:
                  d[host]['cname'] = c_names[0]
          except Exception as e:
+            print(e)
             pass
 
     return d

@@ -131,7 +131,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
     q_key = "ocsp:serial:" + ocsp_url
     elements = r.lrange(q_key, 0, -1)
     elements = [e.decode() for e in elements]
-    print("Len of elements {}".format(len(elements)))
+    print("{}: Len of elements {}".format(ocsp_url, len(elements)))
     #print(ocsp_url)
     elements = list(set(elements))
     elements = random.sample(elements, certs_per_bucket)
@@ -150,6 +150,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
     for element in new_list:
         d_d = {"with_nonce": {}, "without_nonce": {}}
         serial_number, akid, fingerprint = element.split(":")
+        print("{} {}".format(ocsp_url, serial_number))
         akid_c = akid
         print(ocsp_url, serial_number, akid)
 

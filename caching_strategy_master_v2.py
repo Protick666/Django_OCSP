@@ -127,7 +127,7 @@ def ocsp_url_analizer():
         if base_url in base_url_vis:
             #if len(ans[base_url]['host_list']) < 20:
             ans[base_url]['host_list'].append(key)
-            ans[base_url]['is_delegated'].append([get_delegation(key)])
+            ans[base_url]['is_delegated'].append(get_delegation(key))
             # tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
             # ans[base_url]['count'] += tot_count
             #print("Done with {")
@@ -199,8 +199,7 @@ def exp_init(base_url):
 def caching_exp():
     global mother_dict
     d = ocsp_url_analizer()
-    # f = open('data/ocsp_url_info_v3.json')
-    # d = json.load(f)
+
     mother_dict = d
 
     base_urls = list(d.keys())

@@ -240,6 +240,7 @@ def get_dns_records(ocsp_url):
         base_to_records[ocsp_url_base] = dns_records
         return dns_records, base_to_A_record
     except Exception as e:
+        print("mami", ocsp_url, e)
         return []
 
 

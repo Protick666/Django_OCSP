@@ -128,6 +128,7 @@ def ocsp_url_analizer():
             #if len(ans[base_url]['host_list']) < 20:
             ans[base_url]['host_list'].append(key)
             ans[base_url]['is_delegated'].append(get_delegation(key))
+
             # tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
             # ans[base_url]['count'] += tot_count
             #print("Done with {")
@@ -150,7 +151,9 @@ def ocsp_url_analizer():
         ans[base_url]['host_list'] = [key]
         #ans[base_url]['count'] = int(tot_count)
         ans[base_url]["full_url"] = key
+        print(ans[base_url]['is_delegated'])
     # a = 1
+
     with open('data/ocsp_url_info_v3.json', "w") as ouf:
         json.dump(ans, fp=ouf)
 

@@ -101,6 +101,18 @@ def get_root_domain(url):
 
 
 # in future, do all !!
+
+def get_delegation(key):
+    try:
+        is_delegated = OcspResponsesWrtAsn.objects.filter(ocsp_url__url=key,
+                                                          ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
+                                                          ocsp_cert_status='OCSPCertStatus.GOOD').values(
+            'delegated_response').distinct()
+        return is_delegated
+    except:
+        return {}
+
+
 def ocsp_url_analizer():
     d = get_dns_records_of_ocsp_hosts()
     base_url_vis = {}
@@ -113,8 +125,9 @@ def ocsp_url_analizer():
     for key in d:
         base_url = get_base_url(key)
         if base_url in base_url_vis:
-            if len(ans[base_url]['host_list']) < 20:
-                ans[base_url]['host_list'].append(key)
+            #if len(ans[base_url]['host_list']) < 20:
+            ans[base_url]['host_list'].append(key)
+            ans[base_url]['is_delegated'].append([get_delegation(key)])
             # tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
             # ans[base_url]['count'] += tot_count
             #print("Done with {")
@@ -126,13 +139,13 @@ def ocsp_url_analizer():
         d[key]['asn'] = get_asn(d[key]['a_record'])
         d[key]['org'] = get_org(d[key]['asn'])
         #d[key]['root_domain'] = get_root_domain(key)
-        is_delegated = OcspResponsesWrtAsn.objects.filter(ocsp_url__url=key,
-                                                          ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
-                                                          ocsp_cert_status='OCSPCertStatus.GOOD').values('delegated_response').distinct()
+        # is_delegated = OcspResponsesWrtAsn.objects.filter(ocsp_url__url=key,
+        #                                                   ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
+        #                                                   ocsp_cert_status='OCSPCertStatus.GOOD').values('delegated_response').distinct()
 
         #tot_count = OcspResponsesWrtAsn.objects.filter(ocsp_url__id=host_to_id[key]).count()
 
-        d[key]['is_delegated'] = list(is_delegated)
+        d[key]['is_delegated'] = [get_delegation(key)]
         ans[base_url] = d[key]
         ans[base_url]['host_list'] = [key]
         #ans[base_url]['count'] = int(tot_count)
@@ -143,6 +156,7 @@ def ocsp_url_analizer():
 
     return ans
 
+
 mother_dict = {}
 ans_dict = {}
 
@@ -151,30 +165,42 @@ def exp_init(base_url):
     try:
         global mother_dict
         global ans_dict
+        local_lst = []
 
         candidate_urls = mother_dict[base_url]['host_list']
-        print("Chosen {} from {}".format(candidate_urls[0], base_url))
-        # print(candidate_urls[0] in url_to_a_record)
-        # print(url_to_a_record)
-        base = get_base_url(candidate_urls[0])
-        ans = luminati_master_crawler_cache(ocsp_url=candidate_urls[0], ip_host=mother_dict[base]['a_record'])
-        # from caching_strategy_master_v2 import *
-        # ans[base_url]['host_list'] = [(key, host_to_id[key])]
-        # ans[base_url]['count'] = int(tot_count)
-        # ans[base_url]["full_url"] = key
+        index = 0
+        for url in candidate_urls:
+            try:
+                # print("Chosen {} from {}".format(candidate_urls[0], base_url))
+                # print(candidate_urls[0] in url_to_a_record)
+                # print(url_to_a_record)
+                base = get_base_url(url)
+                ans = luminati_master_crawler_cache(ocsp_url=url, ip_host=mother_dict[base]['a_record'])
+                local_lst.append(ans)
 
-        ans_dict[base_url] = ans
+                ans = luminati_master_crawler_cache(ocsp_url=url, ip_host=mother_dict[base]['a_record'])
+                local_lst.append(ans)
+
+                index += 1
+                if index > 10:
+                    break
+            except:
+                pass
+            # from caching_strategy_master_v2 import *
+            # ans[base_url]['host_list'] = [(key, host_to_id[key])]
+            # ans[base_url]['count'] = int(tot_count)
+            # ans[base_url]["full_url"] = key
+        ans_dict[base_url] = local_lst
         print("Done with {}".format(base_url))
     except Exception as e:
         print(base_url, e)
-        ans_dict[base_url] = {}
 
 
 def caching_exp():
     global mother_dict
     d = ocsp_url_analizer()
-    f = open('data/ocsp_url_info_v3.json')
-    d = json.load(f)
+    # f = open('data/ocsp_url_info_v3.json')
+    # d = json.load(f)
     mother_dict = d
 
     base_urls = list(d.keys())
@@ -190,5 +216,5 @@ def caching_exp():
     # # # # # # #
     ###base url###
 
-ocsp_url_analizer()
-# caching_exp()
+# ocsp_url_analizer()
+caching_exp()

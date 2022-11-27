@@ -107,7 +107,7 @@ def get_delegation(key):
         is_delegated = OcspResponsesWrtAsn.objects.filter(ocsp_url__url=key,
                                                           ocsp_response_status='OCSPResponseStatus.SUCCESSFUL',
                                                           ocsp_cert_status='OCSPCertStatus.GOOD').values(
-            'delegated_response').distinct()
+            'delegated_response').distinct().values()
         return is_delegated
     except:
         return {}

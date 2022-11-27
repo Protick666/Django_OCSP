@@ -238,7 +238,7 @@ def get_dns_records(ocsp_url):
         for rdata in resolver.resolve(ocsp_url_base, NS, raise_on_no_answer=False):
             dns_records.append(('NS_RECORD', str(rdata)))
         base_to_records[ocsp_url_base] = dns_records
-        return dns_records, base_to_A_record
+        return dns_records
     except Exception as e:
         print("mami", ocsp_url, e)
         return []

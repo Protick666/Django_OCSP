@@ -40,6 +40,17 @@ def random_with_N_digits(n):
     return randint(range_start, range_end)
 
 
+def get_ocsp_host_suffix(ocsp_url):
+    ocsp_host = ocsp_url
+    if ocsp_host.startswith("http://"):
+        ocsp_host = ocsp_host[7:]
+
+    if "/" in ocsp_host:
+        ocsp_host = ocsp_host[ocsp_host.find("/"):]
+        return ocsp_host
+    return None
+
+
 def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
     response = None
     ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
@@ -71,11 +82,20 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
             d['this_update'] = str(decoded_response.this_update)
             d['next_update'] = str(decoded_response.next_update)
             d['signature'] = str(decoded_response.signature)
-            if pre[0] == -1:
-                d['sig_same'] = True
-            else:
-                d['sig_same'] = (pre[0] == str(decoded_response.signature))
-            pre[0] = str(decoded_response.signature)
+            delegated_responder = False
+            try:
+                if len(decoded_response.certificates) > 0:
+                    delegated_responder = True
+            except:
+                pass
+
+            d['is_delegated'] = delegated_responder
+
+            # if pre[0] == -1:
+            #     d['sig_same'] = True
+            # else:
+            #     d['sig_same'] = (pre[0] == str(decoded_response.signature))
+            # pre[0] = str(decoded_response.signature)
 
         d['elapsed_time'] = response.elapsed.total_seconds()
         d['response_time'] = response_time
@@ -112,10 +132,18 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
     print("Doing {} {}".format(ocsp_url, ip_host))
     ip_host = 'http://' + ip_host
 
+    suffix = get_ocsp_host_suffix(ocsp_url)
+    if suffix:
+        ip_host = "{}{}".format(ip_host, suffix)
+        # if not ip_host.endswith("/"):
+        #     ip_host = ip_host + "/"
+
+
+
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
 
     #TODO change
-    certs_per_bucket = 2
+    certs_per_bucket = 1
     query_number = 40
 
     random_list = []
@@ -133,9 +161,9 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
     elements = [e.decode() for e in elements]
     print("{}: Len of elements {}".format(ocsp_url, len(elements)))
     #print(ocsp_url)
-    elements = list(set(elements))
-    elements = random.sample(elements, certs_per_bucket)
-    new_list = elements
+    #elements = list(set(elements))
+    #elements = random.sample(elements, certs_per_bucket)
+    new_list = [elements[-1]]
 
     for i in range(certs_per_bucket):
         random_list.append(random_with_N_digits(len(ex_serial)))

@@ -206,13 +206,15 @@ def caching_exp():
     mother_dict = d
 
     base_urls = list(d.keys())
+    base_urls = ['ocsp.globalsign.com']
     #print("10", base_urls)
-    pool = ThreadPool(10)
-    results = pool.map(exp_init, base_urls)
-    pool.close()
-    pool.join()
+    # pool = ThreadPool(5)
+    exp_init('ocsp.globalsign.com')
+    #results = pool.map(exp_init, base_urls)
+    #pool.close()
+    #pool.join()
 
-    with open('data/ult_mother_v2.json', "w") as ouf:
+    with open('data/ult_mother_v4.json', "w") as ouf:
         json.dump(ans_dict, fp=ouf)
 
     # # # # # # #

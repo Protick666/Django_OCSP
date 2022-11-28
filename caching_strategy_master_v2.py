@@ -154,7 +154,7 @@ def ocsp_url_analizer():
         print(ans[base_url]['is_delegated'])
     # a = 1
 
-    with open('data/ocsp_url_info_v3.json', "w") as ouf:
+    with open('data/ocsp_url_info_v4.json', "w") as ouf:
         json.dump(ans, fp=ouf)
 
     return ans
@@ -171,6 +171,7 @@ def exp_init(base_url):
         local_lst = []
 
         candidate_urls = mother_dict[base_url]['host_list']
+        candidate_urls = [candidate_urls[0]]
         index = 0
         for url in candidate_urls:
             try:
@@ -181,12 +182,9 @@ def exp_init(base_url):
                 ans = luminati_master_crawler_cache(ocsp_url=url, ip_host=mother_dict[base]['a_record'])
                 local_lst.append(ans)
 
-                ans = luminati_master_crawler_cache(ocsp_url=url, ip_host=mother_dict[base]['a_record'])
-                local_lst.append(ans)
-
                 index += 1
-                if index > 10:
-                    break
+                # if index > 2:
+                #     break
             except:
                 pass
             # from caching_strategy_master_v2 import *
@@ -201,18 +199,20 @@ def exp_init(base_url):
 
 def caching_exp():
     global mother_dict
+    # f = open("data/ocsp_url_info_v3.json")
+    # d = json.load(f)
     d = ocsp_url_analizer()
 
     mother_dict = d
 
     base_urls = list(d.keys())
     #print("10", base_urls)
-    pool = ThreadPool(40)
+    pool = ThreadPool(10)
     results = pool.map(exp_init, base_urls)
     pool.close()
     pool.join()
 
-    with open('data/ult_mother.json', "w") as ouf:
+    with open('data/ult_mother_v2.json', "w") as ouf:
         json.dump(ans_dict, fp=ouf)
 
     # # # # # # #

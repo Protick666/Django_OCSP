@@ -212,7 +212,7 @@ def exp_init(base_url):
         print(base_url, e)
 # sudo service apache2 stop 3.220
 
-def caching_exp(threadcount):
+def caching_exp(threadcount, pp):
     global mother_dict
     # f = open("data/ocsp_url_info_v4.json")
     # d = json.load(f)
@@ -231,7 +231,7 @@ def caching_exp(threadcount):
     pool.close()
     pool.join()
 
-    with open('data/ult_mother_v5.json', "w") as ouf:
+    with open('data/ult_mother_v{}.json'.format(pp), "w") as ouf:
         json.dump(ans_dict, fp=ouf)
 
     # # # # # # #
@@ -239,3 +239,7 @@ def caching_exp(threadcount):
 
 # ocsp_url_analizer()
 # caching_exp()
+
+def init(threadcount):
+    for i in range(3):
+        caching_exp(threadcount, i + 6)

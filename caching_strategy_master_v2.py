@@ -185,8 +185,8 @@ def exp_init(base_url):
                 index += 1
                 # if index > 2:
                 #     break
-            except:
-                pass
+            except Exception as e:
+                a = 1
             # from caching_strategy_master_v2 import *
             # ans[base_url]['host_list'] = [(key, host_to_id[key])]
             # ans[base_url]['count'] = int(tot_count)
@@ -199,7 +199,7 @@ def exp_init(base_url):
 
 def caching_exp():
     global mother_dict
-    # f = open("data/ocsp_url_info_v3.json")
+    # f = open("data/ocsp_url_info_v4.json")
     # d = json.load(f)
     d = ocsp_url_analizer()
 
@@ -209,7 +209,7 @@ def caching_exp():
     base_urls = ['ocsp.globalsign.com']
     #print("10", base_urls)
     # pool = ThreadPool(5)
-    exp_init('ocsp.globalsign.com')
+    exp_init('h.ocsp-certum.com')
     #results = pool.map(exp_init, base_urls)
     #pool.close()
     #pool.join()

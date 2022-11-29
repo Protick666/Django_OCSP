@@ -51,15 +51,10 @@ def get_ocsp_host_suffix(ocsp_url):
     return None
 
 
-def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
+def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre, ocspReq, headers):
+    print("Doing 1")
     response = None
-    ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
-    ca_cert = pem.readPemFromString(ca_cert)
-    issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
-    ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)
-    ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(serial_number)),
-                              userCert=None, add_nonce=nonce)
-    headers = get_ocsp_request_headers(ocsp_host)
+
 
     try:
         d = {}
@@ -70,8 +65,9 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
         # connection_time = time.monotonic() - starting_time - response_temp.elapsed.total_seconds()
         # d['connection_time'] = connection_time
 
+        dd = encoder.encode(ocspReq)
         starting_time = time.monotonic()
-        response = requests.post(ip_host, data=encoder.encode(ocspReq), headers=headers)
+        response = requests.post(ip_host, data=dd, headers=headers)
         response_time = time.monotonic() - starting_time
         decoded_response = return_ocsp_result(response.content, is_bytes=True)
 
@@ -99,6 +95,7 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
 
         d['elapsed_time'] = response.elapsed.total_seconds()
         d['response_time'] = response_time
+        print("Doing 2")
         return d
 
     except Exception as e:
@@ -107,6 +104,7 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre):
         d['error'] = str(e) + " " + str(decoded_response) + " " + str(response)
         if response:
             d['elapsed_time'] = response.elapsed.total_seconds()
+        print("Doing 2")
         return d
 
 
@@ -127,6 +125,60 @@ def get_ips_of_urls():
     with open("url_to_ips.json", "w") as ouf:
         json.dump(d, fp=ouf, indent=2)
 
+ex_serial = '10028015818766309226464494355'
+
+def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False):
+    d_d = {"with_nonce": {}, "without_nonce": {}}
+
+    #print("{} {}".format(ocsp_url, serial_number))
+
+    #print(ocsp_url, serial_number, akid)
+
+    ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
+    ca_cert = pem.readPemFromString(ca_cert)
+    issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
+    ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)
+    headers = get_ocsp_request_headers(ocsp_host)
+
+
+    pre = [-1]
+
+    ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(serial_number)),
+                              userCert=None, add_nonce=False)
+
+    for c in range(query_number):
+        temp_serial = serial_number
+        if dynamic:
+            temp_serial = random_with_N_digits(len(ex_serial))
+            ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(temp_serial)),
+                                      userCert=None, add_nonce=False)
+        data = make_ocsp_query(serial_number=temp_serial,
+                               akid=akid, r=r, ocsp_url=ocsp_url,
+                               ip_host=ip_host, nonce=False, pre=pre, ocspReq=ocspReq, headers=headers)
+        print(c, data)
+        d_d['without_nonce'][c] = data
+
+
+
+    pre = [-1]
+    for c in range(query_number):
+        temp_serial = serial_number
+        if dynamic:
+            temp_serial = random_with_N_digits(len(ex_serial))
+            ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(temp_serial)),
+                                      userCert=None, add_nonce=True)
+        else:
+            ocspReq = makeOcspRequest(issuerCert=issuerCert, userSerialNumber=hex(int(serial_number)),
+                                      userCert=None, add_nonce=True)
+        data = make_ocsp_query(serial_number=temp_serial,
+                               akid=akid, r=r, ocsp_url=ocsp_url,
+                               ip_host=ip_host, nonce=True, pre=pre, ocspReq=ocspReq, headers=headers)
+        print(c, data)
+        d_d['with_nonce'][c] = data
+
+    return d_d
+
+
 
 def luminati_master_crawler_cache(ocsp_url, ip_host):
     print("Doing {} {}".format(ocsp_url, ip_host))
@@ -138,8 +190,6 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
         # if not ip_host.endswith("/"):
         #     ip_host = ip_host + "/"
 
-
-
     r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
 
     #TODO change
@@ -149,7 +199,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
     random_list = []
     random_list_dynamic = []
 
-    ex_serial = '10028015818766309226464494355'
+
 
     akid_c = None
 
@@ -174,74 +224,44 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
     import time
 
     d = {}
-
     for element in new_list:
-        d_d = {"with_nonce": {}, "without_nonce": {}}
         serial_number, akid, fingerprint = element.split(":")
-        print("{} {}".format(ocsp_url, serial_number))
         akid_c = akid
-        print(ocsp_url, serial_number, akid)
-
-        pre = [-1]
-        for c in range(query_number):
-            data = make_ocsp_query(serial_number=serial_number,
-                                   akid=akid, r=r, ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=False, pre=pre)
-
-            d_d['without_nonce'][c] = data
-
-        pre = [-1]
-        for c in range(query_number):
-            data = make_ocsp_query(serial_number=serial_number,
-                                   akid=akid, r=r, ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=True, pre=pre)
-            d_d['with_nonce'][c] = data
-
+        d_d = mid_exp(serial_number=serial_number, akid=akid, query_number=query_number, ocsp_url=ocsp_url, ip_host=ip_host, dynamic=False)
         d[serial_number] = d_d
     ans['new'] = d
 
     d = {}
     for e in random_list:
-        d_d = {"with_nonce": {}, "without_nonce": {}}
-        pre = [-1]
-        for c in range(query_number):
-            data = make_ocsp_query(serial_number=e,
-                                   akid=akid_c, r=r,
-                                   ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=False, pre=pre)
-            d_d['without_nonce'][c] = data
-
-        pre = [-1]
-        for c in range(query_number):
-            data = make_ocsp_query(serial_number=e,
-                                   akid=akid_c, r=r,
-                                   ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=True, pre=pre)
-            d_d['with_nonce'][c] = data
-
+        # serial_number, akid, fingerprint = element.split(":")
+        # akid_c = akid
+        d_d = mid_exp(serial_number=e, akid=akid_c, query_number=query_number, ocsp_url=ocsp_url,
+                      ip_host=ip_host, dynamic=False)
         d[e] = d_d
     ans['random'] = d
 
     d = {}
     for e in random_list_dynamic:
-        d_d = {"with_nonce": {}, "without_nonce": {}}
+        # d_d = {"with_nonce": {}, "without_nonce": {}}
+        #
+        # pre = [-1]
+        # for c in range(query_number):
+        #     data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
+        #                            akid=akid_c, r=r,
+        #                            ocsp_url=ocsp_url,
+        #                            ip_host=ip_host, nonce=False, pre=pre)
+        #     d_d['without_nonce'][c] = data
+        #
+        # pre = [-1]
+        # for c in range(query_number):
+        #     data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
+        #                            akid=akid_c, r=r,
+        #                            ocsp_url=ocsp_url,
+        #                            ip_host=ip_host, nonce=True, pre=pre)
+        #     d_d['with_nonce'][c] = data
 
-        pre = [-1]
-        for c in range(query_number):
-            data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
-                                   akid=akid_c, r=r,
-                                   ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=False, pre=pre)
-            d_d['without_nonce'][c] = data
-
-        pre = [-1]
-        for c in range(query_number):
-            data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
-                                   akid=akid_c, r=r,
-                                   ocsp_url=ocsp_url,
-                                   ip_host=ip_host, nonce=True, pre=pre)
-            d_d['with_nonce'][c] = data
-
+        d_d = mid_exp(serial_number=e, akid=akid_c, query_number=query_number, ocsp_url=ocsp_url,
+                      ip_host=ip_host, dynamic=True)
         d[e] = d_d
     ans['random_dynamic'] = d
 

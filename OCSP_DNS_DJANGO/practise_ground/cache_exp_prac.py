@@ -194,7 +194,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
 
     #TODO change
     certs_per_bucket = 1
-    query_number = 40
+    query_number = 100
 
     random_list = []
     random_list_dynamic = []

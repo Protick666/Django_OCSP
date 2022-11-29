@@ -154,7 +154,7 @@ def ocsp_url_analizer():
         print(ans[base_url]['is_delegated'])
     # a = 1
 
-    with open('data/ocsp_url_info_v4.json', "w") as ouf:
+    with open('data/ocsp_url_info_v5.json', "w") as ouf:
         json.dump(ans, fp=ouf)
 
     return ans
@@ -212,7 +212,7 @@ def exp_init(base_url):
         print(base_url, e)
 # sudo service apache2 stop 3.220
 
-def caching_exp():
+def caching_exp(threadcount):
     global mother_dict
     # f = open("data/ocsp_url_info_v4.json")
     # d = json.load(f)
@@ -221,21 +221,21 @@ def caching_exp():
     mother_dict = d
 
     base_urls = list(d.keys())
-    base_urls = ['ocsp.globalsign.com']
+    # base_urls = ['ocsp.globalsign.com', 'h.ocsp-certum.com', ]
     #print("10", base_urls)
-    # pool = ThreadPool(5)
+    pool = ThreadPool(threadcount)
 
-    exp_init('ocsp.globalsign.com')
-    exp_init('h.ocsp-certum.com')
-    #results = pool.map(exp_init, base_urls)
-    #pool.close()
-    #pool.join()
+    # exp_init('ocsp.globalsign.com')
+    # exp_init('h.ocsp-certum.com')
+    results = pool.map(exp_init, base_urls)
+    pool.close()
+    pool.join()
 
-    with open('data/ult_mother_v4.json', "w") as ouf:
+    with open('data/ult_mother_v5.json', "w") as ouf:
         json.dump(ans_dict, fp=ouf)
 
     # # # # # # #
     ###base url###
 
 # ocsp_url_analizer()
-caching_exp()
+# caching_exp()

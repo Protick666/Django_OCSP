@@ -156,6 +156,7 @@ def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False)
                                akid=akid, r=r, ocsp_url=ocsp_url,
                                ip_host=ip_host, nonce=False, pre=pre, ocspReq=ocspReq, headers=headers)
         print(c, data)
+        time.sleep(1)
         d_d['without_nonce'][c] = data
 
 
@@ -174,6 +175,7 @@ def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False)
                                akid=akid, r=r, ocsp_url=ocsp_url,
                                ip_host=ip_host, nonce=True, pre=pre, ocspReq=ocspReq, headers=headers)
         print(c, data)
+        time.sleep(1)
         d_d['with_nonce'][c] = data
 
     return d_d
@@ -194,7 +196,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
 
     #TODO change
     certs_per_bucket = 1
-    query_number = 100
+    query_number = 50
 
     random_list = []
     random_list_dynamic = []

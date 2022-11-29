@@ -226,6 +226,7 @@ def caching_exp():
     # pool = ThreadPool(5)
 
     exp_init('ocsp.globalsign.com')
+    exp_init('h.ocsp-certum.com')
     #results = pool.map(exp_init, base_urls)
     #pool.close()
     #pool.join()

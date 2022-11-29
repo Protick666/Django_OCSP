@@ -164,6 +164,18 @@ mother_dict = {}
 ans_dict = {}
 
 
+def choose_candidate_urls(candidate_urls):
+    ans = None
+    temp = -1
+    for ocsp_url in candidate_urls:
+        q_key = "ocsp:serial:" + ocsp_url
+        elements = r.lrange(q_key, 0, -1)
+        elements = [e.decode() for e in elements]
+        if len(elements) > temp:
+            ans = ocsp_url
+            temp = len(elements)
+    return ans
+
 def exp_init(base_url):
     try:
         global mother_dict
@@ -171,18 +183,21 @@ def exp_init(base_url):
         local_lst = []
 
         candidate_urls = mother_dict[base_url]['host_list']
-        candidate_urls = [candidate_urls[0]]
+        candidate_urls = [choose_candidate_urls(candidate_urls)]
+
         index = 0
+
         for url in candidate_urls:
             try:
                 # print("Chosen {} from {}".format(candidate_urls[0], base_url))
                 # print(candidate_urls[0] in url_to_a_record)
                 # print(url_to_a_record)
+
                 base = get_base_url(url)
                 ans = luminati_master_crawler_cache(ocsp_url=url, ip_host=mother_dict[base]['a_record'])
                 local_lst.append(ans)
-
                 index += 1
+
                 # if index > 2:
                 #     break
             except Exception as e:
@@ -195,7 +210,7 @@ def exp_init(base_url):
         print("Done with {}".format(base_url))
     except Exception as e:
         print(base_url, e)
-
+# sudo service apache2 stop 3.220
 
 def caching_exp():
     global mother_dict

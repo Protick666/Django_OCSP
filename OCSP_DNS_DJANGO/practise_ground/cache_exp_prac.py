@@ -155,8 +155,8 @@ def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False)
         data = make_ocsp_query(serial_number=temp_serial,
                                akid=akid, r=r, ocsp_url=ocsp_url,
                                ip_host=ip_host, nonce=False, pre=pre, ocspReq=ocspReq, headers=headers)
-        print(c, data)
-        time.sleep(1)
+        #print(c, data)
+        #time.sleep(1)
         d_d['without_nonce'][c] = data
 
 
@@ -174,8 +174,8 @@ def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False)
         data = make_ocsp_query(serial_number=temp_serial,
                                akid=akid, r=r, ocsp_url=ocsp_url,
                                ip_host=ip_host, nonce=True, pre=pre, ocspReq=ocspReq, headers=headers)
-        print(c, data)
-        time.sleep(1)
+        #print(c, data)
+        #time.sleep(1)
         d_d['with_nonce'][c] = data
 
     return d_d
@@ -363,7 +363,7 @@ def cache_exp_init_v5():
                     luminati_master_crawler_cache(ocsp_url=d[key]['ocsp_url'],
                                                   ip_host=d[key]['ip_host'], master_akid=d[key]['master_akid'],
                                                   OCSP_URL_ID=1, cdn=d[key]['cdn'], key=key, meta=d[key]['is_delegated'])
-                    time.sleep(1)
+                    #time.sleep(1)
             except Exception as e:
                 pass
         #time.sleep(1800)

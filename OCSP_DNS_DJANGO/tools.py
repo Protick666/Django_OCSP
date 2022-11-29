@@ -22,8 +22,10 @@ def exp():
 class AS2ISP:
     def __init__(self):
         if LOCAL:
-            self.raw_path = "../OCSP_DNS_DJANGO/" + "/data"
-            self.export_path = "../OCSP_DNS_DJANGO/" + "/data/as2isp.json"
+            # self.raw_path = "/Users/protick.bhowmick/PriyoRepos/OCSP_DNS_DJANGO/OCSP_DNS_DJANGO/data"
+            # self.export_path = "/Users/protick.bhowmick/PriyoRepos/OCSP_DNS_DJANGO/OCSP_DNS_DJANGO/data/as2isp.json"
+            self.raw_path = "/home/ubuntu/ocsp_dns_django/OCSP_DNS_DJANGO/data"
+            self.export_path = "/home/ubuntu/ocsp_dns_django/OCSP_DNS_DJANGO/data/as2isp.json"
         else:
             self.raw_path = "OCSP_DNS_DJANGO/" + "/data"
             self.export_path = "OCSP_DNS_DJANGO/" + "/data/as2isp.json"

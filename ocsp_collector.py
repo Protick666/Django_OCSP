@@ -85,7 +85,7 @@ def caching_exp(index):
         if 'ocsp.pki.goog' not in e:
             final_hosts.append(e)
 
-    pool = ThreadPool(80)
+    pool = ThreadPool(40)
     results = pool.map(exp_init, final_hosts)
     pool.close()
     pool.join()

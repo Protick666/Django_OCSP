@@ -41,7 +41,7 @@ def send_query(ocsp_url, serial_number, akid):
         d['produced_at'] = str(decoded_response.produced_at)
         d['this_update'] = str(decoded_response.this_update)
         d['next_update'] = str(decoded_response.next_update)
-        d['signature'] = str(decoded_response.signature)
+        # d['signature'] = str(decoded_response.signature)
         delegated_responder = -1
         try:
             if len(decoded_response.certificates) > 0:
@@ -103,9 +103,12 @@ def caching_exp(index):
 index = 0
 
 while(True):
-    index += 1
-    print("Starting {}".format(index))
-    caching_exp(index=index)
-    time.sleep(60 * 15)
+    try:
+        index += 1
+        print("Starting {}".format(index))
+        caching_exp(index=index)
+        time.sleep(60 * 10)
+    except:
+        pass
 
 

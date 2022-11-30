@@ -107,6 +107,7 @@ while(True):
         index += 1
         print("Starting {}".format(index))
         caching_exp(index=index)
+        print("Done {}".format(index))
         time.sleep(60 * 10)
     except:
         pass

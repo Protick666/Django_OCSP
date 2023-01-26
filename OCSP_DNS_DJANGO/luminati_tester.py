@@ -134,7 +134,6 @@ def carry_out_exp(exp_id, hops, iter, offset, ttl, cool_down, chunk_size):
     # send_telegram_msg(msg=msg)
 
 
-
 def luminati_asn_ttl_crawler_req(exp_id, TTL_IN_SEC, TOTAL_REQUESTS, chunk_size):
 
     COOL_DOWN_PERIOD = TTL_IN_SEC

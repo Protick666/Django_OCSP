@@ -89,9 +89,10 @@ def luminati_asn_ttl_crawler_req(target):
 
 while(True):
     urls = get_urls()
-    a = 1
+
     for url in urls:
         luminati_asn_ttl_crawler_req(target=url)
+        print("done with {}".format(url))
 
-    time.sleep(30*60)
+    time.sleep(15*60)
 

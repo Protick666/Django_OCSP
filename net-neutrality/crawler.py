@@ -22,15 +22,11 @@ async def query_through_luminati(hop, session, target):
 
         cn = hop
         proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}-session-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(cn, session_key)
-        # print("ASN :", hop)
-        # async with session.get(url=target, proxy=proxy_url) as response:
-        async with session.get(url='http://lumtest.com/myip.json', proxy=proxy_url) as response:
+
+        async with session.get(url=target, proxy=proxy_url) as response:
             try:
-                result_data = await response.read()
-                end_node_meta_data = str(json.loads(result_data))
-                print(hop, end_node_meta_data)
-                # header_dict = dict(response.headers)
-                # meta_data.append((hop, target, header_dict, int(time.time())))
+                header_dict = dict(response.headers)
+                meta_data.append((hop, target, header_dict, int(time.time())))
             except Exception as e:
                 a = 1
                 pass

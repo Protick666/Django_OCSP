@@ -22,11 +22,15 @@ async def query_through_luminati(hop, session, target):
 
         cn = hop
         proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}-session-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(cn, session_key)
-
-        async with session.get(url=target, proxy=proxy_url) as response:
+        # print("ASN :", hop)
+        # async with session.get(url=target, proxy=proxy_url) as response:
+        async with session.get(url='http://lumtest.com/myip.json', proxy=proxy_url) as response:
             try:
-                header_dict = dict(response.headers)
-                meta_data.append((hop, target, header_dict, int(time.time())))
+                result_data = await response.read()
+                end_node_meta_data = str(json.loads(result_data))
+                print(hop, end_node_meta_data)
+                # header_dict = dict(response.headers)
+                # meta_data.append((hop, target, header_dict, int(time.time())))
             except Exception as e:
                 a = 1
                 pass
@@ -76,7 +80,7 @@ def luminati_asn_ttl_crawler_req(target):
     import json
 
     time_str = int(time.time())
-    dump_path = "/net/data/net-neutrality/korean-asns/"
+    dump_path = "/net/data/net-neutrality/korean-asns-v2/"
     Path(dump_path).mkdir(parents=True, exist_ok=True)
     with open("{}{}.json".format(dump_path, time_str), "w") as ouf:
         json.dump(store_dict, fp=ouf)
@@ -94,5 +98,5 @@ while(True):
         luminati_asn_ttl_crawler_req(target=url)
         print("done with {}".format(url))
 
-    time.sleep(15*60)
+    time.sleep(60*60)
 

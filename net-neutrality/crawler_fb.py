@@ -40,7 +40,7 @@ async def query_through_luminati(hop, session, target):
 
 async def process_ocsp_urls_async(chosen_hop_list, target):
 
-    timeout = aiohttp.ClientTimeout(total=100)
+    timeout = aiohttp.ClientTimeout(total=1000)
 
     async with aiohttp.ClientSession(timeout=timeout) as session:
         tasks = []
@@ -94,7 +94,7 @@ while(True):
     store_dict = {'meta_data': meta_data}
     import json
     time_str = int(time.time())
-    dump_path = "/net/data/net-neutrality/korean-asns-fb-v2/"
+    dump_path = "/net/data/net-neutrality/korean-asns-fb-v3/"
     Path(dump_path).mkdir(parents=True, exist_ok=True)
     with open("{}{}.json".format(dump_path, time_str), "w") as ouf:
         json.dump(store_dict, fp=ouf)

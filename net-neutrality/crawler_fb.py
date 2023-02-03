@@ -85,7 +85,7 @@ def luminati_asn_ttl_crawler_req(target):
 
 while(True):
     # urls = get_urls()
-    urls = ['https://www.facebook.com/Ramee/videos/852801019119887']
+    urls = ['https://www.facebook.com/JamunaTelevision/videos/1202789207280652']
 
     for url in urls:
         luminati_asn_ttl_crawler_req(target=url)
@@ -94,7 +94,7 @@ while(True):
     store_dict = {'meta_data': meta_data}
     import json
     time_str = int(time.time())
-    dump_path = "/net/data/net-neutrality/korean-asns-fb/"
+    dump_path = "/net/data/net-neutrality/korean-asns-fb-v2/"
     Path(dump_path).mkdir(parents=True, exist_ok=True)
     with open("{}{}.json".format(dump_path, time_str), "w") as ouf:
         json.dump(store_dict, fp=ouf)

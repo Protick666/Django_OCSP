@@ -23,7 +23,7 @@ async def query_through_luminati(hop, session, target):
         cn = hop
         proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}-session-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(cn, session_key)
 
-        async with session.get(url='https://facebook.com', proxy=proxy_url) as response:
+        async with session.get(url=target, proxy=proxy_url) as response:
             try:
                 header_dict = dict(response.headers)
                 meta_data.append((hop, target, header_dict, int(time.time())))

@@ -28,8 +28,8 @@ async def query_through_luminati(hop, session, target):
         # https://www.facebook.com/Ramee/videos/852801019119887
         async with session.get(url=target, proxy=proxy_url) as response:
             try:
-                str = str(response.content._buffer)
-                meta_data.append((hop, target, str, int(time.time())))
+                st = str(response.content._buffer)
+                meta_data.append((hop, target, st, int(time.time())))
             except Exception as e:
                 a = 1
                 pass

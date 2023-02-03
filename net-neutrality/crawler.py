@@ -91,7 +91,7 @@ while(True):
     store_dict = {'meta_data': meta_data}
     import json
     time_str = int(time.time())
-    dump_path = "/net/data/net-neutrality/korean-asns-v2/"
+    dump_path = "/net/data/net-neutrality/korean-asns-v3/"
     Path(dump_path).mkdir(parents=True, exist_ok=True)
     with open("{}{}.json".format(dump_path, time_str), "w") as ouf:
         json.dump(store_dict, fp=ouf)

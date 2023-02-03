@@ -23,7 +23,7 @@ async def query_through_luminati(hop, session, target):
         cn = hop
         proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}-session-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(cn, session_key)
 
-        async with session.get(url=target, proxy=proxy_url) as response:
+        async with session.get(url='https://facebook.com', proxy=proxy_url) as response:
             try:
                 header_dict = dict(response.headers)
                 meta_data.append((hop, target, header_dict, int(time.time())))
@@ -72,14 +72,7 @@ def luminati_asn_ttl_crawler_req(target):
     chosen_hop_list = get_korea_asns()
     carry_out_exp(hops=chosen_hop_list, url=target)
 
-    store_dict = {'meta_data': meta_data}
-    import json
 
-    time_str = int(time.time())
-    dump_path = "/net/data/net-neutrality/korean-asns-v2/"
-    Path(dump_path).mkdir(parents=True, exist_ok=True)
-    with open("{}{}.json".format(dump_path, time_str), "w") as ouf:
-        json.dump(store_dict, fp=ouf)
 
 
 # urls = ['https://api.fast.com/netflix/speedtest/v2?https=true&token=YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=5',
@@ -90,9 +83,19 @@ def luminati_asn_ttl_crawler_req(target):
 while(True):
     urls = get_urls()
 
+
     for url in urls:
         luminati_asn_ttl_crawler_req(target=url)
         print("done with {}".format(url))
+
+    store_dict = {'meta_data': meta_data}
+    import json
+    time_str = int(time.time())
+    dump_path = "/net/data/net-neutrality/korean-asns-v2/"
+    Path(dump_path).mkdir(parents=True, exist_ok=True)
+    with open("{}{}.json".format(dump_path, time_str), "w") as ouf:
+        json.dump(store_dict, fp=ouf)
+    meta_data = []
 
     time.sleep(60*60)
 

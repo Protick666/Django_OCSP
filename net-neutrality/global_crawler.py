@@ -96,10 +96,11 @@ def luminati_asn_ttl_crawler_req(target, mode):
     chosen_hop_list = get_all_asns()
 
     hop_chunks = chunks(chosen_hop_list, 1000)
-    print("done with chunk {}".format(target))
+
 
     for chunk in hop_chunks:
         carry_out_exp(hops=chunk, url=target, mode=mode)
+        print("done with chunk {}".format(target))
 
 
 if __name__ == "__main__":

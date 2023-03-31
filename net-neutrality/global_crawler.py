@@ -33,7 +33,7 @@ async def query_through_luminati(hop, session, target, mode):
             headers = [('User-Agent', 'Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0')]
             async with session.get(url=target, proxy=proxy_url, headers=headers) as response:
                 try:
-                    await response.text()
+                    # await response.text()
                     header_dict = dict(response.headers)
                     meta_data.append((hop, mode, target, header_dict, int(time.time())))
 
@@ -70,9 +70,9 @@ async def query_through_luminati(hop, session, target, mode):
 async def process_ocsp_urls_async(chosen_hop_list, target, mode):
 
     if mode == 'facebook':
-        timeout = aiohttp.ClientTimeout(total=180)
+        timeout = aiohttp.ClientTimeout(total=80)
     else:
-        timeout = aiohttp.ClientTimeout(total=30)
+        timeout = aiohttp.ClientTimeout(total=20)
 
     async with aiohttp.ClientSession(timeout=timeout) as session:
         tasks = []
@@ -104,6 +104,12 @@ def luminati_asn_ttl_crawler_req(target, mode):
 
 
 if __name__ == "__main__":
+
+    import json
+
+    dump_path = "/net/data/net-neutrality/global-v1/"
+    Path(dump_path).mkdir(parents=True, exist_ok=True)
+
     urls = get_urls()
     for url in urls:
         mode = None
@@ -117,13 +123,14 @@ if __name__ == "__main__":
         luminati_asn_ttl_crawler_req(target=url, mode=mode)
         print("done with {}".format(url))
 
-    store_dict = {'meta_data': meta_data}
-    import json
-    time_str = int(time.time())
-    dump_path = "/net/data/net-neutrality/global-v1/"
-    Path(dump_path).mkdir(parents=True, exist_ok=True)
-    with open("{}{}.json".format(dump_path, time_str), "w") as ouf:
-        json.dump(store_dict, fp=ouf)
+        time_str = int(time.time())
+        with open("{}{}.json".format(dump_path, time_str), "w") as ouf:
+            json.dump(meta_data, fp=ouf)
+
+        meta_data = []
+
+
+
 
 
 

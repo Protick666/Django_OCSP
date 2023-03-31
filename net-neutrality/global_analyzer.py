@@ -67,8 +67,8 @@ class CDNSigPro:
                 video_re = "video\-[a-zA-Z]{3}\d\-\d\.[a-z]{2}\.fbcdn\.net"
                 video_re_dot = "video\.f[a-zA-Z]{3}\d\-\d\.fna"
 
-                video_basics = re.findall(video_re, d[asn])
-                video_dots = re.findall(video_re_dot, d[asn])
+                video_basics = re.findall(video_re, data)
+                video_dots = re.findall(video_re_dot, data)
                 basic_iatas = process_basics(video_basics)
                 basic_iata_set = set(basic_iatas)
                 dot_iatas = process_dots(video_dots)

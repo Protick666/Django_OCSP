@@ -106,7 +106,7 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
 
             result_data = await response.read()
 
-            to_store['status_code-end'] = response.status
+            to_store['status_code'] = response.status
             to_store['time-end'] = time.time()
             headers = response.headers
             headers = dict(headers)
@@ -144,7 +144,6 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
                 if len(decoded_response.certificates)  > 0:
                     delegated_response = True
                 try:
-
                     for e in list(decoded_response.extensions):
                         if '1.3.6.1.5.5.7.48.1.2' in (str(e.oid)):
                             has_nonce = True
@@ -152,7 +151,6 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
                     pass
 
             to_store['has_nonce'] = has_nonce
-
             to_store['ocsp_response_status'] = ocsp_response_status
             to_store['delegated_response'] = delegated_response
             to_store['ocsp_cert_status'] = ocsp_cert_status
@@ -178,7 +176,8 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
         else:
             to_store['error'] = str(e)
 
-        global_ans.append(to_store)
+        if save:
+            global_ans.append(to_store)
 
 
 def process_cert_async(ocsp_host, ocsp_url, ocspReq,
@@ -247,11 +246,7 @@ async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_hop
                     else:
                         cert_string = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
 
-
-
                     ca_cert = pem.readPemFromString(cert_string)
-
-
 
                     issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
                     #
@@ -303,7 +298,7 @@ def luminati_master_non_db(mode, nonce, dump_prefix):
         nonce_ex = "nonce"
     else:
         nonce_ex = "no-nonce"
-    dump_dir = dump_prefix + "{}/{}/".format(nonce, mode)
+    dump_dir = dump_prefix + "{}/{}/".format(nonce_ex, mode)
     from pathlib import Path
     Path(dump_dir).mkdir(parents=True, exist_ok=True)
 
@@ -372,7 +367,6 @@ def luminati_master_non_db(mode, nonce, dump_prefix):
             global_ans = []
 
 
-
         except Exception as e:
             id_to_hash = {}
             global_ans = []
@@ -381,7 +375,12 @@ def luminati_master_non_db(mode, nonce, dump_prefix):
         # global_ans = []
         print("Done with {}".format(ocsp_url))
 
-
+'''
+Post:
+    every pharah would run->
+        nonce
+        no-nonce
+'''
 
 def init(mode, nonce, dump_prefix):
     # (mode="post", nonce=True, dump_prefix='test/')

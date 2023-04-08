@@ -37,10 +37,10 @@ def get_total_cert_per_ocsp_url():
 
 
 def choose_candidate_asns():
-    f = open('lum_dash_asns_list.json')
+    f = open('global_tuple_list.json')
     asn_list = json.load(f)
-    asn_cn_tuple_list = [(e, "N/A") for e in asn_list]
-    return asn_cn_tuple_list
+    # asn_cn_tuple_list = [(e, "N/A") for e in asn_list]
+    return asn_list
     '''
     
     prev implementation
@@ -71,14 +71,18 @@ def choose_all_available_asns():
 
 def choose_hops(only_asns=False, ban_list=[]):
     # 17844
-    dash_board_asns = choose_candidate_asns()
-    dash_board_asns = [element[0] for element in dash_board_asns]
-    if LOCAL:
-        dash_board_split = 10
-    else:
-        dash_board_split = 150
-
-    dash_board_asns = random.sample(dash_board_asns, dash_board_split)
+    f = open("ttl_data_set-live-local-False.json")
+    d = json.load(f)
+    return d
+    # asns = choose_candidate_asns()
+    # return asns
+    # dash_board_asns = [element[0] for element in dash_board_asns]
+    # if LOCAL:
+    #     dash_board_split = 10
+    # else:
+    #     dash_board_split = 150
+    #
+    # dash_board_asns = random.sample(dash_board_asns, dash_board_split)
 
     ## TODO masssive: rebuild this json after scanning
     # f = open('OCSP_DNS_DJANGO/luminati_data/successful_asns.json')
@@ -88,32 +92,32 @@ def choose_hops(only_asns=False, ban_list=[]):
     #     global_asn_split = 800
     # asn_list = json.load(f)
     # asn_list = random.sample(asn_list, global_asn_split)
-    asn_list = []
-    all_asns = dash_board_asns + asn_list
-    all_asns = [(element, ASN) for element in all_asns]
+    # asn_list = []
+    # all_asns = dash_board_asns + asn_list
+    # all_asns = [(element, ASN) for element in all_asns]
+    #
+    # if only_asns:
+    #     return all_asns
 
-    if only_asns:
-        return all_asns
 
-
-    f = open("OCSP_DNS_DJANGO/countries.json")
-    d = json.load(f)
-    country_codes = []
-    for e in d:
-        country_codes.append(d[e]["cc"])
-    if LOCAL:
-        country_split = 10
-    else:
-        country_split = 50
-    country_codes = random.sample(country_codes, country_split)
-    all_countries = [(element, CN) for element in country_codes]
-
-    return all_asns + all_countries
+    # f = open("OCSP_DNS_DJANGO/countries.json")
+    # d = json.load(f)
+    # country_codes = []
+    # for e in d:
+    #     country_codes.append(d[e]["cc"])
+    # if LOCAL:
+    #     country_split = 10
+    # else:
+    #     country_split = 50
+    # country_codes = random.sample(country_codes, country_split)
+    # all_countries = [(element, CN) for element in country_codes]
+    #
+    # return all_asns + all_countries
 
 
 def get_ocsp_url_number(total_number):
     if LOCAL:
-        return 10
+        return total_number
     else:
         return total_number
 
@@ -166,7 +170,7 @@ def choose_hops_for_ttl_exp_v2(total_requests, asn_list, asn_to_prefix_count):
         if asn_to_prefix_count[asn] == 0:
             continue
         allotment = (asn_to_prefix_count[asn] / asn_to_prefix_count['all']) * total_requests
-        allotment = max(min(allotment, 2), 30)
+        allotment = max(min(allotment, 5), 50)
         lst.append((asn, allotment))
 
     import random
@@ -241,41 +245,43 @@ def create_lst_both(total_requests):
 
     local_asn_list = get_local_asn_list()
 
-    print("Local ", len(local_asn_list))
+    # print("Local ", len(local_asn_list))
     print("Global ", len(asn_list))
 
-    asn_to_cnt_tup = []
-    for asn in asn_list:
-        if asn_to_address_count[asn] == 0:
-            continue
-        asn_to_cnt_tup.append((asn_to_address_count[asn], asn))
-    asn_to_cnt_tup.sort()
+    # asn_to_cnt_tup = []
+    # for asn in asn_list:
+    #     if asn_to_address_count[asn] == 0:
+    #         continue
+    #     asn_to_cnt_tup.append((asn_to_address_count[asn], asn))
+    # asn_to_cnt_tup.sort()
 
     # asn_list_curated = []
     # for asn in asn_list:
     #     if asn in local_asn_list:
     #         continue
     #     asn_list_curated.append(asn)
-    id = 1
-    ans = []
-    for e in asn_list:
-        if asn_to_address_count[e] == 0:
-            continue
-        ans.append((e, id))
-        id = id + 1
+    # id = 1
+    # ans = []
+    # for e in asn_list:
+    #     if asn_to_address_count[e] == 0:
+    #         continue
+    #     ans.append((e, id))
+    #     id = id + 1
 
-    with open("ttl_data_set-live-v4-local-{}.json".format(LOCAL), "w") as ouf:
-        json.dump(ans, fp=ouf)
-
+    # with open("ttl_data_set-live-v4-local-{}.json".format(LOCAL), "w") as ouf:
+    #     json.dump(ans, fp=ouf)
 
     # local_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=local_asn_list,
     #                                          asn_to_prefix_count=asn_to_prefix_count)
 
-    local_list = choose_hops_for_ttl_exp_v3(total_requests=total_requests, asn_to_cnt_tup=asn_to_cnt_tup,
-                                            asn_to_address_count=asn_to_address_count)
-    # print("yo {}".format(len(local_list)))
-    # with open("ttl_data_set-live-v3-local-{}.json".format(LOCAL), "w") as ouf:
-    #     json.dump(local_list, fp=ouf)
+    global_list = choose_hops_for_ttl_exp_v2(total_requests=total_requests, asn_list=asn_list,
+                                             asn_to_prefix_count=asn_to_prefix_count)
+
+    # local_list = choose_hops_for_ttl_exp_v3(total_requests=total_requests, asn_to_cnt_tup=asn_to_cnt_tup,
+    #                                         asn_to_address_count=asn_to_address_count)
+    print("yo {}".format(len(global_list)))
+    with open("global_tuple_list.json".format(LOCAL), "w") as ouf:
+        json.dump(global_list, fp=ouf)
 
 
 def create_lst(ll):

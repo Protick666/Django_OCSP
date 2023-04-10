@@ -73,7 +73,16 @@ def choose_hops(only_asns=False, ban_list=[]):
     # 17844
     f = open("ttl_data_set-live-local-False.json")
     d = json.load(f)
-    return d
+    s = set()
+    for e in d:
+        s.add(e[0])
+    a = []
+
+    index = 1
+    for e in s:
+        a.append((e, index))
+        index += 1
+    return a
     # asns = choose_candidate_asns()
     # return asns
     # dash_board_asns = [element[0] for element in dash_board_asns]

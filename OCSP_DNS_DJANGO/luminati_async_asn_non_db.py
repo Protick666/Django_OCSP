@@ -2,6 +2,7 @@ import asyncio
 import logging
 import random
 import time
+import traceback
 
 import aiohttp
 import django
@@ -32,6 +33,8 @@ else:
 
 is_nonce = False
 
+missing_akid = set()
+missing_urls = set()
 class Config:
     """
         get/post
@@ -63,7 +66,7 @@ skid_to_cert = {}
 
 async def query_through_luminati(headers, ocsp_url, ocspReq,
                                  ocsp_url_id, serial_number, akid,
-                                 fingerprint, type, session, element, ocspReqconfig, save, element_identifier):
+                                 fingerprint, typer, session, element, ocspReqconfig, save, element_identifier):
     try:
         import random, string, time
         global config, id_to_hash
@@ -74,7 +77,7 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
         to_store['akid'] = akid
         to_store['time-pre'] = time.time()
         to_store['hop'] = element
-        to_store['hop_type'] = type
+        to_store['hop_type'] = typer
         to_store['mode'] = "{}-{}".format(config.nonce, config.mode)
 
         if config.nonce:
@@ -112,6 +115,9 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
             headers = dict(headers)
             to_store['headers'] = headers
 
+            if response.status != 200:
+                raise Exception("non-200-{}".format(response.status))
+
             if isinstance(result_data, str):
                 raise Exception("response-str-{}".format(result_data))
             elif not isinstance(result_data, bytes):
@@ -123,7 +129,7 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
             except:
                 pass
             if 'No peers' in s:
-                raise Exception("no-peers-{}")
+                raise Exception("no-peers")
 
             response_b64_encoded = b64encode(result_data).decode("utf-8")
             to_store['response_b64_encoded'] = response_b64_encoded
@@ -133,13 +139,16 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
             decoded_response = return_ocsp_result(result_data, is_bytes=True)
 
             if isinstance(decoded_response, str):
-                raise Exception("decode-str-{}:{}".format(decoded_response))
+                raise Exception("decode-str-{}".format(decoded_response))
 
             has_nonce = False
 
             ocsp_response_status = str(decoded_response.response_status)
+
+            delegated_response = False
+            ocsp_cert_status = -1
             if 'SUCCESSFUL' in ocsp_response_status:
-                delegated_response = False
+
                 ocsp_cert_status = str(decoded_response.certificate_status)
                 if len(decoded_response.certificates)  > 0:
                     delegated_response = True
@@ -176,7 +185,8 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
         else:
             to_store['error'] = str(e)
 
-        if save:
+
+        if save and 'no-peers' not in to_store['error']:
             global_ans.append(to_store)
 
 
@@ -191,13 +201,13 @@ def process_cert_async(ocsp_host, ocsp_url, ocspReq,
         import random
 
         for hop_tuple in chosen_hop_list:
-            element, element_identifier, type = hop_tuple[0], hop_tuple[1], 'ASN'
+            element, element_identifier, typer = hop_tuple[0], hop_tuple[1], 'ASN'
 
             task = asyncio.ensure_future(query_through_luminati(headers=headers, ocsp_url=ocsp_url, ocspReq=ocspReq,
                                                                 ocsp_url_id=ocsp_url_id,
                                                                 serial_number=serial_number,
                                                                 akid=akid, fingerprint=fingerprint,
-                                                                type=type, session=session, element=element,
+                                                                typer=typer, session=session, element=element,
                                                                 ocspReqconfig=ocspReqconfig, save=save,
                                                                 element_identifier=element_identifier))
             tasks.append(task)
@@ -271,7 +281,7 @@ async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_hop
                                        ocspReqconfig=ocspReqconfig, save=save)
 
                 except Exception as e:
-                    print(serial_number, akid)
+                    # print(serial_number, akid)
                     a = 1
                     logger.error(
                         "Error in init Processing cert serial {}, akid {} for ocsp url {} ({})".format(serial_number, akid, ocsp_url,
@@ -366,12 +376,10 @@ def luminati_master_non_db(mode, nonce, dump_prefix):
             id_to_hash = {}
             global_ans = []
 
-
         except Exception as e:
             id_to_hash = {}
             global_ans = []
         # id_to_hash = {}
-        #
         # global_ans = []
         print("Done with {}".format(ocsp_url))
 
@@ -380,10 +388,17 @@ Post:
     every pharah would run->
         nonce
         no-nonce
+        
+    pharah01 screens: nonce1 - > nonce, nonce2 -> non noce
+        
+    from OCSP_DNS_DJANGO.luminati_async_asn_non_db import *
 '''
 
 def init(mode, nonce, dump_prefix):
-    # (mode="post", nonce=True, dump_prefix='test/')
+    # from OCSP_DNS_DJANGO.luminati_async_asn_non_db import *
+    # init(mode="post", nonce=True, dump_prefix='/net/data/luminati/')
+    # init(mode="post", nonce=False, dump_prefix='/net/data/luminati/')
+
     while True:
         luminati_master_non_db(mode=mode, nonce=nonce, dump_prefix=dump_prefix)
 # luminati_master_crawler_async_v2()

@@ -219,7 +219,7 @@ def process_cert_async(ocsp_host, ocsp_url, ocspReq,
             "Error in asyncio ({})".format(e))
 
 
-async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_hop_list, save):
+async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_hop_list, save, elements):
     timeout = aiohttp.ClientTimeout(total=180)
     global config
 
@@ -227,16 +227,10 @@ async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_hop
         tasks = []
         for ocsp_url in ocsp_url_list:
 
-            epoch = int(time.time())
+
             """
                 Choosing prev day
             """
-            day_index = ((epoch // (24 * 60 * 60)) % 2 + 1) % 2
-            q_key = "{}-{}".format(day_index, ocsp_url)
-
-            elements = r.lrange(q_key, 0, -1)
-            elements = [e.decode() for e in elements]
-            elements = list(set(elements))
 
             # if LOCAL:
             #     # TODO fix 2
@@ -347,27 +341,37 @@ def luminati_master_non_db(mode, nonce, dump_prefix):
     chosen_hop_list = choose_hops()
     # hop_chunks = chunks(chosen_hop_list, 1000)
     # TODO fix 2
-    chosen_hop_list = random.sample(chosen_hop_list, 1000)
+    chosen_hop_list = random.sample(chosen_hop_list, 100)
 
     logger.info("Chosen total {} hops".format(len(chosen_hop_list)))
-
 
     global id_to_hash, global_ans
     for ocsp_url in ocsp_urls_lst:
         try:
+
+            epoch = int(time.time())
+            day_index = ((epoch // (24 * 60 * 60)) % 2 + 1) % 2
+            q_key = "{}-{}".format(day_index, ocsp_url)
+
+            elements = r.lrange(q_key, 0, -1)
+            elements = [e.decode() for e in elements]
+            elements = list(set(elements))
+            if len(elements) > 100:
+                elements = random.sample(elements, 100)
+
             if config.nonce:
                 asyncio.run(process_ocsp_urls_async(ocsp_url_list=[ocsp_url],
                                                     ocsp_url_to_id_dict=ocsp_url_to_id_dict,
-                                                    chosen_hop_list=chosen_hop_list, save=True))
+                                                    chosen_hop_list=chosen_hop_list, save=True, elements=elements))
             else:
                 for i in range(2):
                     asyncio.run(process_ocsp_urls_async(ocsp_url_list=[ocsp_url],
                                                         ocsp_url_to_id_dict=ocsp_url_to_id_dict,
-                                                        chosen_hop_list=chosen_hop_list, save=False))
+                                                        chosen_hop_list=chosen_hop_list, save=False, elements=elements))
 
                 asyncio.run(process_ocsp_urls_async(ocsp_url_list=[ocsp_url],
                                                     ocsp_url_to_id_dict=ocsp_url_to_id_dict,
-                                                    chosen_hop_list=chosen_hop_list, save=True))
+                                                    chosen_hop_list=chosen_hop_list, save=True, elements=elements))
 
             import json
             with open("{}{}-{}.json".format(dump_dir, int(time.time()), random.randint(1, 1000000)), "w") as ouf:

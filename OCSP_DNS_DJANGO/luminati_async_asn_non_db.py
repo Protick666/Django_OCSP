@@ -33,6 +33,7 @@ else:
 
 is_nonce = False
 
+err_set = set()
 missing_akid = set()
 missing_urls = set()
 class Config:
@@ -64,12 +65,16 @@ global_ans = []
 
 skid_to_cert = {}
 
+akid_to_cert = {}
+
 async def query_through_luminati(headers, ocsp_url, ocspReq,
                                  ocsp_url_id, serial_number, akid,
                                  fingerprint, typer, session, element, ocspReqconfig, save, element_identifier):
     try:
         import random, string, time
         global config, id_to_hash
+
+        hash_identifier = '{}-{}'.format(element_identifier, serial_number)
 
         to_store = {}
         to_store['target'] = ocsp_url
@@ -81,7 +86,6 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
         to_store['mode'] = "{}-{}".format(config.nonce, config.mode)
 
         if config.nonce:
-            a = 1
             ocspReq = makeOcspRequest(issuerCert=ocspReqconfig.issuerCert, userSerialNumber=ocspReqconfig.userSerialNumber,
                                       userCert=None, add_nonce=True)
 
@@ -97,7 +101,9 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
             proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}-session-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(
                 element, session_key)
         else:
-            prev_hash = id_to_hash[element_identifier]
+            if hash_identifier not in id_to_hash:
+                return
+            prev_hash = id_to_hash[hash_identifier]
             proxy_url = 'http://lum-customer-c_9c799542-zone-protick-dns-remote-asn-{}-session-{}-ip-{}:cbp4uaamzwpy@zproxy.lum-superproxy.io:22225'.format(
                 element, session_key, prev_hash)
 
@@ -168,9 +174,9 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
 
             for header in headers.keys():
                 if header.startswith('x-luminati'):
-                    if header == 'x-luminati-ip':
+                    if header.lower() == 'x-luminati-ip':
                         if not save:
-                            id_to_hash[element_identifier] = headers[header]
+                            id_to_hash[hash_identifier] = headers[header]
                         else:
                             a = 1
 
@@ -185,6 +191,16 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
         else:
             to_store['error'] = str(e)
 
+        if 'non-200' in to_store['error']:
+            for header in to_store['headers']:
+                # TODO massive see other causes of x-luminati-error:
+                if 'x-luminati-error' in header.lower():
+                    if 'proxy error' in headers[header].lower():
+                        return
+                    if 'agent_auth_lum timeout' in headers[header].lower():
+                        return
+
+            a = 1
 
         if save and 'no-peers' not in to_store['error']:
             global_ans.append(to_store)
@@ -219,9 +235,9 @@ def process_cert_async(ocsp_host, ocsp_url, ocspReq,
             "Error in asyncio ({})".format(e))
 
 
-async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_hop_list, save, elements):
+async def process_ocsp_urls_async(ocsp_url_list, chosen_hop_list, save, elements):
     timeout = aiohttp.ClientTimeout(total=180)
-    global config
+    global config, akid_to_cert
 
     async with aiohttp.ClientSession(timeout=timeout) as session:
         tasks = []
@@ -245,10 +261,14 @@ async def process_ocsp_urls_async(ocsp_url_list, ocsp_url_to_id_dict, chosen_hop
                     # r.lpush(serial_key, "{}:{}:{}".format(serial, finger_print, akid))
                     serial_number_hex_str, fingerprint, akid = element.split(":")
 
-                    if akid.upper() in skid_to_cert:
+                    if akid.upper() in akid_to_cert:
+                        cert_string = akid_to_cert[akid.upper()]
+                    elif akid.upper() in skid_to_cert:
                         cert_string = skid_to_cert[akid.upper()]
+                        akid_to_cert[akid.upper()] = cert_string
                     else:
                         cert_string = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
+                        akid_to_cert[akid.upper()] = cert_string
 
                     ca_cert = pem.readPemFromString(cert_string)
 
@@ -289,38 +309,14 @@ def chunks(lst, n):
         ans.append(lst[i:i + n])
     return ans
 
-def luminati_master_non_db(mode, nonce, dump_prefix):
-
+def luminati_master_non_db(mode, nonce, dump_prefix, chosen_hop_list, dump_dir):
+    '''
+        Loading skid to cert
+    '''
     import json
     global skid_to_cert
     f = open("ski_to_cert.json")
     skid_to_cert = json.load(f)
-
-
-    nonce_ex = ""
-    if nonce:
-        nonce_ex = "nonce"
-    else:
-        nonce_ex = "no-nonce"
-    dump_dir = dump_prefix + "{}/{}/".format(nonce_ex, mode)
-    from pathlib import Path
-    Path(dump_dir).mkdir(parents=True, exist_ok=True)
-
-    global is_nonce
-    if mode not in ["get", "post"] or nonce not in [True, False]:
-        print("bad parameters")
-        return
-
-    """
-        Set parameters
-    """
-    global config
-    config.nonce = nonce
-    config.mode = mode
-
-    is_nonce = config.nonce
-
-    starting_time = time.time()
 
     logger.info("Starting ocsp job now !")
 
@@ -333,22 +329,14 @@ def luminati_master_non_db(mode, nonce, dump_prefix):
     ocsp_urls_set = r.smembers("ocsp_urls")
     TOTAL_OCSP_URLS = get_ocsp_url_number(len(ocsp_urls_set))
     ocsp_urls_lst = [item.decode() for item in ocsp_urls_set][: TOTAL_OCSP_URLS]
-    # TODO
     # ocsp_urls_lst = ['http://ocsp.globalsign.com/prodrivetechnologiesgccr3ovtlsca2022']
     logger.info("Processing total {} ocsp urls".format(len(ocsp_urls_lst)))
-
-    ocsp_url_to_id_dict = {}
-    chosen_hop_list = choose_hops()
-    # hop_chunks = chunks(chosen_hop_list, 1000)
-    # TODO fix 2
-    chosen_hop_list = random.sample(chosen_hop_list, 100)
 
     logger.info("Chosen total {} hops".format(len(chosen_hop_list)))
 
     global id_to_hash, global_ans
     for ocsp_url in ocsp_urls_lst:
         try:
-
             epoch = int(time.time())
             day_index = ((epoch // (24 * 60 * 60)) % 2 + 1) % 2
             q_key = "{}-{}".format(day_index, ocsp_url)
@@ -356,21 +344,19 @@ def luminati_master_non_db(mode, nonce, dump_prefix):
             elements = r.lrange(q_key, 0, -1)
             elements = [e.decode() for e in elements]
             elements = list(set(elements))
+
             if len(elements) > 100:
                 elements = random.sample(elements, 100)
 
             if config.nonce:
                 asyncio.run(process_ocsp_urls_async(ocsp_url_list=[ocsp_url],
-                                                    ocsp_url_to_id_dict=ocsp_url_to_id_dict,
                                                     chosen_hop_list=chosen_hop_list, save=True, elements=elements))
             else:
                 for i in range(2):
                     asyncio.run(process_ocsp_urls_async(ocsp_url_list=[ocsp_url],
-                                                        ocsp_url_to_id_dict=ocsp_url_to_id_dict,
                                                         chosen_hop_list=chosen_hop_list, save=False, elements=elements))
 
                 asyncio.run(process_ocsp_urls_async(ocsp_url_list=[ocsp_url],
-                                                    ocsp_url_to_id_dict=ocsp_url_to_id_dict,
                                                     chosen_hop_list=chosen_hop_list, save=True, elements=elements))
 
             import json
@@ -398,13 +384,60 @@ Post:
     from OCSP_DNS_DJANGO.luminati_async_asn_non_db import *
 '''
 
+def chunks(lst, n):
+    ans = []
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        ans.append(lst[i:i + n])
+    return ans
+
 def init(mode, nonce, dump_prefix):
     # from OCSP_DNS_DJANGO.luminati_async_asn_non_db import *
     # init(mode="post", nonce=True, dump_prefix='/net/data/luminati/')
     # init(mode="post", nonce=False, dump_prefix='/net/data/luminati/')
 
+    '''
+            Creating Directory
+        '''
+    nonce_ex = ""
+    if nonce:
+        nonce_ex = "nonce"
+    else:
+        nonce_ex = "no-nonce"
+    dump_dir = dump_prefix + "{}/{}/".format(nonce_ex, mode)
+    from pathlib import Path
+    Path(dump_dir).mkdir(parents=True, exist_ok=True)
+
+    '''
+        Checking params
+    '''
+    global is_nonce
+    if mode not in ["get", "post"] or nonce not in [True, False]:
+        print("bad parameters")
+        return
+
+    """
+        Set parameters
+    """
+
+    global config
+    config.nonce = nonce
+    config.mode = mode
+    is_nonce = config.nonce
+
+
+    '''
+        Choose hops, currently local
+    '''
+    chosen_hop_list = choose_hops()
+    chosen_hop_chunks = chunks(chosen_hop_list, 100)
+
+    chunk_index = 0
     while True:
-        luminati_master_non_db(mode=mode, nonce=nonce, dump_prefix=dump_prefix)
+        luminati_master_non_db(mode=mode, nonce=nonce, dump_prefix=dump_prefix, chosen_hop_list=chosen_hop_chunks[chunk_index], dump_dir=dump_dir)
+        chunk_index += 1
+        if chunk_index >= len(chosen_hop_chunks):
+            chunk_index = 0
 # luminati_master_crawler_async_v2()
 
 

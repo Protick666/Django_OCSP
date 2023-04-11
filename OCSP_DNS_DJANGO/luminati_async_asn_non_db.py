@@ -3,6 +3,8 @@ import logging
 import random
 import time
 import traceback
+import base64
+from urllib.parse import urljoin
 
 import aiohttp
 import django
@@ -69,7 +71,8 @@ akid_to_cert = {}
 
 async def query_through_luminati(headers, ocsp_url, ocspReq,
                                  ocsp_url_id, serial_number, akid,
-                                 fingerprint, typer, session, element, ocspReqconfig, save, element_identifier):
+                                 fingerprint, typer, session, element,
+                                 ocspReqconfig, save, element_identifier):
     try:
         import random, string, time
         global config, id_to_hash
@@ -109,9 +112,18 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
 
         to_store['time-start'] = time.time()
 
-        async with session.post(url=ocsp_url,
-                                proxy=proxy_url,
-                                data=encoder.encode(ocspReq), headers=headers) as response:
+        if config.mode == 'post':
+            url = ocsp_url
+            data = encoder.encode(ocspReq)
+            chosen_function = session.post
+            args = {"url": url, "proxy": proxy_url, "headers": headers, "data": data}
+        elif config.mode == 'get':
+            req_path = base64.b64encode(encoder.encode(ocspReq))
+            url = urljoin(ocsp_url + '/', req_path.decode('ascii'))
+            chosen_function = session.get
+            args = {"url": url, "proxy": proxy_url, "headers": headers}
+
+        async with chosen_function(**args) as response:
 
             result_data = await response.read()
 
@@ -193,14 +205,13 @@ async def query_through_luminati(headers, ocsp_url, ocspReq,
 
         if 'non-200' in to_store['error']:
             for header in to_store['headers']:
-                # TODO massive see other causes of x-luminati-error:
+                # TODO massive see other causes of x-luminati-error:, also check dvcasha2.ocsp-certum.com for nonce/no-nonce diff
                 if 'x-luminati-error' in header.lower():
                     if 'proxy error' in headers[header].lower():
                         return
                     if 'agent_auth_lum timeout' in headers[header].lower():
                         return
 
-            a = 1
 
         if save and 'no-peers' not in to_store['error']:
             global_ans.append(to_store)

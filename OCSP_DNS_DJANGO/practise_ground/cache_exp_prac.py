@@ -2,6 +2,9 @@ import json
 import logging
 import time
 from random import randint
+import dill as pickle
+import traceback
+
 
 import django
 import requests
@@ -22,7 +25,7 @@ else:
     redis_host = REMOTE_REDIS_HOST
 
 
-r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
+r = redis.Redis(host=redis_host, port=6379, db=4, password="certificatesarealwaysmisissued")
 
 import redis
 
@@ -52,7 +55,7 @@ def get_ocsp_host_suffix(ocsp_url):
 
 
 def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre, ocspReq, headers):
-    print("Doing 1")
+
     response = None
 
 
@@ -71,14 +74,34 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre, ocspR
         response_time = time.monotonic() - starting_time
         decoded_response = return_ocsp_result(response.content, is_bytes=True)
 
+        d['response_len'] = len(response.content)
+
         d['response_status'] = str(decoded_response.response_status)
+
+        has_nonce = False
+
+        try:
+            for e in list(decoded_response.extensions):
+                if '1.3.6.1.5.5.7.48.1.2' in (str(e.oid)):
+                    has_nonce = True
+            d['has_nonce'] = has_nonce
+        except:
+            pass
+
+        # d['response_status'] = str(decoded_response.response_status)
+
+        if str(decoded_response.response_status) != "OCSPResponseStatus.SUCCESSFUL":
+            a = 1
+
         if str(decoded_response.response_status) == "OCSPResponseStatus.SUCCESSFUL":
             d['cert_status'] = str(decoded_response.certificate_status)
             d['produced_at'] = str(decoded_response.produced_at)
             d['this_update'] = str(decoded_response.this_update)
             d['next_update'] = str(decoded_response.next_update)
-            d['signature'] = str(decoded_response.signature)
+            # d['signature'] = str(decoded_response.signature)
+
             delegated_responder = False
+
             try:
                 if len(decoded_response.certificates) > 0:
                     delegated_responder = True
@@ -95,7 +118,7 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre, ocspR
 
         d['elapsed_time'] = response.elapsed.total_seconds()
         d['response_time'] = response_time
-        print("Doing 2")
+
         return d
 
     except Exception as e:
@@ -109,7 +132,7 @@ def make_ocsp_query(serial_number, akid, r, ocsp_url, ip_host, nonce, pre, ocspR
 
 
 def get_ips_of_urls():
-    r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
+    r = redis.Redis(host=redis_host, port=6379, db=4, password="certificatesarealwaysmisissued")
     ocsp_urls_set = r.smembers("ocsp:ocsp_urls")
     ocsp_urls_lst = [item.decode() for item in ocsp_urls_set]
 
@@ -125,7 +148,14 @@ def get_ips_of_urls():
     with open("url_to_ips.json", "w") as ouf:
         json.dump(d, fp=ouf, indent=2)
 
+
 ex_serial = '10028015818766309226464494355'
+
+f = open("ski_to_cert.json")
+skid_to_cert = json.load(f)
+def get_cert(akid):
+    cert_string = skid_to_cert[akid.upper()]
+    return cert_string
 
 def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False):
     d_d = {"with_nonce": {}, "without_nonce": {}}
@@ -134,12 +164,11 @@ def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False)
 
     #print(ocsp_url, serial_number, akid)
 
-    ca_cert = fix_cert_indentation(r.get("ocsp:akid:" + akid).decode())
+    ca_cert = fix_cert_indentation(get_cert(akid))
     ca_cert = pem.readPemFromString(ca_cert)
     issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
     ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)
     headers = get_ocsp_request_headers(ocsp_host)
-
 
     pre = [-1]
 
@@ -158,7 +187,6 @@ def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False)
         #print(c, data)
         #time.sleep(1)
         d_d['without_nonce'][c] = data
-
 
 
     pre = [-1]
@@ -182,92 +210,103 @@ def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False)
 
 
 
-def luminati_master_crawler_cache(ocsp_url, ip_host):
-    print("Doing {} {}".format(ocsp_url, ip_host))
-    ip_host = 'http://' + ip_host
+def luminati_master_crawler_cache(tuple):
+    try:
+        ocsp_url, ip_host = tuple
+        print(tuple)
+        print("Doing {} {}".format(ocsp_url, ip_host))
+        ip_host = 'http://' + ip_host
 
-    suffix = get_ocsp_host_suffix(ocsp_url)
-    if suffix:
-        ip_host = "{}{}".format(ip_host, suffix)
-        # if not ip_host.endswith("/"):
-        #     ip_host = ip_host + "/"
+        suffix = get_ocsp_host_suffix(ocsp_url)
+        if suffix:
+            ip_host = "{}{}".format(ip_host, suffix)
+            # if not ip_host.endswith("/"):
+            #     ip_host = ip_host + "/"
 
-    r = redis.Redis(host=redis_host, port=6379, db=0, password="certificatesarealwaysmisissued")
+        r = redis.Redis(host=redis_host, port=6379, db=4, password="certificatesarealwaysmisissued")
 
-    #TODO change
-    certs_per_bucket = 1
-    query_number = 50
+        # TODO change
+        certs_per_bucket = 1
+        query_number = 50
 
-    random_list = []
-    random_list_dynamic = []
+        random_list = []
+        random_list_dynamic = []
 
+        akid_c = None
 
+        import random, time
 
-    akid_c = None
+        epoch = int(time.time())
+        day_index = ((epoch // (24 * 60 * 60)) % 2 + 1) % 2
+        q_key = "{}-{}".format(day_index, ocsp_url)
+        elements = r.lrange(q_key, 0, -1)
+        elements = [e.decode() for e in elements]
+        print("{}: Len of elements {}".format(ocsp_url, len(elements)))
+        # print(ocsp_url)
+        # elements = list(set(elements))
+        # elements = random.sample(elements, certs_per_bucket)
+        new_list = [elements[-1]]
 
+        for i in range(certs_per_bucket):
+            random_list.append(random_with_N_digits(len(ex_serial)))
+            random_list_dynamic.append(random_with_N_digits(len(ex_serial)))
 
-    import random
+        from collections import defaultdict
+        ans = defaultdict(lambda: dict())
+        import time
 
-    q_key = "ocsp:serial:" + ocsp_url
-    elements = r.lrange(q_key, 0, -1)
-    elements = [e.decode() for e in elements]
-    print("{}: Len of elements {}".format(ocsp_url, len(elements)))
-    #print(ocsp_url)
-    #elements = list(set(elements))
-    #elements = random.sample(elements, certs_per_bucket)
-    new_list = [elements[-1]]
+        d = {}
+        for element in new_list:
+            serial_number_hex_str, fingerprint, akid = element.split(":")
+            serial_number = int(serial_number_hex_str, 16)
+            akid_c = akid
+            d_d = mid_exp(serial_number=serial_number, akid=akid, query_number=query_number, ocsp_url=ocsp_url,
+                          ip_host=ip_host, dynamic=False)
+            d[serial_number] = d_d
+        ans['new'] = d
 
-    for i in range(certs_per_bucket):
-        random_list.append(random_with_N_digits(len(ex_serial)))
-        random_list_dynamic.append(random_with_N_digits(len(ex_serial)))
+        d = {}
+        for e in random_list:
+            # serial_number, akid, fingerprint = element.split(":")
+            # akid_c = akid
+            d_d = mid_exp(serial_number=e, akid=akid_c, query_number=query_number, ocsp_url=ocsp_url,
+                          ip_host=ip_host, dynamic=False)
+            d[e] = d_d
 
-    from collections import defaultdict
-    ans = defaultdict(lambda: dict())
-    import time
+        ans['random'] = d
 
-    d = {}
-    for element in new_list:
-        serial_number, akid, fingerprint = element.split(":")
-        akid_c = akid
-        d_d = mid_exp(serial_number=serial_number, akid=akid, query_number=query_number, ocsp_url=ocsp_url, ip_host=ip_host, dynamic=False)
-        d[serial_number] = d_d
-    ans['new'] = d
+        d = {}
+        for e in random_list_dynamic:
+            # d_d = {"with_nonce": {}, "without_nonce": {}}
+            #
+            # pre = [-1]
+            # for c in range(query_number):
+            #     data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
+            #                            akid=akid_c, r=r,
+            #                            ocsp_url=ocsp_url,
+            #                            ip_host=ip_host, nonce=False, pre=pre)
+            #     d_d['without_nonce'][c] = data
+            #
+            # pre = [-1]
+            # for c in range(query_number):
+            #     data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
+            #                            akid=akid_c, r=r,
+            #                            ocsp_url=ocsp_url,
+            #                            ip_host=ip_host, nonce=True, pre=pre)
+            #     d_d['with_nonce'][c] = data
 
-    d = {}
-    for e in random_list:
-        # serial_number, akid, fingerprint = element.split(":")
-        # akid_c = akid
-        d_d = mid_exp(serial_number=e, akid=akid_c, query_number=query_number, ocsp_url=ocsp_url,
-                      ip_host=ip_host, dynamic=False)
-        d[e] = d_d
-    ans['random'] = d
+            d_d = mid_exp(serial_number=e, akid=akid_c, query_number=query_number, ocsp_url=ocsp_url,
+                          ip_host=ip_host, dynamic=True)
+            d[e] = d_d
+        ans['random_dynamic'] = d
 
-    d = {}
-    for e in random_list_dynamic:
-        # d_d = {"with_nonce": {}, "without_nonce": {}}
-        #
-        # pre = [-1]
-        # for c in range(query_number):
-        #     data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
-        #                            akid=akid_c, r=r,
-        #                            ocsp_url=ocsp_url,
-        #                            ip_host=ip_host, nonce=False, pre=pre)
-        #     d_d['without_nonce'][c] = data
-        #
-        # pre = [-1]
-        # for c in range(query_number):
-        #     data = make_ocsp_query(serial_number=random_with_N_digits(len(ex_serial)),
-        #                            akid=akid_c, r=r,
-        #                            ocsp_url=ocsp_url,
-        #                            ip_host=ip_host, nonce=True, pre=pre)
-        #     d_d['with_nonce'][c] = data
+        ans['url'] = ocsp_url
 
-        d_d = mid_exp(serial_number=e, akid=akid_c, query_number=query_number, ocsp_url=ocsp_url,
-                      ip_host=ip_host, dynamic=True)
-        d[e] = d_d
-    ans['random_dynamic'] = d
-
-    ans['url'] = ocsp_url
+        return dict(ans), ocsp_url, ip_host
+    except Exception as e:
+        traceback.print_exc()
+        print("err", e)
+        return {}, ocsp_url, ip_host
 
     # try:
     #     with open("jsons_v11/{}-cache_exp-{}.json".format(cdn, time.time()), "w") as ouf:
@@ -276,7 +315,7 @@ def luminati_master_crawler_cache(ocsp_url, ip_host):
     #     print(e)
     #     pass
 
-    return ans
+    # return ans
 
 
 def cache_exp_init_v5():
@@ -394,6 +433,56 @@ def cache_exp_init_v7():
 
         except Exception as e:
             print("Exception: {}-{}".format(key, e))
+
+def get_redis_host():
+    r = redis.Redis(host=redis_host, port=6379, db=4, password="certificatesarealwaysmisissued")
+    return r
+
+
+def do_it():
+    r = get_redis_host()
+    ocsp_urls_set = r.smembers("ocsp_urls")
+
+    ocsp_urls_list = [e.decode() for e in ocsp_urls_set]
+    ocsp_urls_list = ocsp_urls_list
+    arr = []
+
+    for ocsp_url in ocsp_urls_list:
+        try:
+            records = get_dns_records(ocsp_url)
+            a_records = [e[1] for e in records if e[0] == 'A_RECORD']
+            arr.append((ocsp_url, a_records[0]))
+        except:
+            pass
+
+    mother_dict = {}
+
+    ii = time.time()
+
+    from multiprocessing import Pool
+    with Pool() as pool:
+        for result in pool.imap_unordered(luminati_master_crawler_cache, arr):
+            ans, ocsp_url, ip_host = result
+            mother_dict[ocsp_url] = {
+                "a_record": ip_host,
+                "ans": ans
+            }
+
+    # for ocsp_url_ in ocsp_urls_set:
+    #     ocsp_url = ocsp_url_.decode()
+    #
+    #     data = luminati_master_crawler_cache(ocsp_url=ocsp_url, ip_host=a_records[0])
+    #     a = 1
+    #     mother_dict[ocsp_url] = {
+    #         "data": data,
+    #         "records": records
+    #     }
+
+    print("total time {}".format((time.time() - ii)/60))
+    with open("all_data.json", "w") as ouf:
+        json.dump(mother_dict, fp=ouf)
+    a = 1
+# do_it()
 
 
 

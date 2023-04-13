@@ -164,7 +164,7 @@ def mid_exp(serial_number, akid, query_number, ocsp_url, ip_host, dynamic=False)
 
     #print(ocsp_url, serial_number, akid)
 
-    ca_cert = fix_cert_indentation(get_cert(akid))
+    ca_cert = get_cert(akid)
     ca_cert = pem.readPemFromString(ca_cert)
     issuerCert, _ = decoder.decode(ca_cert, asn1Spec=rfc2459.Certificate())
     ocsp_host = get_ocsp_host(ocsp_url=ocsp_url)

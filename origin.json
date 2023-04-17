@@ -1,0 +1,1422 @@
+{
+  "http://status.geotrust.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/ca/gsatlaseccr5ovtlsca2023q2": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://itrusdv.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://GEANT.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp2.globalsign.com/gsalphasha2g2": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/gseccevsslca2018": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3dvtlsca2023q2": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.quovadisglobal.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.entrust.net": {
+    "org": "Akamai Technologies, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.starfieldtech.com/": {
+    "org": "Sucuri",
+    "type": 4,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.swisssign.net/DA34D48E1023F46A2D6CB41FF32811DE5E01C4DE": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.apple.com/ocsp03-apevsrsaca3g101": {
+    "org": "Apple Inc.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.pki.goog/s/gts1p5/CKo8RHsyt4Y": {
+    "org": "Google LLC",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/cuisecgccr3tlsdvca2021": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/gsatlaseccr5ovtlsca2023q1": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://lh.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://nijimo.ocsp.secomtrust.net": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://zerossl.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://sr30.ocsp.secomtrust.net": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/validsslovca2018": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp05.actalis.it/VA/AUTHEV-G3": {
+    "org": "Aruba S.p.A.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://digitaltrust.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://abitabdv.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.swisssign.ch/sign/ocs-aaccced5-66e8-4069-9b1b-fd29ab73efec": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.swisssign.net/ACD03AC2C25755916911CC706A59388A8CAC9C3D": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.serpro.gov.br/acserprosslv1": {
+    "org": "SERVICO FEDERAL DE PROCESSAMENTO DE DADOS - SERPRO",
+    "type": 1,
+    "delegation": true,
+    "origin": 1
+  },
+  "http://ocsp.pki.goog/s/gts1d4/AwzopMrwWjw": {
+    "org": "Google LLC",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3dvtlsca2023q1": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://abitabov.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://status.thawte.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://xinchachaov.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://onesign.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp2.globalsign.com/gsorganizationvalsha2g3": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://abitabev.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.securecore-ca.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.e3m01.amazontrust.com": {
+    "org": "Amazon",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://alpiro.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.catrust.oemssl.cn": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.pki.goog/s/gts1p5/nKxlvt3lONc": {
+    "org": "Google LLC",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://xinchacha2dv.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://rootnetworksdv.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp2.globalsign.com/gsorganizationvalsha2g2": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://commercial.ocsp.identrust.com": {
+    "org": "IdenTrust",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.emSign.com": {
+    "org": "Bharti Airtel Limited",
+    "type": 4,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.e2m02.amazontrust.com": {
+    "org": "Amazon",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/prodrivetechnologiesgccr3ovtlsca2022": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp2.globalsign.com/gsextendvalsha2g3r3": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://tiTrust.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://rsarootca2023.ocsp.secom-cert.jp": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://eMudhra.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/gsrsadvsslca2018": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/dhltlscai5": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.comodoca4.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": null,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.e3m02.amazontrust.com": {
+    "org": "Amazon",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp09.actalis.it/VA/AUTHOV-G3": {
+    "org": "Aruba S.p.A.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://nazwassl2sha2.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://rapidssl-ocsp.geotrust.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.digicert.cn": {
+    "org": "Alibaba (US) Technology Co., Ltd.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://r3.o.lencr.org": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.apple.com/ocsp03-appleistca2g129": {
+    "org": "Apple Inc.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/validalphasslca2018": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ovca5.ocsp.secomtrust.net": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3alphasslca2023q2": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://xinchacha2ov.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.sbca.telesec.de/ocspr": {
+    "org": "T-Systems International GmbH",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": false
+  },
+  "http://ocsp.apple.com/ocsp03-apevsecc1g101": {
+    "org": "Apple Inc.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://soomadv.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://commercialpte.ocsp.identrust.com": {
+    "org": "IdenTrust",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.netsolssl.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.comodoca.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://tlsrsarootca2023.ocsp.secom-cert.jp": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://dvcasha2.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://niig7rsa.ocsp.secom-cert.jp": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp2.globalsign.com/cloudsslsha2g3": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.pki.goog/s/gts1p5/mjn-52PjnYI": {
+    "org": "Google LLC",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://dv.g4.ocsp.pubcert.jprs.jp": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.apple.com/ocsp03-apsrsa12g101": {
+    "org": "Apple Inc.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.pki.goog/s/gts1d4/9K1l6Vp-zpU": {
+    "org": "Google LLC",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.digicert.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://oneocsp.microsoft.com/ocsp": {
+    "org": "Microsoft Corporation",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.trustcor.ca": {
+    "org": "cloudfront",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/gseccovsslca2018": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3dvtlsca2022q4": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://genious.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocspx.digicert.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.swisssign.net/3C9E527903636F4F9C811BD328700C245AEAA587": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://nijimo.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.wisekey.com": {
+    "org": "amazon",
+    "type": 2,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": false
+  },
+  "http://statuse.digitalcertvalidation.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://evcasha2.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/gsrsaovsslca2018": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp-pte.actalis.it/ocsp/authsubcadv": {
+    "org": "Aruba S.p.A.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://unitedtrustov.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.global.sheca.com/ovscag5": {
+    "org": "Alibaba (US) Technology Co., Ltd.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.crlocsp.cn": {
+    "org": "Beijing Qihu Technology Company Limited",
+    "type": 4,
+    "delegation": null,
+    "origin": 1
+  },
+  "http://evsslocsp.twca.com.tw/": {
+    "org": "Taiwan Fixed Network, Telco and Network Service Provider.",
+    "type": 4,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": false
+  },
+  "http://ev2.ocsp.secomtrust.net": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://twcasslocsp.twca.com.tw/": {
+    "org": "Taiwan Fixed Network, Telco and Network Service Provider.",
+    "type": 4,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": false
+  },
+  "http://ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.pki.goog/s/gts1d4/aEL1pyc03DI": {
+    "org": "Google LLC",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.xinchacha.oemssl.cn": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://gdcadv.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3alphasslca2023q1": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ov.g4.ocsp.pubcert.jprs.jp": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.int-r1.certainly.com": {
+    "org": "Fastly",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://globessl.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.apple.com/ocsp03-apevsrsa1g101": {
+    "org": "Apple Inc.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://cyberfolks.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.godaddy.com/": {
+    "org": "Sucuri",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://gdcaov.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://statusd.digitalcertvalidation.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/acdefesagr3ovtlsca2023": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp2.globalsign.com/solutidvsha256g3": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.ssl.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://nyatworkdv.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.int-e1.certainly.com": {
+    "org": "Fastly",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.trust.telia.com": {
+    "org": "Telia Company AB",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.pki.goog/s/gts1p5/AS87VWz5ti4": {
+    "org": "Google LLC",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://statush.digitalcertvalidation.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://nijimo3.ocsp.secomtrust.net": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/attatlasr3ovtlsca2020": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.serverid.telesec.de/ocspr": {
+    "org": "T-Systems International GmbH",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": false
+  },
+  "http://status.rapidssl.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://xinchachadv.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp06.actalis.it/VA/AUTHDV-G3": {
+    "org": "Aruba S.p.A.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/gsgccr3evqwacca2020": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/gsgccr3dvtlsca2020": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.incommon-igtf.org": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3ovtlsca2023q1": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.apple.com/ocsp03-apevsrsa2g101": {
+    "org": "Apple Inc.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.apple.com/ocsp03-apsecc12g101": {
+    "org": "Apple Inc.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://Certera.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp2.globalsign.com/solutievsha256g3": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/tkelevatoratlasr6dvca2021": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3dvtlsca2022q3": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://wotrus-ovca.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.r2m02.amazontrust.com": {
+    "org": "Amazon",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://certdata.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.pki.goog/s/gts1p5/D-5FRo8GE8k": {
+    "org": "Google LLC",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3ovtlsca2023q2": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp2.globalsign.com/solutiovsha256g3": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/alphasslcasha256g4": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.dcocsp.cn": {
+    "org": "Alibaba (US) Technology Co., Ltd.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.sectigochina.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.serverpass.telesec.de/ocspr": {
+    "org": "T-Systems International GmbH",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": false
+  },
+  "http://ocsp.apple.com/ocsp03-appleistca2g127": {
+    "org": "Apple Inc.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3dvacmeca2023q2": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.pca.dfn.de/OCSP-Server/OCSP": {
+    "org": "Verein zur Foerderung eines Deutschen Forschungsnetzes e.V.",
+    "type": 4,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp2.globalsign.com/gsdomainvalsha2g2": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.e2m01.amazontrust.com": {
+    "org": "Amazon",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.r2m01.amazontrust.com": {
+    "org": "Amazon",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.harica.gr": {
+    "org": "Aristotle University of Thessaloniki",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/rnpicpeduovsslca2019": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.sca1b.amazontrust.com": {
+    "org": "Amazon",
+    "type": 1,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3alphasslca2022q3": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ziwit.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.cntrus.oemssl.cn": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp-pte.actalis.it/ocsp/authsubcaov": {
+    "org": "Aruba S.p.A.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://h.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://esafer.ocsp.sectigo.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.globalsign.com/ca/gsatlasr3dvtlsca2022q2": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  },
+  "http://ocsp.buypass.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://e1.o.lencr.org": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.incommon-ecc.org": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.apple.com/ocsp03-appleistca2g128": {
+    "org": "Apple Inc.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ovcasha2.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://shoperssl.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.global.sheca.com/dvscag5": {
+    "org": "Alibaba (US) Technology Co., Ltd.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsps.ssl.com": {
+    "org": "Amazon.com, Inc.",
+    "type": 2,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.msocsp.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://statusf.digitalcertvalidation.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp.trust-provider.cn": {
+    "org": "Alibaba (US) Technology Co., Ltd.",
+    "type": 3,
+    "delegation": null,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://niig7ecc.ocsp.secom-cert.jp": {
+    "org": "SECOM Trust Systems Co.,Ltd.",
+    "type": 1,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://xinchachaev.ocsp-certum.com": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.pre.swisssign.ch/sign/ocs-192cba97-3391-4237-8fad-b3973d0170ce": {
+    "org": "Akamai International B.V.",
+    "type": 3,
+    "delegation": true,
+    "origin": 2,
+    "response_signed": true,
+    "nonce_support": true
+  },
+  "http://ocsp.usertrust.com": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": false,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp2.digicert.com": {
+    "org": "MCI Communications Services, Inc. d/b/a Verizon Business",
+    "type": 1,
+    "delegation": false,
+    "origin": 2,
+    "response_signed": false,
+    "nonce_support": false
+  },
+  "http://ocsp2.globalsign.com/gsdomainvalsha2g3": {
+    "org": "Cloudflare, Inc.",
+    "type": 3,
+    "delegation": true,
+    "origin": 1,
+    "response_signed": false,
+    "nonce_support": true
+  }
+}
